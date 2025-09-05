@@ -1,11 +1,10 @@
-import React from 'react';
-import { useApp } from '@/context';
-import { Select, SelectLabelCrypt, SelectLabelLibrary } from '@/components';
-import { filterCrypt, filterLibrary, getIsPlaytest } from '@/utils';
-import { ID, NAME, TWD, CRYPT, LIBRARY, VALUE } from '@/constants';
+import { Select, SelectLabelCrypt, SelectLabelLibrary } from "@/components";
+import { CRYPT, ID, LIBRARY, NAME, TWD, VALUE } from "@/constants";
+import { useApp } from "@/context";
+import { filterCrypt, filterLibrary, getIsPlaytest } from "@/utils";
 
-const STARTING_WITH = 'startingWith';
-const OTHER = 'other';
+const STARTING_WITH = "startingWith";
+const OTHER = "other";
 
 const getMatches = (inputValue, filterAction, playtestMode, inInventory) => {
   const input = { [NAME]: inputValue };
@@ -17,9 +16,9 @@ const getMatches = (inputValue, filterAction, playtestMode, inInventory) => {
 
       if (card[NAME].toLowerCase().startsWith(inputValue.toLowerCase())) {
         startingWith.push({ [VALUE]: card[ID] });
-      } else {
-        return true;
+        return false;
       }
+      return true;
     })
     .map((card) => ({
       [VALUE]: card[ID],
@@ -52,24 +51,23 @@ const CardSelect = ({
   target,
   value,
   inInventory,
-  placeholder = 'Enter Card Name',
+  placeholder = "Enter Card Name",
   autoFocus,
   onChange,
   menuPlacement,
   ref,
 }) => {
   const { cryptCardBase, libraryCardBase, playtestMode } = useApp();
-  const filterCryptAction = (filter) => filterCrypt(cryptCardBase, filter);
-  const filterLibraryAction = (filter) => filterLibrary(libraryCardBase, filter);
+  const filterCryptAction = (filter) => filterCrypt(filter, cryptCardBase);
+  const filterLibraryAction = (filter) => filterLibrary(filter, libraryCardBase);
 
   const getOptionLabel = (option) => {
     const cardid = option.value;
 
     if (cardid > 200000) {
       return <SelectLabelCrypt cardid={cardid} inInventory={inInventory} />;
-    } else {
-      return <SelectLabelLibrary cardid={cardid} inInventory={inInventory} />;
     }
+    return <SelectLabelLibrary cardid={cardid} inInventory={inInventory} />;
   };
 
   const byTwd = (a, b) => {
@@ -83,8 +81,8 @@ const CardSelect = ({
 
   const loadOptions = async (inputValue) => {
     if (
-      (inputValue.length > 2 && !inputValue.startsWith('the')) ||
-      (inputValue.length > 3 && !inputValue.startsWith('the ')) ||
+      (inputValue.length > 2 && !inputValue.startsWith("the")) ||
+      (inputValue.length > 3 && !inputValue.startsWith("the ")) ||
       inputValue.length > 4
     ) {
       const { cryptMatches, libraryMatches } = getAllMatches(
@@ -101,7 +99,8 @@ const CardSelect = ({
           ...cryptMatches[STARTING_WITH].toSorted(byTwd),
           ...cryptMatches[OTHER].toSorted(byTwd),
         ];
-      } else if (target === LIBRARY) {
+      }
+      if (target === LIBRARY) {
         return [
           ...libraryMatches[STARTING_WITH].toSorted(byTwd),
           ...libraryMatches[OTHER].toSorted(byTwd),
@@ -117,6 +116,7 @@ const CardSelect = ({
   return (
     <Select
       variant="async"
+      isSearchable
       autoFocus={autoFocus}
       getOptionLabel={getOptionLabel}
       loadOptions={loadOptions}

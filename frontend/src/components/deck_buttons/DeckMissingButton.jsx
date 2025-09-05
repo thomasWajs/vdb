@@ -1,7 +1,6 @@
-import React from 'react';
-import Cart4 from '@icons/cart4.svg?react';
-import { ButtonIconed } from '@/components';
-import { useApp } from '@/context';
+import Cart4 from "@icons/cart4.svg?react";
+import { ButtonIconed } from "@/components";
+import { useApp } from "@/context";
 
 const DeckMissingButton = ({ setShow }) => {
   const { isDesktop, setShowFloatingButtons, setShowMenuButtons } = useApp();
@@ -14,7 +13,7 @@ const DeckMissingButton = ({ setShow }) => {
 
   return (
     <ButtonIconed
-      variant={isDesktop ? 'secondary' : 'primary'}
+      variant={isDesktop ? "secondary" : "primary"}
       onClick={handleClick}
       title="Get Missing in Inventory Cards"
       icon={<Cart4 />}

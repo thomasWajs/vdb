@@ -1,35 +1,34 @@
 {
-  "Promo": {
-    "name": "Promo",
-    "date": ""
-  },
-  "POD": {
-    "name": "Print-on-Demand (DTC)",
-    "date": ""
-  },
   "playtest": {
     "name": "PLAYTEST",
     "date": "",
     "precons": {
+      "BbN": {
+        "name": "Brazil By Night",
+        "clan": "Bundle"
+      },
+      "SoNY": {
+        "name": "Shadows of New York",
+        "clan": "Bundle"
+      },
       "SCai": {
         "name": "Path of Caine",
-        "clan": "Caine"
+        "clan": "Caine",
+        "playtest_old": true
       },
       "SCat": {
         "name": "Path of Cathari",
-        "clan": "Cathari"
+        "clan": "Cathari",
+        "playtest_old": true
       },
       "SDS": {
         "name": "Path of Death",
-        "clan": "Death and the Soul"
+        "clan": "Death and the Soul",
+        "playtest_old": true
       },
       "SPIV": {
         "name": "Path of Power",
-        "clan": "Power and the Inner Voice"
-      },
-      "PH": {
-        "name": "Hecata",
-        "clan": "Hecata",
+        "clan": "Power and the Inner Voice",
         "playtest_old": true
       },
       "NR": {
@@ -46,16 +45,100 @@
         "name": "New Blood: Tzimisce",
         "clan": "Tzimisce",
         "playtest_old": true
+      }
+    }
+  },
+  "Promo": {
+    "name": "Promo",
+    "date": ""
+  },
+  "POD": {
+    "name": "Print-on-Demand (DTC)",
+    "date": ""
+  },
+  "2P": {
+    "name": "Two Players",
+    "date": "",
+    "precons": {
+      "BH": {
+        "name": "Banu Haqim",
+        "clan": "Banu Haqim"
       },
-      "NH": {
-        "name": "New Blood: Hecata",
-        "clan": "Hecata",
-        "playtest_old": true
+      "B": {
+        "name": "Brujah",
+        "clan": "Brujah"
       },
-      "NL": {
-        "name": "New Blood: Lasombra",
-        "clan": "Lasombra",
-        "playtest_old": true
+      "G": {
+        "name": "Gangrel",
+        "clan": "Gangrel"
+      },
+      "H": {
+        "name": "Hecata",
+        "clan": "Hecata"
+      },
+      "L": {
+        "name": "Lasombra",
+        "clan": "Lasombra"
+      },
+      "M": {
+        "name": "Malkavian",
+        "clan": "Malkavian"
+      },
+      "Mi": {
+        "name": "Ministry",
+        "clan": "Ministry"
+      },
+      "N": {
+        "name": "Nosferatu",
+        "clan": "Nosferatu"
+      },
+      "R": {
+        "name": "Ravnos",
+        "clan": "Ravnos"
+      },
+      "Sal": {
+        "name": "Salubri",
+        "clan": "Salubri"
+      },
+      "To": {
+        "name": "Toreador",
+        "clan": "Toreador"
+      },
+      "Tr": {
+        "name": "Tremere",
+        "clan": "Tremere"
+      },
+      "Tz": {
+        "name": "Tzimisce",
+        "clan": "Tzimisce"
+      },
+      "V": {
+        "name": "Ventrue",
+        "clan": "Ventrue"
+      }
+    }
+  },
+  "NB3": {
+    "name": "New Blood III",
+    "date": "2025-05-31",
+    "precons": {
+      "PH": {
+        "name": "Hecata",
+        "clan": "Hecata"
+      },
+      "PL": {
+        "name": "Lasombra",
+        "clan": "Lasombra"
+      }
+    }
+  },
+  "V5H": {
+    "name": "Fifth Edition (Hecata)",
+    "date": "2025-02-28",
+    "precons": {
+      "PH": {
+        "name": "Hecata",
+        "clan": "Hecata"
       }
     }
   },

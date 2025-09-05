@@ -1,80 +1,93 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useImmer } from 'use-immer';
-import { useSnapshot } from 'valtio';
-import { set, setMany, getMany, update } from 'idb-keyval';
-import { playtestServices, userServices, cardServices } from '@/services';
-import { getLocalStorage, setLocalStorage } from '@/services/storageServices';
-import { useWindowSize } from '@/hooks';
-import { parseDeck, deepClone, byTimestamp } from '@/utils';
+import { getMany, set, setMany, update } from "idb-keyval";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useImmer } from "use-immer";
+import { useSnapshot } from "valtio";
+import limitedV5 from "@/assets/data/limitedV5.json";
 import {
+  ALLOWED,
   BRANCHES,
   CAPACITY_MIN_MAX,
   CARDS,
   CRYPT,
+  CUSTOM,
   DATE_NEW_OLD,
   DECK,
   DECKID,
   DECKS,
   EN,
   IS_AUTHOR,
-  IS_FROZEN,
   IS_BRANCHES,
+  IS_FROZEN,
   LIBRARY,
   LIMITED_ALLOWED_CRYPT,
   LIMITED_ALLOWED_LIBRARY,
   LIMITED_BANNED_CRYPT,
   LIMITED_BANNED_LIBRARY,
+  LIMITED_ONLY_DECKS,
   LIMITED_SETS,
   MASTER,
   NAME,
   NATIVE_CRYPT,
   NATIVE_LIBRARY,
   PDA,
+  PLAYTEST,
   PUBLIC_PARENT,
   QUANTITYx,
   RANK_HIGH_LOW,
+  SETS,
   SRC,
   TEXT,
   TWD,
+  TWO_P,
   TYPE,
-} from '@/constants';
+  V5,
+} from "@/constants";
 import {
-  setLimitedSets,
+  deckLocalize,
+  deckStore,
+  inventoryStore,
+  limitedFullStore,
   setLimitedAllowedCrypt,
   setLimitedAllowedLibrary,
   setLimitedBannedCrypt,
   setLimitedBannedLibrary,
+  setLimitedSets,
   setupUsedInventory,
-  limitedFullStore,
-  deckStore,
-  inventoryStore,
-  deckLocalize,
-} from '@/context';
+} from "@/context";
+import { useWindowSize } from "@/hooks";
+import { cardServices, playtestServices, userServices } from "@/services";
+import { getLocalStorage, setLocalStorage } from "@/services/storageServices";
+import { byTimestamp, deepClone, parseDeck } from "@/utils";
 
-const CRYPT_SEARCH_SORT = 'cryptSearchSort';
-const CRYPT_DECK_SORT = 'cryptDeckSort';
-const CRYPT_INVENTORY_SORT = 'cryptInventorySort';
-const LIBRARY_SEARCH_SORT = 'libraryInventorySort';
-const LIBRARY_INVENTORY_SORT = 'libraryInventorySort';
-const TWD_SEARCH_SORT = 'twdSearchSort';
-const PDA_SEARCH_SORT = 'pdaSearchSort';
-const TDA_SEARCH_SORT = 'tdaSearchSort';
-const LANG = 'lang';
-const ADD_MODE = 'addMode';
-const INVENTORY_MODE = 'inventoryMode';
-const LIMITED_MODE = 'limitedMode';
-const PLAYTEST_MODE = 'playtestMode';
-const SHOW_IMAGE = 'showImage';
-const SHOW_LEGACY_IMAGE = 'showLegacyImage';
-const RECENT_DECKS = 'recentDecks';
-const ONLINE = 'online';
-const OFFLINE = 'offline';
-const CARD_VERSION_KEY = 'cardVersion';
-const CRYPT_CARDBASE = 'cryptCardBase';
-const LIBRARY_CARDBASE = 'libraryCardBase';
-const LOCALIZED_CRYPT = 'localizedCrypt';
-const LOCALIZED_LIBRARY = 'localizedLibrary';
-const PRECON_DECKS = 'preconDecks';
+const CRYPT_SEARCH_SORT = "cryptSearchSort";
+const CRYPT_DECK_SORT = "cryptDeckSort";
+const CRYPT_INVENTORY_SORT = "cryptInventorySort";
+const LIBRARY_SEARCH_SORT = "libraryInventorySort";
+const LIBRARY_INVENTORY_SORT = "libraryInventorySort";
+const DECKS_ADV_SORT = "decksAdvSort";
+const TWD_SEARCH_SORT = "twdSearchSort";
+const PDA_SEARCH_SORT = "pdaSearchSort";
+const TDA_SEARCH_SORT = "tdaSearchSort";
+const LANG = "lang";
+const ADD_MODE = "addMode";
+const INVENTORY_MODE = "inventoryMode";
+const LIMITED_MODE = "limitedMode";
+const LIMITED_PRESET = "limitedPreset";
+const PLAYTEST_MODE = "playtestMode";
+const SHOW_IMAGE = "showImage";
+const SHOW_LEGACY_IMAGE = "showLegacyImage";
+const RECENT_DECKS = "recentDecks";
+const ONLINE = "online";
+const OFFLINE = "offline";
+const CARD_VERSION_KEY = "cardVersion";
+const CRYPT_CARDBASE = "cryptCardBase";
+const LIBRARY_CARDBASE = "libraryCardBase";
+const LOCALIZED_CRYPT = "localizedCrypt";
+const LOCALIZED_LIBRARY = "localizedLibrary";
+const PRECON_DECKS = "preconDecks";
+const IS_PLAYTEST = "isPlaytest";
+const IS_PLAYTESTER = "is_playtester";
+const IS_ADMIN = "is_admin";
 
 export const AppContext = React.createContext();
 
@@ -84,7 +97,6 @@ export const AppProvider = ({ children }) => {
   const isNarrow = useMemo(() => screenSize <= 1024, [screenSize]);
   const isDesktop = useMemo(() => screenSize >= 1280, [screenSize]);
   const isWide = useMemo(() => screenSize >= 1440, [screenSize]);
-  const isXWide = useMemo(() => screenSize >= 1920, [screenSize]);
 
   const [userData, setUserData] = useState();
   const [username, setUsername] = useState();
@@ -105,12 +117,17 @@ export const AppProvider = ({ children }) => {
   const [addMode, setAddMode] = useState(getLocalStorage(ADD_MODE) ?? isDesktop);
   const [inventoryMode, setInventoryMode] = useState(getLocalStorage(INVENTORY_MODE) ?? false);
   const [limitedMode, setLimitedMode] = useState(getLocalStorage(LIMITED_MODE) ?? false);
+  const [limitedPreset, setLimitedPreset] = useState(getLocalStorage(LIMITED_PRESET) ?? false);
+  const [limitedOnlyDecks, setLimitedOnlyDecks] = useState(
+    getLocalStorage(LIMITED_ONLY_DECKS) ?? false,
+  );
   const [searchInventoryMode, setSearchInventoryMode] = useState();
   const [searchMissingInventoryMode, setSearchMissingInventoryMode] = useState();
   const [cryptDeckSort, setCryptDeckSort] = useState(getLocalStorage(CRYPT_DECK_SORT) ?? QUANTITYx);
   const [cryptSearchSort, setCryptSearchSort] = useState(
     getLocalStorage(CRYPT_SEARCH_SORT) ?? CAPACITY_MIN_MAX,
   );
+  const [decksAdvSort, setDecksAdvSort] = useState(getLocalStorage(DECKS_ADV_SORT) ?? NAME);
   const [cryptInventorySort, setCryptInventorySort] = useState(
     getLocalStorage(CRYPT_INVENTORY_SORT) ?? NAME,
   );
@@ -132,13 +149,13 @@ export const AppProvider = ({ children }) => {
   const [showFloatingButtons, setShowFloatingButtons] = useState(true);
   const [showMenuButtons, setShowMenuButtons] = useState();
 
-  const updatePlaytestProfile = (target, value) => {
+  const updatePlaytestProfile = useCallback((target, value) => {
     setPlaytestProfile((prevState) => ({
       ...prevState,
       [target]: value,
     }));
     playtestServices.updateProfile(target, value);
-  };
+  }, []);
 
   const [cryptCardBase, setCryptCardBase] = useImmer();
   const [libraryCardBase, setLibraryCardBase] = useImmer();
@@ -157,11 +174,12 @@ export const AppProvider = ({ children }) => {
 
   // CARD BASE
   const CARD_VERSION = import.meta.env.VITE_CARD_VERSION;
-  const fetchAndSetCardBase = (isIndexedDB = true) => {
-    cardServices.getCardBase().then((data) => {
+  const fetchAndSetCardBase = (isIndexedDB, secret) => {
+    cardServices.getCardBase(secret).then((data) => {
       if (isIndexedDB) {
         setMany([
           [CARD_VERSION_KEY, CARD_VERSION],
+          [IS_PLAYTEST, !!secret],
           [CRYPT_CARDBASE, data[CRYPT]],
           [LIBRARY_CARDBASE, data[LIBRARY]],
           [NATIVE_CRYPT, data[NATIVE_CRYPT]],
@@ -178,24 +196,57 @@ export const AppProvider = ({ children }) => {
       setLocalizedCrypt({ [EN]: data[NATIVE_CRYPT] });
       setLocalizedLibrary({ [EN]: data[NATIVE_LIBRARY] });
 
-      cardServices.getPreconDecks(data[CRYPT], data[LIBRARY]).then((preconData) => {
+      cardServices.getPreconDecks(data[CRYPT], data[LIBRARY], secret).then((preconData) => {
         if (isIndexedDB) set(PRECON_DECKS, deepClone(preconData));
         setPreconDecks(preconData);
       });
     });
   };
 
-  const setLimitedFormat = (lac, lal, lbc, lbl, ls) => {
+  useEffect(() => {
+    switch (limitedPreset) {
+      case V5:
+        setLimitedAllowedCrypt(limitedV5[ALLOWED][CRYPT]);
+        setLimitedAllowedLibrary(limitedV5[ALLOWED][LIBRARY]);
+        setLimitedSets(limitedV5[SETS]);
+        setLimitedBannedCrypt({});
+        setLimitedBannedLibrary({});
+        break;
+      case TWO_P:
+        setLimitedAllowedCrypt({});
+        setLimitedAllowedLibrary({});
+        setLimitedSets({ "2P": true });
+        setLimitedBannedCrypt({});
+        setLimitedBannedLibrary({});
+        break;
+      case CUSTOM:
+        getMany([
+          LIMITED_ALLOWED_CRYPT,
+          LIMITED_ALLOWED_LIBRARY,
+          LIMITED_BANNED_CRYPT,
+          LIMITED_BANNED_LIBRARY,
+          LIMITED_SETS,
+        ]).then(([lac, lal, lbc, lbl, ls]) => {
+          setLimitedFormat(lac, lal, lbc, lbl, ls);
+        });
+        break;
+      default:
+        if (limitedMode) toggleLimitedMode();
+    }
+  }, [limitedPreset]);
+
+  const setLimitedFormat = useCallback((lac, lal, lbc, lbl, ls) => {
     if (lac) setLimitedAllowedCrypt(lac);
     if (lal) setLimitedAllowedLibrary(lal);
     if (lbc) setLimitedBannedCrypt(lbc);
     if (lbl) setLimitedBannedLibrary(lbl);
     if (ls) setLimitedSets(ls);
-  };
+  }, []);
 
   useEffect(() => {
     getMany([
       CARD_VERSION_KEY,
+      IS_PLAYTEST,
       CRYPT_CARDBASE,
       LIBRARY_CARDBASE,
       NATIVE_CRYPT,
@@ -203,15 +254,10 @@ export const AppProvider = ({ children }) => {
       LOCALIZED_CRYPT,
       LOCALIZED_LIBRARY,
       PRECON_DECKS,
-      LIMITED_ALLOWED_CRYPT,
-      LIMITED_ALLOWED_LIBRARY,
-      LIMITED_BANNED_CRYPT,
-      LIMITED_BANNED_LIBRARY,
-      LIMITED_SETS,
     ])
-      .then(([v, cb, lb, nc, nl, lc, ll, pd, lac, lal, lbc, lbl, ls]) => {
-        if (!v || CARD_VERSION > v) {
-          fetchAndSetCardBase();
+      .then(([v, pt, cb, lb, nc, nl, lc, ll, pd, _lac, _lal, _lbc, _lbl, _ls]) => {
+        if (!v || CARD_VERSION > v || (userData?.[PLAYTEST][IS_PLAYTESTER] && !pt)) {
+          fetchAndSetCardBase(true, userData?.[PLAYTEST]?.secret);
         } else {
           limitedFullStore[CRYPT] = cb;
           limitedFullStore[LIBRARY] = lb;
@@ -223,12 +269,13 @@ export const AppProvider = ({ children }) => {
           setLocalizedLibrary(ll);
           setPreconDecks(pd);
         }
-        setLimitedFormat(lac, lal, lbc, lbl, ls);
       })
       .catch(() => {
-        fetchAndSetCardBase(false);
+        fetchAndSetCardBase(false, userData?.[PLAYTEST]?.secret);
       });
+  }, [userData]);
 
+  useEffect(() => {
     userServices.whoAmI().then((data) => {
       if (data.success === false) {
         setUserData(null);
@@ -257,30 +304,37 @@ export const AppProvider = ({ children }) => {
     return inventoryData;
   };
 
-  const initializeUserData = (data) => {
-    setUsername(data.username);
-    setPublicName(data.public_name);
-    setEmail(data.email);
-    setInventoryKey(data.inventory_key);
-    setIsPlaytester(data.playtest.is_playtester);
-    setIsPlaytestAdmin(data.playtest.is_admin);
-    setPlaytestProfile(data.playtest.profile);
-    if (!data.playtest.is_playtester && !data.playtest.is_admin) setPlaytestMode(false);
-    const {
-      [IS_FROZEN]: isFrozen,
-      [CRYPT]: crypt,
-      [LIBRARY]: library,
-    } = parseInventoryData(data.inventory);
-    inventoryStore[IS_FROZEN] = isFrozen;
-    inventoryStore[CRYPT] = crypt;
-    inventoryStore[LIBRARY] = library;
-    deckStore[DECKS] = parseDecksData(data.decks);
-  };
+  const initializeUserData = useCallback(
+    (data) => {
+      if (cryptCardBase && libraryCardBase) {
+        setUsername(data.username);
+        setPublicName(data.public_name);
+        setEmail(data.email);
+        setInventoryKey(data.inventory_key);
+        setIsPlaytester(data[PLAYTEST][IS_PLAYTESTER]);
+        setIsPlaytestAdmin(data[PLAYTEST][IS_ADMIN]);
+        setPlaytestProfile(data[PLAYTEST].profile);
+        if (!data[PLAYTEST][IS_PLAYTESTER] && !data[PLAYTEST][IS_ADMIN]) setPlaytestMode(false);
+        const {
+          [IS_FROZEN]: isFrozen,
+          [CRYPT]: crypt,
+          [LIBRARY]: library,
+        } = parseInventoryData(data.inventory);
+        inventoryStore[IS_FROZEN] = isFrozen;
+        inventoryStore[CRYPT] = crypt;
+        inventoryStore[LIBRARY] = library;
+        deckStore[DECKS] = parseDecksData(data[DECKS]);
+      }
+    },
+    [deckStore, inventoryStore, cryptCardBase, libraryCardBase],
+  );
 
-  const initializeUnauthenticatedUser = () => {
+  const initializeUnauthenticatedUser = useCallback(() => {
     setAddMode(false);
     setInventoryMode(false);
     setLimitedMode(false);
+    setLimitedPreset(false);
+    setLimitedOnlyDecks(false);
     setIsPlaytester(false);
     setIsPlaytestAdmin(false);
     setPlaytestMode(false);
@@ -292,7 +346,7 @@ export const AppProvider = ({ children }) => {
       deckStore[DECK] = undefined;
     }
     deckStore[DECKS] = undefined;
-  };
+  }, [deckStore, inventoryStore]);
 
   useEffect(() => {
     if (cryptCardBase && libraryCardBase) {
@@ -305,10 +359,10 @@ export const AppProvider = ({ children }) => {
   }, [userData, cryptCardBase, libraryCardBase]);
 
   // LANGUAGE
-  const changeLang = (lang) => {
+  const changeLang = useCallback((lang) => {
     setLang(lang);
     setLocalStorage(LANG, lang);
-  };
+  }, []);
 
   const changeBaseTextToLocalizedText = (setCardBase, localizedInfo, nativeInfo) => {
     setCardBase((draft) => {
@@ -369,78 +423,96 @@ export const AppProvider = ({ children }) => {
   }, [deckStore[DECK]?.[DECKID], lang, localizedCrypt, localizedLibrary]);
 
   // APP DATA
-  const toggleShowImage = () => {
+  const toggleShowImage = useCallback(() => {
     setShowImage(!showImage);
     setLocalStorage(SHOW_IMAGE, !showImage);
-  };
+  }, [showImage]);
 
-  const toggleShowLegacyImage = () => {
+  const toggleShowLegacyImage = useCallback(() => {
     setShowLegacyImage(!showLegacyImage);
     setLocalStorage(SHOW_LEGACY_IMAGE, !showLegacyImage);
-  };
+  }, [showLegacyImage]);
 
-  const toggleInventoryMode = () => {
+  const toggleInventoryMode = useCallback(() => {
     setInventoryMode(!inventoryMode);
     setLocalStorage(INVENTORY_MODE, !inventoryMode);
-  };
+  }, [inventoryMode]);
 
-  const toggleLimitedMode = () => {
+  const toggleLimitedMode = useCallback(() => {
     setLimitedMode(!limitedMode);
     setLocalStorage(LIMITED_MODE, !limitedMode);
-  };
+  }, [limitedMode]);
 
-  const togglePlaytestMode = () => {
+  const togglePlaytestMode = useCallback(() => {
     setPlaytestMode(!playtestMode);
     setLocalStorage(PLAYTEST_MODE, !playtestMode);
-  };
+  }, [playtestMode]);
 
-  const toggleAddMode = () => {
+  const toggleLimitedOnlyDecks = useCallback(() => {
+    setLimitedOnlyDecks(!limitedOnlyDecks);
+    setLocalStorage(LIMITED_ONLY_DECKS, !limitedOnlyDecks);
+  }, [limitedOnlyDecks]);
+
+  const toggleAddMode = useCallback(() => {
     setAddMode(!addMode);
     setLocalStorage(ADD_MODE, !addMode);
-  };
+  }, [addMode]);
 
-  const changeCryptDeckSort = (method) => {
+  const changeLimitedPreset = useCallback(
+    (value) => {
+      setLimitedPreset(value);
+      setLocalStorage(LIMITED_PRESET, value);
+    },
+    [limitedPreset],
+  );
+
+  const changeDecksAdvSort = useCallback((method) => {
+    setDecksAdvSort(method);
+    setLocalStorage(DECKS_ADV_SORT, method);
+  }, []);
+
+  const changeCryptDeckSort = useCallback((method) => {
     setCryptDeckSort(method);
     setLocalStorage(CRYPT_DECK_SORT, method);
-  };
+  }, []);
 
-  const changeCryptSearchSort = (method) => {
+  const changeCryptSearchSort = useCallback((method) => {
     setCryptSearchSort(method);
     setLocalStorage(CRYPT_SEARCH_SORT, method);
-  };
+  }, []);
 
-  const changeCryptInventorySort = (method) => {
+  const changeCryptInventorySort = useCallback((method) => {
     setCryptInventorySort(method);
     setLocalStorage(CRYPT_INVENTORY_SORT, method);
-  };
+  }, []);
 
-  const changeLibrarySearchSort = (method) => {
+  const changeLibrarySearchSort = useCallback((method) => {
     setLibrarySearchSort(method);
     setLocalStorage(LIBRARY_SEARCH_SORT, method);
-  };
+  }, []);
 
-  const changeLibraryInventorySort = (method) => {
+  const changeLibraryInventorySort = useCallback((method) => {
     setLibraryInventorySort(method);
     setLocalStorage(LIBRARY_INVENTORY_SORT, method);
-  };
+  }, []);
 
-  const changeTwdSearchSort = (method) => {
+  const changeTwdSearchSort = useCallback((method) => {
     setTwdSearchSort(method);
     setLocalStorage(TWD_SEARCH_SORT, method);
-  };
+  }, []);
 
-  const changePdaSearchSort = (method) => {
+  const changePdaSearchSort = useCallback((method) => {
     setPdaSearchSort(method);
     setLocalStorage(PDA_SEARCH_SORT, method);
-  };
+  }, []);
 
-  const changeTdaSearchSort = (method) => {
+  const changeTdaSearchSort = useCallback((method) => {
     setTdaSearchSort(method);
     setLocalStorage(TDA_SEARCH_SORT, method);
-  };
+  }, []);
 
-  const addRecentDeck = (recentDeck) => {
-    const src = recentDeck[DECKID].length != 9 ? TWD : recentDeck[PUBLIC_PARENT] ? PDA : 'shared';
+  const addRecentDeck = useCallback((recentDeck) => {
+    const src = recentDeck[DECKID].length !== 9 ? TWD : recentDeck[PUBLIC_PARENT] ? PDA : "shared";
     let d = [...recentDecks];
     const idx = recentDecks.map((v) => v[DECKID]).indexOf(recentDeck[DECKID]);
     if (idx !== -1) d.splice(idx, 1);
@@ -452,12 +524,12 @@ export const AppProvider = ({ children }) => {
     if (d.length > 10) d = d.slice(0, 10);
     setRecentDecks(d);
     setLocalStorage(RECENT_DECKS, d);
-  };
+  }, []);
 
-  const updateRecentDecks = (recentDecks) => {
+  const updateRecentDecks = useCallback((recentDecks) => {
     setRecentDecks(recentDecks);
     setLocalStorage(RECENT_DECKS, recentDecks);
-  };
+  }, []);
 
   useEffect(() => {
     window.addEventListener(OFFLINE, () => setIsOnline(false));
@@ -471,32 +543,28 @@ export const AppProvider = ({ children }) => {
 
   // DECKS
   const parseDecksData = (decksData) => {
+    const parsedDecks = {};
     Object.keys(decksData).forEach((deckid) => {
-      const cardsData = parseDeck(decksData[deckid][CARDS], cryptCardBase, libraryCardBase);
+      const cardsData = parseDeck(cryptCardBase, libraryCardBase, decksData[deckid][CARDS]);
+      parsedDecks[deckid] = { ...decksData[deckid], ...cardsData };
 
-      decksData[deckid] = { ...decksData[deckid], ...cardsData };
       if (decksData[deckid].usedInInventory) {
         Object.keys(decksData[deckid].usedInInventory).forEach((cardid) => {
-          if (cardid > 200000) {
-            if (decksData[deckid][CRYPT][cardid]) {
-              decksData[deckid][CRYPT][cardid].i = decksData[deckid].usedInInventory[cardid];
-            }
-          } else {
-            if (decksData[deckid][LIBRARY][cardid]) {
-              decksData[deckid][LIBRARY][cardid].i = decksData[deckid].usedInInventory[cardid];
-            }
+          const target = cardid > 200000 ? CRYPT : LIBRARY;
+          if (parsedDecks[deckid][target][cardid]) {
+            parsedDecks[deckid][target][cardid].i = decksData[deckid].usedInInventory[cardid];
           }
         });
       }
-      decksData[deckid][IS_AUTHOR] = true;
-      decksData[deckid][MASTER] = decksData[deckid][MASTER] || null;
-      decksData[deckid][IS_BRANCHES] = !!(
+      parsedDecks[deckid][IS_AUTHOR] = true;
+      parsedDecks[deckid][MASTER] = decksData[deckid][MASTER] || null;
+      parsedDecks[deckid][IS_BRANCHES] = !!(
         decksData[deckid][MASTER] || decksData[deckid][BRANCHES]?.length > 0
       );
-      delete decksData[deckid][CARDS];
+      delete parsedDecks[deckid][CARDS];
     });
 
-    return decksData;
+    return parsedDecks;
   };
 
   useEffect(() => {
@@ -523,9 +591,8 @@ export const AppProvider = ({ children }) => {
         // APP Context
         isMobile,
         isNarrow,
-        isWide,
-        isXWide,
         isDesktop,
+        isWide,
         lang,
         changeLang,
         playtestMode,
@@ -538,7 +605,10 @@ export const AppProvider = ({ children }) => {
         toggleInventoryMode,
         limitedMode,
         toggleLimitedMode,
-        setLimitedFormat,
+        limitedPreset,
+        changeLimitedPreset,
+        limitedOnlyDecks,
+        toggleLimitedOnlyDecks,
         setInventoryMode,
         addMode,
         toggleAddMode,
@@ -597,6 +667,8 @@ export const AppProvider = ({ children }) => {
         changePdaSearchSort,
         tdaSearchSort,
         changeTdaSearchSort,
+        decksAdvSort,
+        changeDecksAdvSort,
         cryptDeckSort,
         changeCryptDeckSort,
         cryptInventorySort,

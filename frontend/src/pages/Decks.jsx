@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSnapshot } from 'valtio';
-import { useSearchParams, useNavigate, useLocation, useParams, useLoaderData } from 'react-router';
+import { useEffect, useState } from "react";
+import { useLoaderData, useLocation, useNavigate, useParams, useSearchParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
   ButtonFloatClose,
   ButtonFloatMenu,
@@ -25,10 +25,7 @@ import {
   LoginBlock,
   Modal,
   Seating,
-} from '@/components';
-import { deckStore, useApp, setDeck } from '@/context';
-import { useDecksTagsAll } from '@/hooks';
-import { getTags, parseDeck, getRestrictions, getIsEditable, parseDeckHash } from '@/utils';
+} from "@/components";
 import {
   AUTHOR,
   BRANCHES,
@@ -38,17 +35,21 @@ import {
   DECKID,
   DECKS,
   DESCRIPTION,
+  IS_ANONYMOUS,
+  IS_BRANCHES,
+  IS_PUBLIC,
   LIBRARY,
   MASTER,
   NAME,
-  TAGS,
   PUBLIC_PARENT,
-  IS_BRANCHES,
-  IS_PUBLIC,
-  IS_ANONYMOUS,
   SHOW,
-} from '@/constants';
-const IS_FROM_URL = 'isFromUrl';
+  TAGS,
+} from "@/constants";
+import { deckStore, setDeck, useApp } from "@/context";
+import { useDecksTagsAll } from "@/hooks";
+import { getIsEditable, getRestrictions, getTags, parseDeck, parseDeckHash } from "@/utils";
+
+const IS_FROM_URL = "isFromUrl";
 
 const Decks = () => {
   const {
@@ -92,21 +93,18 @@ const Decks = () => {
     const deckData = await loaderData[DECK].catch((e) => {
       switch (e.response.status) {
         case 400:
-          setError('NO DECK WITH THIS ID');
+          setError("NO DECK WITH THIS ID");
           break;
         default:
-          setError('CONNECTION PROBLEM');
+          setError("CONNECTION PROBLEM");
       }
       setDeck(undefined);
     });
 
     setError(false);
-    const cardsData = parseDeck(deckData[CARDS], cryptCardBase, libraryCardBase);
+    const cardsData = parseDeck(cryptCardBase, libraryCardBase, deckData[CARDS]);
     if (deckid.length !== 9 || deckData[PUBLIC_PARENT]) {
-      deckData[TAGS] = [];
-      Object.values(getTags(cardsData[CRYPT], cardsData[LIBRARY])).forEach((v) => {
-        deckData[TAGS] = deckData[TAGS].concat(v);
-      });
+      deckData[TAGS] = Object.values(getTags(cardsData[CRYPT], cardsData[LIBRARY])).flat();
     }
 
     const d = {
@@ -124,7 +122,7 @@ const Decks = () => {
   };
 
   const handleSelect = (e) => {
-    navigate(`/decks/${e.value.replace(' ', '_')}`);
+    navigate(`/decks/${e.value.replace(" ", "_")}`);
   };
 
   const allTagsOptions = useDecksTagsAll(decks);
@@ -135,9 +133,9 @@ const Decks = () => {
 
       setDeck({
         [DECKID]: DECK,
-        [NAME]: searchParams.get(NAME) ?? '',
-        [AUTHOR]: searchParams.get(AUTHOR) ?? '',
-        [DESCRIPTION]: searchParams.get(DESCRIPTION) ?? '',
+        [NAME]: searchParams.get(NAME) ?? "",
+        [AUTHOR]: searchParams.get(AUTHOR) ?? "",
+        [DESCRIPTION]: searchParams.get(DESCRIPTION) ?? "",
         [CRYPT]: crypt,
         [LIBRARY]: library,
       });
@@ -147,15 +145,20 @@ const Decks = () => {
   useEffect(() => {
     if (cryptCardBase && libraryCardBase) {
       if (deckid) {
-        if (!deckStore[DECK] || deckStore[DECK][DECKID] != deckid) {
+        if (!deckStore[DECK] || deckStore[DECK][DECKID] !== deckid) {
           if (deckStore[DECKS]?.[deckid]) {
             setDeck(deckStore[DECKS][deckid]);
-          } else if (deckid.includes(':') && preconDecks) {
-            const deckidFixed = deckid.replace('_', ' ');
+          } else if (deckid.includes(":") && preconDecks) {
+            const deckidFixed = deckid.replace("_", " ");
             if (preconDecks[deckidFixed]) {
-              setDeck(preconDecks[deckidFixed]);
+              setDeck({
+                ...preconDecks[deckidFixed],
+                [TAGS]: Object.values(
+                  getTags(preconDecks[deckidFixed][CRYPT], preconDecks[deckidFixed][LIBRARY]),
+                ).flat(),
+              });
             } else {
-              setError('NO DECK WITH THIS ID');
+              setError("NO DECK WITH THIS ID");
             }
           } else if (!hash) {
             getDeck();
@@ -222,7 +225,7 @@ const Decks = () => {
           )}
         </FlexGapped>
         <div className="min-w-[175px] max-lg:hidden">
-          <div className="sticky z-20 w-full bg-bgPrimary dark:bg-bgPrimaryDark lg:top-10">
+          <div className="sticky z-20 w-full bg-bgPrimary lg:top-10 dark:bg-bgPrimaryDark">
             <DeckButtons
               deck={deck}
               setQrUrl={setQrUrl}
@@ -244,29 +247,32 @@ const Decks = () => {
           <LoginBlock>Login to create your decks</LoginBlock>
         </div>
       )}
-      {username && decks && Object.keys(decks).length === 0 && !deck && (
-        <div className="flex min-h-[70vh] place-items-center max-sm:px-2">
-          <div className="flex flex-col items-center justify-center gap-6">
-            <div className="flex flex-col gap-4 text-center text-lg">
-              <div>You do not have any decks in your collection yet</div>
-              <div>
-                Start by creating new one, import from Lackey / Amaranth / Text or browse official
-                preconstructed decks
-              </div>
+      {username && ((decks && Object.keys(decks).length === 0) || !decks) && !deck && (
+        <div className="flex min-h-[70vh] place-items-center justify-center max-sm:px-2">
+          <div className="flex flex-col items-center justify-center gap-6 sm:basis-1/2">
+            <div className="flex flex-col gap-4 text-balance text-center text-lg">
+              You do not have any decks in your collection yet Start by creating new one, import
+              from Lackey / Amaranth / Text or browse official preconstructed decks
             </div>
             <DeckImport
-              isOnlyNew={true}
               setShowImportAmaranth={setShowImportAmaranth}
               setShowImportText={setShowImportText}
               setBadImportCards={setBadImportCards}
+              isOnlyNew
             />
           </div>
         </div>
       )}
-      {isEditable && isMobile && showFloatingButtons && (
+      {isEditable && showFloatingButtons && (
         <>
-          <DeckNewCardFloating target={CRYPT} deckid={deckid} cards={Object.values(deck[CRYPT])} />
           <DeckNewCardFloating
+            className="sm:hidden"
+            target={CRYPT}
+            deckid={deckid}
+            cards={Object.values(deck[CRYPT])}
+          />
+          <DeckNewCardFloating
+            className="sm:hidden"
             target={LIBRARY}
             deckid={deckid}
             cards={Object.values(deck[LIBRARY])}
@@ -278,24 +284,22 @@ const Decks = () => {
       </div>
       {showMenuButtons && (
         <Modal handleClose={handleClose} centered size="xs" withMobileMargin noClose={!isDesktop}>
-          <>
-            <DeckButtons
-              deck={deck}
-              setQrUrl={setQrUrl}
-              setShowDraw={setShowDraw}
-              setShowInfo={setShowInfo}
-              setShowMissing={setShowMissing}
-              setShowRecommendation={setShowRecommendation}
-              setShowSeating={setShowSeating}
-              setShowProxySelect={setShowProxySelect}
-              setShowImportAmaranth={setShowImportAmaranth}
-              setShowImportText={setShowImportText}
-              setBadImportCards={setBadImportCards}
-            />
-            <div className="lg:hidden">
-              <ButtonFloatClose handleClose={handleClose} />
-            </div>
-          </>
+          <DeckButtons
+            deck={deck}
+            setQrUrl={setQrUrl}
+            setShowDraw={setShowDraw}
+            setShowInfo={setShowInfo}
+            setShowMissing={setShowMissing}
+            setShowRecommendation={setShowRecommendation}
+            setShowSeating={setShowSeating}
+            setShowProxySelect={setShowProxySelect}
+            setShowImportAmaranth={setShowImportAmaranth}
+            setShowImportText={setShowImportText}
+            setBadImportCards={setBadImportCards}
+          />
+          <div className="lg:hidden">
+            <ButtonFloatClose handleClose={handleClose} />
+          </div>
         </Modal>
       )}
       {showSelect && <DeckSelectAdvModal setShow={setShowSelect} />}

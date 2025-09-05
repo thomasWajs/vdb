@@ -1,15 +1,12 @@
-import React, { useMemo } from 'react';
-import { Disclosure } from '@headlessui/react';
-import LightbulbFill from '@icons/lightbulb-fill.svg?react';
+import { DisclosureButton, DisclosurePanel } from "@headlessui/react";
+import LightbulbFill from "@icons/lightbulb-fill.svg?react";
+import { useMemo } from "react";
 import {
   ResultCryptTotal,
   ResultLibraryTotal,
-  TwdHallFameCardsCard,
   ResultModal,
-} from '@/components';
-import { cryptSort, librarySort } from '@/utils';
-import { useModalCardController } from '@/hooks';
-import { useApp } from '@/context';
+  TwdHallFameCardsCard,
+} from "@/components";
 import {
   CAPACITY_MAX_MIN,
   CAPACITY_MIN_MAX,
@@ -18,12 +15,15 @@ import {
   COST_MAX_MIN,
   COST_MIN_MAX,
   GROUP,
+  ID,
   NAME,
   SECT,
-  TYPE,
-  ID,
   TWD_DATE,
-} from '@/constants';
+  TYPE,
+} from "@/constants";
+import { useApp } from "@/context";
+import { useModalCardController } from "@/hooks";
+import { cryptSort, librarySort } from "@/utils";
 
 const TwdHallFameCardsPlayer = ({ name, cards }) => {
   const {
@@ -32,7 +32,6 @@ const TwdHallFameCardsPlayer = ({ name, cards }) => {
     librarySearchSort,
     changeLibrarySearchSort,
     isMobile,
-    isNarrow,
   } = useApp();
 
   const cryptSorted = useMemo(
@@ -63,33 +62,33 @@ const TwdHallFameCardsPlayer = ({ name, cards }) => {
   } = useModalCardController([...cryptSorted, ...librarySorted]);
 
   const cryptSortMethods = {
-    [CAPACITY_MAX_MIN]: 'C↓',
-    [CAPACITY_MIN_MAX]: 'C↑',
-    [CLAN]: 'CL',
-    [GROUP]: 'G',
-    [NAME]: 'N',
-    [SECT]: 'S',
+    [CAPACITY_MAX_MIN]: "C↓",
+    [CAPACITY_MIN_MAX]: "C↑",
+    [CLAN]: "CL",
+    [GROUP]: "G",
+    [NAME]: "N",
+    [SECT]: "S",
   };
 
   const librarySortMethods = {
-    [CLAN_DISCIPLINE]: 'C/D',
-    [COST_MAX_MIN]: 'C↓',
-    [COST_MIN_MAX]: 'C↑',
-    [NAME]: 'N',
-    [TYPE]: 'T',
+    [CLAN_DISCIPLINE]: "C/D",
+    [COST_MAX_MIN]: "C↓",
+    [COST_MIN_MAX]: "C↑",
+    [NAME]: "N",
+    [TYPE]: "T",
   };
 
   let firstCardDate = null;
   let lastCardDate = null;
-  Object.values(cards).map((card) => {
+  Object.values(cards).forEach((card) => {
     if (!firstCardDate || card[TWD_DATE] < firstCardDate) firstCardDate = card[TWD_DATE];
     if (!lastCardDate || card[TWD_DATE] > lastCardDate) lastCardDate = card[TWD_DATE];
   });
 
   return (
-    <div className="border-borderPrimary bg-bgThird dark:border-borderPrimaryDark dark:bg-bgThirdDark rounded-sm border">
-      <Disclosure.Button className="w-full p-3">
-        <div className="text-fgName dark:text-fgNameDark flex items-center gap-4 px-2">
+    <div className="rounded-sm border border-borderPrimary bg-bgThird dark:border-borderPrimaryDark dark:bg-bgThirdDark">
+      <DisclosureButton className="w-full cursor-pointer p-3">
+        <div className="flex items-center gap-4 px-2 text-fgName dark:text-fgNameDark">
           <div className="flex items-center gap-1">
             <div>{Object.keys(cards).length}</div>
             <LightbulbFill height="13" width="13" viewBox="0 0 18 18" />
@@ -105,17 +104,17 @@ const TwdHallFameCardsPlayer = ({ name, cards }) => {
                 : `${firstCardDate.slice(0, 4)} - ${lastCardDate.slice(0, 4)}`}
             </div>
             <div className="flex whitespace-nowrap">
-              {isMobile ? 'C:' : 'Crypt: '}
+              {isMobile ? "C:" : "Crypt: "}
               {cryptSorted.length}
             </div>
             <div className="flex whitespace-nowrap">
-              {isMobile ? 'L:' : 'Library: '}
+              {isMobile ? "L:" : "Library: "}
               {librarySorted.length}
             </div>
           </div>
         </div>
-      </Disclosure.Button>
-      <Disclosure.Panel>
+      </DisclosureButton>
+      <DisclosurePanel>
         <ResultCryptTotal
           cards={cryptSorted}
           sortMethods={cryptSortMethods}
@@ -123,21 +122,19 @@ const TwdHallFameCardsPlayer = ({ name, cards }) => {
           setSortMethod={changeCryptSearchSort}
           inHoF={true}
         />
-        <table className="border-bgSecondary dark:border-bgSecondaryDark sm:border">
-          <thead className="bg-bgSecondary text-fgSecondary dark:bg-bgSecondaryDark dark:text-fgSecondaryDark font-bold">
+        <table className="border-bgSecondary sm:border dark:border-bgSecondaryDark">
+          <thead className="bg-bgSecondary font-bold text-fgSecondary dark:bg-bgSecondaryDark dark:text-fgSecondaryDark">
             <tr>
               <th />
-              {!isMobile && <th />}
+              <th className="max-sm:hidden" />
               <th />
               <th />
-              {!isNarrow && <th />}
-              {!isNarrow && <th />}
-              {!isNarrow && <th />}
-              {!isMobile && (
-                <th className="text-center font-bold" title="First Print Date">
-                  Print
-                </th>
-              )}
+              <th className="max-md:hidden lg:max-xl:hidden" />
+              <th className="max-md:hidden lg:max-xl:hidden" />
+              <th className="max-md:hidden lg:max-xl:hidden" />
+              <th className="text-center font-bold max-sm:hidden" title="First Print Date">
+                Print
+              </th>
               <th className="text-center font-bold" title="First TWD Appearance Date">
                 Win
               </th>
@@ -167,19 +164,17 @@ const TwdHallFameCardsPlayer = ({ name, cards }) => {
           setSortMethod={changeLibrarySearchSort}
           inHoF
         />
-        <table className="border-bgSecondary dark:border-bgSecondaryDark w-full sm:border">
+        <table className="w-full border-bgSecondary sm:border dark:border-bgSecondaryDark">
           <thead className="bg-bgSecondary text-fgSecondary dark:bg-bgSecondaryDark dark:text-fgSecondaryDark">
             <tr>
               <th />
               <th />
               <th />
               <th />
-              {!isMobile && <th />}
-              {!isMobile && (
-                <th className="text-center font-bold" title="First Print Date">
-                  Print
-                </th>
-              )}
+              <th className="max-sm:hidden" />
+              <th className="text-center font-bold max-sm:hidden" title="First Print Date">
+                Print
+              </th>
               <th className="text-center font-bold" title="First TWD Appearance Date">
                 Win
               </th>
@@ -204,7 +199,7 @@ const TwdHallFameCardsPlayer = ({ name, cards }) => {
             })}
           </tbody>
         </table>
-      </Disclosure.Panel>
+      </DisclosurePanel>
       {shouldShowModal && (
         <ResultModal
           card={currentModalCard}

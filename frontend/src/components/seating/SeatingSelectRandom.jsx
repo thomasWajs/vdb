@@ -1,6 +1,5 @@
-import React from 'react';
-import { Toggle, Hr, SeatingDeck, SeatingCustomDeckAdd } from '@/components';
-import { DECKID, NAME } from '@/constants';
+import { Hr, SeatingCustomDeckAdd, SeatingDeck, Toggle } from "@/components";
+import { DECKID, NAME } from "@/constants";
 
 const SeatingSelectRandom = ({
   addCustomDeck,
@@ -75,7 +74,7 @@ const SeatingSelectRandom = ({
       <div className="flex flex-col gap-2">
         <Toggle size="lg" isOn={withStandard} handleClick={() => setWithStandard(!withStandard)}>
           <div className="font-bold text-fgSecondary dark:text-fgSecondaryDark">
-            Standard Decks (from{' '}
+            Standard Decks (from{" "}
             <a
               className="text-fgName dark:text-fgNameDark"
               target="_blank"

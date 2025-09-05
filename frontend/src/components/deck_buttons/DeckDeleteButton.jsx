@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { useSnapshot } from 'valtio';
-import { useNavigate } from 'react-router';
-import TrashFill from '@icons/trash-fill.svg?react';
-import { ButtonIconed, ModalConfirmation } from '@/components';
-import { deckServices } from '@/services';
-import { deckStore, useApp } from '@/context';
-import { byTimestamp } from '@/utils';
-import { IS_BRANCHES, BRANCHES, DECKID, MASTER, NAME, DECKS } from '@/constants';
+import TrashFill from "@icons/trash-fill.svg?react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { useSnapshot } from "valtio";
+import { ButtonIconed, ModalConfirmation } from "@/components";
+import { BRANCHES, DECKID, DECKS, IS_BRANCHES, MASTER, NAME } from "@/constants";
+import { deckStore, useApp } from "@/context";
+import { deckServices } from "@/services";
+import { byTimestamp } from "@/utils";
 
-const DeckDeleteButton = ({ deck, noText }) => {
+const DeckDeleteButton = ({ deck, noText, className }) => {
   const { isDesktop, setShowFloatingButtons, setShowMenuButtons } = useApp();
   const decks = useSnapshot(deckStore)[DECKS];
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -17,7 +17,7 @@ const DeckDeleteButton = ({ deck, noText }) => {
   const getLastDeckExcept = () => {
     const lastDecks = Object.values(decks)
       .filter((d) => {
-        if (d[BRANCHES] && d[BRANCHES].includes(deck[DECKID])) return false;
+        if (d[BRANCHES].includes(deck[DECKID])) return false;
         if (d[MASTER]) return false;
         if (d[DECKID] === deck[DECKID]) return false;
         return true;
@@ -33,7 +33,7 @@ const DeckDeleteButton = ({ deck, noText }) => {
       .deckDelete(deck)
       .then(() => {
         const lastDeckId = getLastDeckExcept();
-        navigate(lastDeckId ? `/decks/${lastDeckId}` : '/decks');
+        navigate(lastDeckId ? `/decks/${lastDeckId}` : "/decks");
       })
       .finally(() => {
         setShowConfirmation(false);
@@ -45,17 +45,18 @@ const DeckDeleteButton = ({ deck, noText }) => {
   return (
     <>
       <ButtonIconed
-        variant={noText || !isDesktop ? 'primary' : 'secondary'}
+        className={className}
+        variant={noText || !isDesktop ? "primary" : "secondary"}
         onClick={() => setShowConfirmation(true)}
         title="Delete Deck"
         icon={
           <TrashFill
-            width={noText ? '18' : '18'}
-            height={noText ? '22' : '18'}
+            width={noText ? "18" : "18"}
+            height={noText ? "22" : "18"}
             viewBox="0 0 18 16"
           />
         }
-        text={noText ? null : 'Delete'}
+        text={noText ? null : "Delete"}
       />
       {showConfirmation && (
         <ModalConfirmation

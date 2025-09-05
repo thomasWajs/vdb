@@ -1,8 +1,7 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { SortButton } from '@/components';
-import { useApp } from '@/context';
-import { SUPERIOR, BASE, SCORE, RANK, TAGS } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { SortButton } from "@/components";
+import { BASE, DQ, RANK, SCORE, SUPERIOR, TAGS } from "@/constants";
+import { useApp } from "@/context";
 
 const TdaResultTotal = ({ results, sortMethods, sortMethod, setSortMethod }) => {
   const { isMobile } = useApp();
@@ -12,14 +11,13 @@ const TdaResultTotal = ({ results, sortMethods, sortMethod, setSortMethod }) => 
 
   results.forEach((deck) => {
     const rank = deck[SCORE][RANK];
-    totalRank += rank;
+    if (rank !== DQ) totalRank += rank;
 
     if (byRank[rank]) {
       byRank[rank] += 1;
     } else {
       byRank[rank] = 1;
     }
-
     [...deck[TAGS][SUPERIOR], ...deck[TAGS][BASE]].forEach((t) => {
       if (byTags[t]) {
         byTags[t] += 1;
@@ -32,8 +30,8 @@ const TdaResultTotal = ({ results, sortMethods, sortMethod, setSortMethod }) => 
   return (
     <div
       className={twMerge(
-        isMobile && Object.keys(byRank).length > 10 ? 'block' : 'flex',
-        'items-center justify-between bg-bgSecondary dark:bg-bgSecondaryDark sm:space-x-2',
+        isMobile && Object.keys(byRank).length > 10 ? "block" : "flex",
+        "items-center justify-between bg-bgSecondary sm:space-x-2 dark:bg-bgSecondaryDark",
       )}
     >
       <div className="flex flex-col gap-1 p-2">

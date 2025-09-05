@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import Check2 from '@icons/check2.svg?react';
+import Check2 from "@icons/check2.svg?react";
+import { useCallback, useEffect, useState } from "react";
 import {
-  SearchAdditionalFormsText,
-  SearchFormButtonLogicToggle,
-  SearchFormButtonAddText,
-  SearchFormButtonDel,
-  Input,
-  Checkbox,
   ButtonClose,
   ButtonIconed,
-} from '@/components';
-import { useDebounce } from '@/hooks';
-import { useApp } from '@/context';
-import { TYPE_DEBOUNCE_DELAY, NAME, TEXT, LABEL, VALUE, LOGIC, IN, REGEX } from '@/constants';
+  Checkbox,
+  Input,
+  SearchAdditionalFormsText,
+  SearchFormButtonAddText,
+  SearchFormButtonDel,
+  SearchFormButtonLogicToggle,
+} from "@/components";
+import { IN, LABEL, LOGIC, NAME, REGEX, TEXT, TYPE_DEBOUNCE_DELAY, VALUE } from "@/constants";
+import { useApp } from "@/context";
+import { useDebounce } from "@/hooks";
 
 const SearchFormTextAndButtons = ({
   searchForm,
@@ -30,12 +30,11 @@ const SearchFormTextAndButtons = ({
     searchMissingInventoryMode,
     setSearchMissingInventoryMode,
     inventoryMode,
-    isMobile,
   } = useApp();
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
 
   useEffect(() => {
-    setText(value[0][VALUE] ?? '');
+    setText(value[0][VALUE] ?? "");
   }, [value]);
 
   useDebounce(() => onChange(0, text), TYPE_DEBOUNCE_DELAY, [text]);
@@ -43,17 +42,24 @@ const SearchFormTextAndButtons = ({
   const options = [
     {
       [VALUE]: NAME,
-      [LABEL]: 'Only in Name',
+      [LABEL]: "Only in Name",
     },
     {
       [VALUE]: TEXT,
-      [LABEL]: 'Only in Text',
+      [LABEL]: "Only in Text",
     },
     {
       [VALUE]: REGEX,
-      [LABEL]: 'Regex',
+      [LABEL]: "Regex",
     },
   ];
+
+  const handleChange = useCallback(
+    (e) => {
+      setText(e.target.value);
+    },
+    [setText],
+  );
 
   return (
     <div className="flex flex-col gap-2">
@@ -62,40 +68,36 @@ const SearchFormTextAndButtons = ({
           <Input
             placeholder="Card Name / Text / RegEx"
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleChange}
             borderStyle="max-sm:border sm:border-y sm:border-l"
             roundedStyle="sm:rounded-r-none rounded-sm"
           />
-          {!isMobile && (
-            <>
-              {preresults > showLimit && (
-                <ButtonIconed
-                  className="rounded-l-none rounded-r-none whitespace-nowrap"
-                  borderStyle="border-y border-l border-r-none"
-                  onClick={handleShowResults}
-                  text={`SHOW ${preresults}`}
-                  icon={<Check2 />}
-                />
-              )}
-              <ButtonClose
-                title="Clear Forms & Results"
-                className="rounded-l-none"
-                handleClick={handleClear}
-              />
-            </>
+          {preresults > showLimit && (
+            <ButtonIconed
+              className="whitespace-nowrap rounded-r-none rounded-l-none max-sm:hidden"
+              borderStyle="border-y border-l border-r-none"
+              onClick={handleShowResults}
+              text={`SHOW ${preresults}`}
+              icon={<Check2 />}
+            />
           )}
+          <ButtonClose
+            title="Clear Forms & Results"
+            className="rounded-l-none max-sm:hidden"
+            handleClick={handleClear}
+          />
         </div>
         <div className="flex justify-between">
           <div className="flex w-1/5 gap-1">
-            {value[0].value !== '' && (
+            {value[0].value !== "" && (
               <>
                 <SearchFormButtonLogicToggle
-                  name="text"
+                  name={TEXT}
                   value={value[0][LOGIC]}
                   i={0}
                   searchForm={searchForm}
                 />
-                {value.length == 1 ? (
+                {value.length === 1 ? (
                   <SearchFormButtonAddText searchForm={searchForm} />
                 ) : (
                   <SearchFormButtonDel searchForm={searchForm} i={0} />

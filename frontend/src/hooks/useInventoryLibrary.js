@@ -1,18 +1,19 @@
-import { useMemo } from 'react';
-import { useSnapshot } from 'valtio';
-import { TYPE, DISCIPLINE, SOFT, HARD, LIBRARY, ALL, NONE, OK, NOK } from '@/constants';
-import { getIsPlaytest, getHardTotal, getSoftMax } from '@/utils';
-import { useApp, usedStore } from '@/context';
-import disciplinesList from '@/assets/data/disciplinesList.json';
-import disciplinesExtraList from '@/assets/data/disciplinesExtraList.json';
-import virtuesList from '@/assets/data/virtuesList.json';
-import cardtypeSorted from '@/assets/data/cardtypeSorted.json';
+import { useMemo } from "react";
+import { useSnapshot } from "valtio";
+import cardtypeSorted from "@/assets/data/cardtypeSorted.json";
+import disciplinesExtraList from "@/assets/data/disciplinesExtraList.json";
+import disciplinesList from "@/assets/data/disciplinesList.json";
+import virtuesList from "@/assets/data/virtuesList.json";
+import { ALL, DISCIPLINE, HARD, LIBRARY, NOK, NONE, OK, SOFT, TYPE } from "@/constants";
+import { useApp, usedStore } from "@/context";
+import { getHardTotal, getIsPlaytest, getSoftMax } from "@/utils";
 
-const useInventoryLibrary = (cards = {}, category = OK, compact, type, discipline, onlyNotes) => {
+const useInventoryLibrary = (library, category, compact, type, discipline, onlyNotes) => {
   const usedLibrary = useSnapshot(usedStore)[LIBRARY];
   const { libraryCardBase } = useApp();
 
   const value = useMemo(() => {
+    const cards = library || {};
     const cardsByType = {};
     const cardsByDiscipline = {};
     const missingByType = {};
@@ -25,7 +26,6 @@ const useInventoryLibrary = (cards = {}, category = OK, compact, type, disciplin
     });
 
     const disciplines = [...Object.keys(disciplinesList), ...disciplinesExtraList].toSorted();
-
     [ALL, NONE, ...disciplines, ...Object.keys(virtuesList)].forEach((i) => {
       cardsByDiscipline[i] = {};
       missingByDiscipline[i] = {};
@@ -42,18 +42,15 @@ const useInventoryLibrary = (cards = {}, category = OK, compact, type, disciplin
       });
     } else {
       Object.keys(cards)
-        .filter((cardid) => {
-          if (onlyNotes) return cards[cardid].t;
-          return true;
-        })
+        .filter((cardid) => (onlyNotes ? cards[cardid].t : true))
         .forEach((cardid) => {
-          const types = cards[cardid].c[TYPE].split('/');
+          const types = cards[cardid].c[TYPE].split("/");
           const d = libraryCardBase[cardid][DISCIPLINE];
           let disciplines = [NONE];
-          if (d.includes('/')) {
-            disciplines = d.split('/');
-          } else if (d.includes(' & ')) {
-            disciplines = d.split(' & ');
+          if (d.includes("/")) {
+            disciplines = d.split("/");
+          } else if (d.includes(" & ")) {
+            disciplines = d.split(" & ");
           } else if (d) {
             disciplines = [d];
           }
@@ -88,7 +85,7 @@ const useInventoryLibrary = (cards = {}, category = OK, compact, type, disciplin
             }
           }
 
-          if (category == NOK) {
+          if (category === NOK) {
             if (miss > 0) {
               types.forEach((t) => {
                 cardsByType[t][cardid] = cards[cardid];
@@ -124,13 +121,13 @@ const useInventoryLibrary = (cards = {}, category = OK, compact, type, disciplin
       Object.keys(usedLibrary[SOFT])
         .filter((cardid) => !(getIsPlaytest(cardid) || cards[cardid]))
         .forEach((cardid) => {
-          const types = libraryCardBase[cardid][TYPE].split('/');
+          const types = libraryCardBase[cardid][TYPE].split("/");
           const d = libraryCardBase[cardid][DISCIPLINE];
           let disciplines = [NONE];
-          if (d.includes('/')) {
-            disciplines = d.split('/');
-          } else if (d.includes(' & ')) {
-            disciplines = d.split(' & ');
+          if (d.includes("/")) {
+            disciplines = d.split("/");
+          } else if (d.includes(" & ")) {
+            disciplines = d.split(" & ");
           } else if (d) {
             disciplines = [d];
           }
@@ -190,13 +187,13 @@ const useInventoryLibrary = (cards = {}, category = OK, compact, type, disciplin
       Object.keys(usedLibrary[HARD])
         .filter((cardid) => !getIsPlaytest(cardid) && !cards[cardid])
         .forEach((cardid) => {
-          const types = libraryCardBase[cardid][TYPE].split('/');
+          const types = libraryCardBase[cardid][TYPE].split("/");
           const d = libraryCardBase[cardid][DISCIPLINE];
           let disciplines = [NONE];
-          if (d.includes('/')) {
-            disciplines = d.split('/');
-          } else if (d.includes(' & ')) {
-            disciplines = d.split(' & ');
+          if (d.includes("/")) {
+            disciplines = d.split("/");
+          } else if (d.includes(" & ")) {
+            disciplines = d.split(" & ");
           } else if (d) {
             disciplines = [d];
           }
@@ -330,7 +327,7 @@ const useInventoryLibrary = (cards = {}, category = OK, compact, type, disciplin
       missingFiltered,
       missingFilteredTotal,
     };
-  }, [cards, category, compact, type, discipline, onlyNotes, usedLibrary]);
+  }, [library, category, compact, type, discipline, onlyNotes, usedLibrary]);
 
   return value;
 };

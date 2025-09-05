@@ -1,35 +1,31 @@
-import React from 'react';
-import { Select } from '@/components';
-import { useApp } from '@/context';
-import { useFetch } from '@/hooks';
-import { LOCATION } from '@/constants';
+import { Select } from "@/components";
+import { LOCATION } from "@/constants";
+import { useFetch } from "@/hooks";
 
 const TwdSearchFormLocation = ({ value, form }) => {
-  const { isXWide } = useApp();
   const urlCountries = `${import.meta.env.VITE_API_URL}/twd/countries`;
   const urlCities = `${import.meta.env.VITE_API_URL}/twd/cities`;
   const { value: countries } = useFetch(urlCountries, {}, []);
   const { value: cities } = useFetch(urlCities, {}, []);
-  const maxMenuHeight = isXWide ? 500 : 350;
 
   const handleChange = (v, target) => {
-    form[LOCATION][target] = v?.value ?? '';
-    if (target === 'country') {
-      form[LOCATION].city = '';
+    form[LOCATION][target] = v?.value ?? "";
+    if (target === "country") {
+      form[LOCATION].city = "";
     }
   };
 
   const loadOptions = async (inputValue, target) => {
     if (inputValue.length >= 3) {
-      const { default: unidecode } = await import('unidecode');
-      const data = target === 'cities' ? cities : countries;
+      const { default: unidecode } = await import("unidecode");
+      const data = target === "cities" ? cities : countries;
 
       return data
         .filter((v) => {
-          if (target === 'cities' && !v.includes(value.country)) {
+          if (target === "cities" && !v.includes(value.country)) {
             return false;
           }
-          return unidecode(v.replace(/,.*$/, ''))
+          return unidecode(v.replace(/,.*$/, ""))
             .toLowerCase()
             .includes(unidecode(inputValue).toLowerCase());
         })
@@ -43,11 +39,11 @@ const TwdSearchFormLocation = ({ value, form }) => {
   };
 
   const loadOptionsCountry = (inputValue) => {
-    return loadOptions(inputValue, 'countries');
+    return loadOptions(inputValue, "countries");
   };
 
   const loadOptionsCity = (inputValue) => {
-    return loadOptions(inputValue, 'cities');
+    return loadOptions(inputValue, "cities");
   };
 
   return (
@@ -60,10 +56,10 @@ const TwdSearchFormLocation = ({ value, form }) => {
           <Select
             variant="async"
             cacheOptions
-            maxMenuHeight={maxMenuHeight}
             autoFocus={false}
             placeholder="Country"
             loadOptions={loadOptionsCountry}
+            isSearchable
             isClearable
             value={
               value.country
@@ -73,7 +69,7 @@ const TwdSearchFormLocation = ({ value, form }) => {
                   }
                 : null
             }
-            onChange={(e) => handleChange(e, 'country')}
+            onChange={(e) => handleChange(e, "country")}
           />
         </div>
       </div>
@@ -83,10 +79,10 @@ const TwdSearchFormLocation = ({ value, form }) => {
           <Select
             variant="async"
             cacheOptions
-            maxMenuHeight={maxMenuHeight}
             autoFocus={false}
             placeholder="City"
             loadOptions={loadOptionsCity}
+            isSearchable
             isClearable
             value={
               value.city
@@ -96,7 +92,7 @@ const TwdSearchFormLocation = ({ value, form }) => {
                   }
                 : null
             }
-            onChange={(e) => handleChange(e, 'city')}
+            onChange={(e) => handleChange(e, "city")}
           />
         </div>
       </div>

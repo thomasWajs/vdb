@@ -1,17 +1,15 @@
-import React, { useMemo } from 'react';
-import dayjs from 'dayjs';
-import { useSnapshot } from 'valtio';
-import Shuffle from '@icons/shuffle.svg?react';
-import PinAngleFill from '@icons/pin-angle-fill.svg?react';
-import At from '@icons/at.svg?react';
-import paths from '@/assets/data/paths.json';
-import { ResultPathImage, Select, ResultPreconClan, ResultLegalIcon } from '@/components';
-import { limitedStore, deckStore, useApp } from '@/context';
-import { byTimestamp, getRestrictions, getClan } from '@/utils';
+import At from "@icons/at.svg?react";
+import PinAngleFill from "@icons/pin-angle-fill.svg?react";
+import Shuffle from "@icons/shuffle.svg?react";
+import dayjs from "dayjs";
+import { useMemo } from "react";
+import { useSnapshot } from "valtio";
+import paths from "@/assets/data/paths.json";
+import { ResultLegalIcon, ResultPathImage, ResultPreconClan, Select } from "@/components";
 import {
   BANNED,
   CRYPT,
-  LIBRARY,
+  CUSTOM,
   DECKS,
   H,
   HAS_BANNED,
@@ -19,27 +17,38 @@ import {
   HAS_PLAYTEST,
   INVENTORY_TYPE,
   IS_HIDDEN,
+  LIBRARY,
   MASTER,
   NAME,
   PLAYTEST,
   S,
+  TAGS,
   TIMESTAMP,
-} from '@/constants';
+} from "@/constants";
+import { deckStore, limitedStore, useApp } from "@/context";
+import { byTimestamp, getClan, getRestrictions } from "@/utils";
 
 const DeckSelectMy = ({ deckid, handleSelect }) => {
-  const { limitedMode, inventoryMode, isMobile, isWide } = useApp();
+  const { limitedOnlyDecks, limitedPreset, limitedMode, inventoryMode, isMobile, isWide } =
+    useApp();
   const decks = useSnapshot(deckStore)[DECKS];
 
   const options = useMemo(() => {
     return Object.keys(decks)
       .filter((i) => !decks[i][MASTER] && !decks[i][IS_HIDDEN])
+      .filter((i) => {
+        if (limitedMode && limitedOnlyDecks && limitedPreset !== CUSTOM) {
+          if (!decks[i][TAGS].includes(limitedPreset.toUpperCase())) return false;
+        }
+        return true;
+      })
       .toSorted((a, b) => byTimestamp(decks[a], decks[b]))
       .map((i, idx) => {
-        const diffDays = dayjs().diff(dayjs(decks[i][TIMESTAMP]), 'day');
+        const diffDays = dayjs().diff(dayjs(decks[i][TIMESTAMP]), "day");
 
         let lastEdit;
         if (diffDays > 90) {
-          lastEdit = dayjs(decks[i][TIMESTAMP]).format('YYYY-MM-DD');
+          lastEdit = dayjs(decks[i][TIMESTAMP]).format("YYYY-MM-DD");
         } else if (diffDays > 30) {
           lastEdit = `${Math.round(diffDays / 30)}mo`;
         } else if (diffDays > 5) {
@@ -54,7 +63,12 @@ const DeckSelectMy = ({ deckid, handleSelect }) => {
         if (idx < 15 || diffDays < 90) {
           restrictions = getRestrictions(
             decks[i],
-            limitedMode ? { [CRYPT]: limitedStore[CRYPT], [LIBRARY]: limitedStore[LIBRARY] } : null,
+            limitedMode
+              ? {
+                  [CRYPT]: limitedStore[CRYPT],
+                  [LIBRARY]: limitedStore[LIBRARY],
+                }
+              : null,
           );
         }
 
@@ -63,16 +77,13 @@ const DeckSelectMy = ({ deckid, handleSelect }) => {
           label: (
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex w-[40px] items-center justify-center">
-                  {clan && (
-                    <>
-                      {paths.includes(clan) ? (
-                        <ResultPathImage value={clan} />
-                      ) : (
-                        <ResultPreconClan clan={clan} />
-                      )}
-                    </>
-                  )}
+                <div className="flex w-[35px] items-center justify-center pr-1">
+                  {clan &&
+                    (paths.includes(clan) ? (
+                      <ResultPathImage value={clan} />
+                    ) : (
+                      <ResultPreconClan clan={clan} />
+                    ))}
                 </div>
                 <div className="inline">
                   {decks[i][NAME].slice(0, inventoryMode ? (isWide ? 28 : 23) : 32)}
@@ -87,8 +98,8 @@ const DeckSelectMy = ({ deckid, handleSelect }) => {
                 </div>
                 {inventoryMode && (
                   <div>
-                    {decks[i][INVENTORY_TYPE] == S && <Shuffle />}
-                    {decks[i][INVENTORY_TYPE] == H && <PinAngleFill />}
+                    {decks[i][INVENTORY_TYPE] === S && <Shuffle />}
+                    {decks[i][INVENTORY_TYPE] === H && <PinAngleFill />}
                     {!decks[i][INVENTORY_TYPE] && <At />}
                   </div>
                 )}
@@ -98,7 +109,7 @@ const DeckSelectMy = ({ deckid, handleSelect }) => {
           ),
         };
       });
-  }, [decks, limitedMode, inventoryMode]);
+  }, [decks, limitedPreset, limitedMode, inventoryMode]);
 
   const filterOption = ({ label }, string) => {
     const name = label.props.children[0].props.children[1].props.children;
@@ -111,35 +122,31 @@ const DeckSelectMy = ({ deckid, handleSelect }) => {
       const v = options.find((obj) => {
         if (decks[deckid][MASTER]) {
           return obj.value === decks[deckid][MASTER];
-        } else {
-          return obj.value === deckid;
         }
+        return obj.value === deckid;
       });
 
       if (v) {
         return v;
-      } else {
-        return {
-          value: deckid,
-          label: (
-            <div className="flex items-center justify-between">
-              <div className="inline">{decks[deckid][NAME]}</div>
-              <div className="flex items-center gap-1">
-                {inventoryMode && (
-                  <div>
-                    {decks[deckid][INVENTORY_TYPE] == S && <Shuffle />}
-                    {decks[deckid][INVENTORY_TYPE] == H && <PinAngleFill />}
-                    {!decks[deckid][INVENTORY_TYPE] && <At />}
-                  </div>
-                )}
-                <div className="text-sm">
-                  {dayjs(decks[deckid][TIMESTAMP]).format('YYYY-MM-DD')}
-                </div>
-              </div>
-            </div>
-          ),
-        };
       }
+      return {
+        value: deckid,
+        label: (
+          <div className="flex items-center justify-between">
+            <div className="inline">{decks[deckid][NAME]}</div>
+            <div className="flex items-center gap-1">
+              {inventoryMode && (
+                <div>
+                  {decks[deckid][INVENTORY_TYPE] === S && <Shuffle />}
+                  {decks[deckid][INVENTORY_TYPE] === H && <PinAngleFill />}
+                  {!decks[deckid][INVENTORY_TYPE] && <At />}
+                </div>
+              )}
+              <div className="text-sm">{dayjs(decks[deckid][TIMESTAMP]).format("YYYY-MM-DD")}</div>
+            </div>
+          </div>
+        ),
+      };
     }
   };
 

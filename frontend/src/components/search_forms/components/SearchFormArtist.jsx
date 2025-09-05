@@ -1,15 +1,11 @@
-import React from 'react';
-import { Select } from '@/components';
-import cryptArtists from '@/assets/data/artistsCrypt.json';
-import libraryArtists from '@/assets/data/artistsLib.json';
-import { useApp } from '@/context';
-import { ARTIST, CRYPT, ANY } from '@/constants';
+import cryptArtists from "@/assets/data/artistsCrypt.json";
+import libraryArtists from "@/assets/data/artistsLib.json";
+import { Select } from "@/components";
+import { ANY, ARTIST, CRYPT } from "@/constants";
 
 const SearchFormArtist = ({ target, value, onChange }) => {
-  const { isXWide } = useApp();
   const name = ARTIST;
-  const menuHeight = isXWide ? 500 : 350;
-  const artists = target == CRYPT ? cryptArtists : libraryArtists;
+  const artists = target === CRYPT ? cryptArtists : libraryArtists;
 
   const options = artists.map((artist) => {
     return {
@@ -39,7 +35,7 @@ const SearchFormArtist = ({ target, value, onChange }) => {
         <Select
           options={options}
           isClearable={value !== ANY}
-          menuHeight={menuHeight}
+          isSearchable
           name={name}
           placeholder="Artist"
           value={options.find((obj) => obj.value === value)}

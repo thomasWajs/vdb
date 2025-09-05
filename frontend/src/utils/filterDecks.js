@@ -3,8 +3,8 @@
 // in case of missing filter or matching them the method returns false, meaning there's no missing criteria
 // if the filter is present and the deck dont match it the method returns true meaning the criteria is missing.
 // if some criteria is missing the main method return false and exits that deck check.
-import { countCards, countTotalCost, getClan, getSect } from '@/utils';
 import {
+  BASE,
   CAPACITY,
   CARDTYPES,
   CLAN,
@@ -23,17 +23,17 @@ import {
   OR,
   PLAYERS,
   RANK,
+  SCORE,
   SECT,
   STAR,
+  SUPERIOR,
+  TAGS,
   TRAITS,
   TYPE,
-  SCORE,
-  TAGS,
-  SUPERIOR,
-  BASE,
-} from '@/constants';
+} from "@/constants";
+import { countCards, countTotalCost, getClan, getSect } from "@/utils";
 
-const filterDecks = (decks = {}, filter) => {
+const filterDecks = (decks, filter) => {
   return Object.values(decks).filter((deck) => {
     if (filter[RANK] && missingRank(filter[RANK], deck)) return false;
     if (filter[CRYPT] && missingCrypt(filter[CRYPT], deck)) return false;
@@ -58,8 +58,8 @@ const missingRank = (filter, deck) => {
   let miss = false;
 
   if (from) {
-    if (from.includes('%')) {
-      if (deck[SCORE][RANK] > (deck[SCORE][PLAYERS] * from.split('%')[0]) / 100) {
+    if (from.includes("%")) {
+      if (deck[SCORE][RANK] > (deck[SCORE][PLAYERS] * from.split("%")[0]) / 100) {
         miss = true;
       }
     } else {
@@ -68,8 +68,8 @@ const missingRank = (filter, deck) => {
   }
 
   if (to) {
-    if (to.includes('%')) {
-      if (deck[SCORE][RANK] < (deck[SCORE][PLAYERS] * to.split('%')[0]) / 100) {
+    if (to.includes("%")) {
+      if (deck[SCORE][RANK] < (deck[SCORE][PLAYERS] * to.split("%")[0]) / 100) {
         miss = true;
       }
     } else {
@@ -111,16 +111,10 @@ const missingLibrary = (filter, deck) => {
 const missingLibraryTotal = (filter, deck) => {
   const libraryTotal = countCards(Object.values(deck[LIBRARY]));
 
-  if (
-    Object.keys(filter).some((i) => {
-      const value = i.split('-');
-      if (libraryTotal >= value[0] && libraryTotal <= value[1]) return true;
-    })
-  ) {
-    return false;
-  }
-
-  return true;
+  return !Object.keys(filter).some((i) => {
+    const value = i.split("-");
+    return libraryTotal >= value[0] && libraryTotal <= value[1];
+  });
 };
 
 const missingClan = (filter, deck) => {
@@ -129,13 +123,9 @@ const missingClan = (filter, deck) => {
 
   switch (logic) {
     case OR:
-      return !value.some((i) => {
-        if (clan && clan.toLowerCase() === i) return true;
-      });
+      return !value.some((i) => clan && clan.toLowerCase() === i);
     case NOT:
-      return value.some((i) => {
-        if (clan && clan.toLowerCase() === i) return true;
-      });
+      return value.some((i) => clan && clan.toLowerCase() === i);
   }
 
   return true;
@@ -147,13 +137,9 @@ const missingSect = (filter, deck) => {
 
   switch (logic) {
     case OR:
-      return !value.some((i) => {
-        if (sect && sect.toLowerCase() === i) return true;
-      });
+      return !value.some((i) => sect && sect.toLowerCase() === i);
     case NOT:
-      return value.some((i) => {
-        if (sect && sect.toLowerCase() === i) return true;
-      });
+      return value.some((i) => sect && sect.toLowerCase() === i);
   }
 
   return true;
@@ -164,33 +150,22 @@ const missingCapacity = (filter, deck) => {
   const cryptTotalCap = countTotalCost(Object.values(deck[CRYPT]), CAPACITY);
   const avgCapacity = cryptTotalCap / cryptTotal;
 
-  if (
-    Object.keys(filter).some((i) => {
-      const value = i.split('-');
-      if (avgCapacity >= value[0] && avgCapacity <= value[1]) return true;
-    })
-  ) {
-    return false;
-  }
-
-  return true;
+  return !Object.keys(filter).some((i) => {
+    const value = i.split("-");
+    return avgCapacity >= value[0] && avgCapacity <= value[1];
+  });
 };
 
 const missingDisciplines = (filter, deck) => {
-  if (
-    Object.keys(filter).every((d) => {
-      return Object.values(deck[LIBRARY]).some((card) => {
-        return card.c[DISCIPLINE].includes(d);
-      });
-    })
-  ) {
-    return false;
-  }
-  return true;
+  return !Object.keys(filter).every((d) => {
+    return Object.values(deck[LIBRARY]).some((card) => {
+      return card.c[DISCIPLINE].includes(d);
+    });
+  });
 };
 
 const missingCardtypes = (filter, deck) => {
-  let cardTypes = {};
+  const cardTypes = {};
   let libraryTotal = 0;
 
   Object.values(deck[LIBRARY]).forEach((card) => {
@@ -203,23 +178,17 @@ const missingCardtypes = (filter, deck) => {
     }
   });
 
-  if (
-    Object.keys(filter).every((t) => {
-      const value = filter[t].split(',');
-      const typeRatio = (cardTypes[t] / libraryTotal) * 100;
-      if (typeRatio >= value[0] && typeRatio <= value[1]) return true;
-    })
-  ) {
-    return false;
-  }
-
-  return true;
+  return !Object.keys(filter).every((t) => {
+    const value = filter[t].split(",");
+    const typeRatio = (cardTypes[t] / libraryTotal) * 100;
+    return typeRatio >= value[0] && typeRatio <= value[1];
+  });
 };
 
 const missingTraits = (filter, deck) => {
   let cryptTotal = 0;
   let cryptMaxUnique = 0;
-  let clans = [];
+  const clans = [];
   Object.values(deck[CRYPT])
     .filter((card) => card[ID] !== 200076)
     .forEach((card) => {
@@ -247,16 +216,23 @@ const missingTraits = (filter, deck) => {
 
 const missingTags = (filter, deck) => {
   const tags = [...deck[TAGS][SUPERIOR], ...deck[TAGS][BASE]];
+  const positiveTags = Object.keys(filter).filter((i) => filter[i]);
+  const negativeTags = Object.keys(filter).filter((i) => !filter[i]);
 
-  return Object.keys(filter).some((i) => {
-    return !tags.includes(i);
-  });
+  return (
+    positiveTags.some((i) => {
+      return !tags.includes(i);
+    }) ||
+    negativeTags.some((i) => {
+      return tags.includes(i);
+    })
+  );
 };
 
 const compareQty = (cardQty, q, m) => {
   switch (m) {
     case EQ:
-      return cardQty == q;
+      return cardQty === q;
     case GT:
       return cardQty >= q;
     case LT:

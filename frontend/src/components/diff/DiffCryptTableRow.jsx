@@ -1,16 +1,15 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
 import {
   DeckCardQuantityTd,
   DeckDrawProbability,
   DiffQuantityDiffCard,
   ResultCryptTableRowCommon,
-} from '@/components';
-import { getSwipedBg, getSoftMax, getHardTotal } from '@/utils';
-import { useApp, usedStore, inventoryStore, deckStore, deckCardChange } from '@/context';
-import { useSwipe } from '@/hooks';
-import { ID, NAME, INVENTORY_TYPE, SOFT, HARD, CRYPT, DECKS } from '@/constants';
+} from "@/components";
+import { CRYPT, DECKS, HARD, ID, INVENTORY_TYPE, NAME, SOFT } from "@/constants";
+import { deckCardChange, deckStore, inventoryStore, useApp, usedStore } from "@/context";
+import { useSwipe } from "@/hooks";
+import { getHardTotal, getSoftMax, getSwipedBg } from "@/utils";
 
 const DiffCryptTableRow = ({
   cardChange,
@@ -45,7 +44,7 @@ const DiffCryptTableRow = ({
     <tr
       {...swipeHandlers}
       className={twMerge(
-        'h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark',
+        "h-[38px] border-bgSecondary border-y dark:border-bgSecondaryDark",
         getSwipedBg(isSwiped),
       )}
     >

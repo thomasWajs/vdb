@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
-import Files from '@icons/files.svg?react';
-import { useApp } from '@/context';
-import { deckServices } from '@/services';
-import { ButtonIconed } from '@/components';
+import Files from "@icons/files.svg?react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { ButtonIconed } from "@/components";
+import { useApp } from "@/context";
+import { deckServices } from "@/services";
 
 const DeckCloneButton = ({ deck, inTwdPda, noText }) => {
   const { isDesktop, setShowFloatingButtons, setShowMenuButtons } = useApp();
@@ -29,11 +29,11 @@ const DeckCloneButton = ({ deck, inTwdPda, noText }) => {
   return (
     <ButtonIconed
       className="w-full"
-      variant={success ? 'success' : inTwdPda || noText || !isDesktop ? 'primary' : 'secondary'}
+      variant={success ? "success" : inTwdPda || noText || !isDesktop ? "primary" : "secondary"}
       onClick={handleClick}
       title="Clone Deck to your account for editing"
       icon={<Files />}
-      text={!noText && (success ? 'Cloned' : 'Clone')}
+      text={!noText && (success ? "Cloned" : "Clone")}
     />
   );
 };

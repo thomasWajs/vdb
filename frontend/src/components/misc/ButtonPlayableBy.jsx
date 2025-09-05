@@ -1,12 +1,11 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
-import Bullseye from '@icons/bullseye.svg?react';
-import { Button } from '@/components';
-import { clearSearchForm } from '@/context';
-import { getLibraryRequirements } from '@/utils';
-import { CRYPT, LE, GE } from '@/constants';
+import Bullseye from "@icons/bullseye.svg?react";
+import { useNavigate } from "react-router";
+import { Button } from "@/components";
+import { BLACK_HAND, CRYPT, GE, LE, RED_LIST, SERAPH, TITLED } from "@/constants";
+import { clearSearchForm } from "@/context";
+import { getLibraryRequirements } from "@/utils";
 
-const ButtonPlayableBy = ({ card, handleClose }) => {
+const ButtonPlayableBy = ({ card, handleClose = () => {} }) => {
   const navigate = useNavigate();
 
   const {
@@ -27,26 +26,26 @@ const ButtonPlayableBy = ({ card, handleClose }) => {
 
     if (isDiscipline.length > 0) {
       const values = isDiscipline.map((i) => `"${i}"%3A1`);
-      queries.push(`"disciplines"%3A{${values.join('%2C')}}`);
+      queries.push(`"disciplines"%3A{${values.join("%2C")}}`);
     }
 
     if (isClan.length > 0) {
       const values = isClan.map((i) => `"${i.toLowerCase()}"`);
-      queries.push(`"clan"%3A{"value"%3A[${values.join('%2C')}]%2C"logic"%3A"or"}`);
+      queries.push(`"clan"%3A{"value"%3A[${values.join("%2C")}]%2C"logic"%3A"or"}`);
     }
     if (isTitle.length > 0) {
-      if (isTitle[0] == 'titled') {
+      if (isTitle[0] === TITLED) {
         queries.push(`"votes"%3A"1"`);
       } else {
         const values = isTitle.map((i) => `"${i}"%3Atrue`);
-        queries.push(`"titles"%3A{${values.join('%2C')}}`);
+        queries.push(`"titles"%3A{${values.join("%2C")}}`);
       }
     }
     if (isCapacity) {
-      const [v, logic] = isCapacity.split(' or ');
+      const [v, logic] = isCapacity.split(" or ");
       queries.push(
         `"capacity"%3A{"value"%3A[{"capacity"%3A"${v}"%2C"moreless"%3A"${
-          logic === 'more' ? GE : LE
+          logic === "more" ? GE : LE
         }"}]%2C"logic"%3A"or"}`,
       );
     }
@@ -56,19 +55,18 @@ const ButtonPlayableBy = ({ card, handleClose }) => {
     if (isNonSect) {
       queries.push(`"sect"%3A{"value"%3A["${isNonSect}"]%2C"logic"%3A"not"}`);
     }
-    if (isRedlist) traits.push('red list');
-    if (isSeraph) traits.push('seraph');
-    if (isBlackHand) traits.push('black hand');
+    if (isRedlist) traits.push(RED_LIST);
+    if (isSeraph) traits.push(SERAPH);
+    if (isBlackHand) traits.push(BLACK_HAND);
 
     if (traits.length > 0) {
-      const traitsQuery = traits.map((t) => `"${t}"%3Atrue`).join('%2C');
+      const traitsQuery = traits.map((t) => `"${t}"%3Atrue`).join("%2C");
       queries.push(`"traits"%3A{${traitsQuery}}`);
     }
 
     clearSearchForm(CRYPT);
-    navigate(`/crypt?q={${queries.join('%2C')}}`);
-
-    handleClose && handleClose();
+    navigate(`/crypt?q={${queries.join("%2C")}}`);
+    handleClose();
   };
 
   return (

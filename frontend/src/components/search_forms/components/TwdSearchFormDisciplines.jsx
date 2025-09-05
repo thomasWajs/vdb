@@ -1,5 +1,4 @@
-import React from 'react';
-import { CryptSearchFormDisciplines, CryptSearchFormVirtues } from '@/components';
+import { CryptSearchFormDisciplines, CryptSearchFormVirtues } from "@/components";
 
 const TwdSearchFormDisciplines = ({ value, onChange }) => {
   return (

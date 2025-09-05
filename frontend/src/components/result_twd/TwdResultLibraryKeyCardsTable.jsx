@@ -1,17 +1,20 @@
-import React from 'react';
+import { useState } from "react";
 import {
-  ResultModal,
-  TwdResultLibraryKeyCardsTableRow,
-  ResultLibraryCost,
+  DeckLibrary,
   ResultLegalIcon,
-} from '@/components';
-import { POOL, BLOOD, X, ID, BANNED, GROUPED_TYPE, ASCII } from '@/constants';
-import { useApp } from '@/context';
-import { librarySort } from '@/utils';
-import { useDeckLibrary, useModalCardController } from '@/hooks';
+  ResultLibraryCost,
+  ResultModal,
+  Toggle,
+  TwdResultLibraryKeyCardsTableRow,
+} from "@/components";
+import { ASCII, BANNED, BLOOD, GROUPED_TYPE, ID, LIBRARY, POOL, X } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckLibrary, useModalCardController } from "@/hooks";
+import { librarySort } from "@/utils";
 
 const TwdResultLibraryKeyCardsTable = ({ library, withHeader }) => {
-  const { isMobile, setShowFloatingButtons } = useApp();
+  const { isMobile, isDesktop, setShowFloatingButtons } = useApp();
+  const [showFullLibrary, setShowFullLibrary] = useState();
   const sortedLibrary = librarySort(Object.values(library), GROUPED_TYPE);
   const keyCards = sortedLibrary
     .filter((card) => card.q >= 4)
@@ -27,12 +30,12 @@ const TwdResultLibraryKeyCardsTable = ({ library, withHeader }) => {
 
   const handleClick = (card) => {
     handleModalCardOpen(card);
-    setShowFloatingButtons(false);
+    !isDesktop && setShowFloatingButtons(false);
   };
 
   const handleClose = () => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
+    !isDesktop && setShowFloatingButtons(true);
   };
 
   const { libraryTotal, hasBanned, poolTotal, bloodTotal } = useDeckLibrary(library);
@@ -43,7 +46,7 @@ const TwdResultLibraryKeyCardsTable = ({ library, withHeader }) => {
         {withHeader ? (
           <>
             <div className="whitespace-nowrap">
-              {isMobile ? 'L' : 'Library'} [{libraryTotal}], Keys:
+              {isMobile ? "L" : "Library"} [{libraryTotal}], Keys:
             </div>
             {hasBanned && <ResultLegalIcon type={BANNED} />}
             <div className="flex gap-1.5 sm:gap-3">
@@ -58,21 +61,29 @@ const TwdResultLibraryKeyCardsTable = ({ library, withHeader }) => {
             </div>
           </>
         ) : (
-          'Key Cards:'
+          <Toggle
+            offValue="Key Cards"
+            isOn={showFullLibrary}
+            handleClick={() => setShowFullLibrary(!showFullLibrary)}
+          >
+            Full Library
+          </Toggle>
         )}
       </div>
-      <table className="border-x border-bgSecondary dark:border-bgSecondaryDark">
+      <table className="border-bgSecondary border-x dark:border-bgSecondaryDark">
         <tbody>
-          {keyCards.map((card) => {
-            return (
+          {showFullLibrary ? (
+            <DeckLibrary deck={{ [LIBRARY]: library }} handleClick={handleClick} inTwd />
+          ) : (
+            keyCards.map((card) => (
               <TwdResultLibraryKeyCardsTableRow
                 key={card.c[ID]}
                 card={card}
                 handleClick={handleClick}
                 shouldShowModal={shouldShowModal}
               />
-            );
-          })}
+            ))
+          )}
         </tbody>
       </table>
       {shouldShowModal && (

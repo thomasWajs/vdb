@@ -1,15 +1,14 @@
-import React from 'react';
 import {
   CardPopover,
-  ResultName,
-  ResultModal,
-  NewCardSelect,
   ConditionalTooltip,
+  NewCardSelect,
+  ResultModal,
+  ResultName,
   TwdSearchFormQuantityButtons,
-} from '@/components';
-import { useApp } from '@/context';
-import { useModalCardController } from '@/hooks';
-import { NEW, GROUP, GT, CRYPT } from '@/constants';
+} from "@/components";
+import { CRYPT, GROUP, GT, NEW } from "@/constants";
+import { useApp } from "@/context";
+import { useModalCardController } from "@/hooks";
 
 const TwdSearchFormCrypt = ({ value, form }) => {
   const { cryptCardBase, setShowFloatingButtons, isMobile } = useApp();

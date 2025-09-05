@@ -1,28 +1,32 @@
-import React from 'react';
-import { EN, ES, FR, PT } from '@/constants';
+import { EN, ES, FR, PT } from "@/constants";
 
-const Flag = ({ value, size = 'md', noTitle }) => {
+const Flag = ({ value, size = "md", noTitle }) => {
   const icons = {
     [EN]: {
-      filename: 'en',
-      title: 'English',
+      filename: "en",
+      title: "English",
     },
     [ES]: {
-      filename: 'es',
-      title: 'Spanish',
+      filename: "es",
+      title: "Spanish",
     },
     [FR]: {
-      filename: 'fr',
-      title: 'French',
+      filename: "fr",
+      title: "French",
     },
     [PT]: {
-      filename: 'br',
-      title: 'Portuguese',
+      filename: "br",
+      title: "Portuguese",
     },
   };
   const sizeStyle = {
-    md: 'h-[18px]',
-    lg: 'h-[22px]',
+    md: "h-[18px]",
+    lg: "h-[22px]",
+  };
+
+  const sizePx = {
+    md: 18,
+    lg: 22,
   };
 
   return (
@@ -31,6 +35,8 @@ const Flag = ({ value, size = 'md', noTitle }) => {
       title={!noTitle ? icons[value].title : null}
       alt={`${icons[value].title} flag`}
       className={sizeStyle[size]}
+      width={sizePx[size]}
+      height={sizePx[size]}
     />
   );
 };

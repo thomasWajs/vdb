@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { Select } from '@/components';
-import { Toggle, ResultLibraryTypeImage } from '@/components';
-import { useApp } from '@/context';
+import { useState } from "react";
+import { ResultLibraryTypeImage, Select, Toggle } from "@/components";
 import {
   ANY,
   CARDTYPES,
@@ -17,12 +15,10 @@ import {
   TYPE_POLITICAL_ACTION,
   TYPE_REACTION,
   TYPE_RETAINER,
-} from '@/constants';
+} from "@/constants";
 
 const TypeForm = ({ isManual, handleManual, value = ANY, name, options, onChange }) => {
-  const { isXWide } = useApp();
-  const maxMenuHeight = isXWide ? 500 : 350;
-  const [min, max] = value == ANY ? [0, 100] : value.split(',');
+  const [min, max] = value === ANY ? [0, 100] : value.split(",");
 
   return (
     <div className="flex items-center gap-1">
@@ -33,19 +29,19 @@ const TypeForm = ({ isManual, handleManual, value = ANY, name, options, onChange
         {isManual ? (
           <div className="flex items-center justify-between gap-1">
             <input
-              className="border-borderSecondary bg-bgPrimary text-fgPrimary outline-bgCheckboxSelected dark:border-borderSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark dark:outline-bgCheckboxSelectedDark min-h-[42px] w-full rounded-sm border text-center focus:outline"
+              className="min-h-[42px] w-full rounded-sm border border-borderSecondary bg-bgPrimary text-center text-fgPrimary outline-bgCheckboxSelected focus:outline dark:border-borderSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark dark:outline-bgCheckboxSelectedDark"
               type="number"
               value={min}
               name={name.toLowerCase()}
-              id="min"
+              id={`${name.toLowerCase()}-min`}
               onChange={handleManual}
             />
             -
             <input
-              className="border-borderSecondary bg-bgPrimary text-fgPrimary outline-bgCheckboxSelected dark:border-borderSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark dark:outline-bgCheckboxSelectedDark min-h-[42px] w-full rounded-sm border text-center focus:outline"
+              className="min-h-[42px] w-full rounded-sm border border-borderSecondary bg-bgPrimary text-center text-fgPrimary outline-bgCheckboxSelected focus:outline dark:border-borderSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark dark:outline-bgCheckboxSelectedDark"
               type="number"
               name={name.toLowerCase()}
-              id="max"
+              id={`${name.toLowerCase()}-max`}
               value={max}
               onChange={handleManual}
             />
@@ -53,9 +49,7 @@ const TypeForm = ({ isManual, handleManual, value = ANY, name, options, onChange
         ) : (
           <Select
             options={options}
-            isSearchable={false}
             name={CARDTYPES}
-            maxMenuHeight={maxMenuHeight}
             value={options.find((obj) => obj.value === value)}
             onChange={onChange}
           />
@@ -82,8 +76,8 @@ const TwdSearchFormCardtypes = ({ value, onChange }) => {
 
   const handleManual = (e) => {
     const v = e.target.value;
-    let [min, max] = value[e.target[NAME]].split(',');
-    if (e.target[ID] == 'min') {
+    let [min, max] = value[e.target[NAME]].split(",");
+    if (e.target[ID].includes("-min")) {
       if (v >= 0) {
         min = e.target.value ?? 0;
       }
@@ -110,7 +104,7 @@ const TwdSearchFormCardtypes = ({ value, onChange }) => {
 
     if (i[1][0] === 0) {
       options.push({
-        value: '0,0',
+        value: "0,0",
         name: i[0].toLowerCase(),
         label: <div className="flex justify-center">None</div>,
       });
@@ -118,7 +112,7 @@ const TwdSearchFormCardtypes = ({ value, onChange }) => {
 
     i[1]
       .filter((i) => i !== 0)
-      .map((j) => {
+      .forEach((j) => {
         options.push({
           value: `0,${j}`,
           name: i[0].toLowerCase(),
@@ -128,17 +122,18 @@ const TwdSearchFormCardtypes = ({ value, onChange }) => {
 
     i[1]
       .filter((i) => i !== 0)
-      .map((j, idx) => {
+      .forEach((j, idx) => {
+        let n = idx;
         if (i[1][0] === 0) {
-          idx = idx + 1;
+          n = n + 1;
         }
-        if (idx < i[1].length - 1)
+        if (n < i[1].length - 1)
           options.push({
-            value: `${j},${i[1][idx + 1]}`,
+            value: `${j},${i[1][n + 1]}`,
             name: i[0].toLowerCase(),
             label: (
               <div className="flex justify-center">
-                {j}...{i[1][idx + 1]}%
+                {j}...{i[1][n + 1]}%
               </div>
             ),
           });
@@ -146,7 +141,7 @@ const TwdSearchFormCardtypes = ({ value, onChange }) => {
 
     i[1]
       .filter((i) => i !== 0)
-      .map((j) => {
+      .forEach((j) => {
         options.push({
           value: `${j},100`,
           name: i[0].toLowerCase(),
@@ -160,7 +155,7 @@ const TwdSearchFormCardtypes = ({ value, onChange }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between gap-2">
-        <div className="text-fgSecondary dark:text-fgSecondaryDark font-bold">
+        <div className="font-bold text-fgSecondary dark:text-fgSecondaryDark">
           Library Card Types:
         </div>
         <Toggle isOn={isManual} handleClick={() => setIsManual(!isManual)}>

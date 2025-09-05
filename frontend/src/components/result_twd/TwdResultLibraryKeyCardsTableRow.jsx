@@ -1,41 +1,36 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
 import {
   CardPopover,
-  UsedPopover,
-  ResultName,
-  ResultLibraryTypeImage,
-  ResultLibraryTableRowReqClanDis,
   ConditionalTooltip,
-} from '@/components';
-import { useApp, limitedStore, inventoryStore, usedStore } from '@/context';
-import { getHardTotal } from '@/utils';
-import { ID, TYPE, HARD, LIBRARY } from '@/constants';
+  ResultLibraryTableRowReqClanDis,
+  ResultLibraryTypeImage,
+  ResultName,
+  Tr,
+  UsedPopover,
+} from "@/components";
+import { HARD, ID, LIBRARY, TYPE } from "@/constants";
+import { inventoryStore, useApp, usedStore } from "@/context";
+import { getHardTotal } from "@/utils";
 
 const TwdResultLibraryKeyCardsTableRow = ({ card, handleClick, shouldShowModal }) => {
-  const { limitedMode, inventoryMode, isMobile } = useApp();
-  const inventoryLibrary = useSnapshot(inventoryStore)[LIBRARY];
-  const limitedLibrary = useSnapshot(limitedStore)[LIBRARY];
+  const { inventoryMode, isMobile } = useApp();
+  const { [LIBRARY]: inventoryLibrary } = useSnapshot(inventoryStore);
   const usedLibrary = useSnapshot(usedStore)[LIBRARY];
-  const inLimited = limitedLibrary[card.c[ID]];
   const inInventory = inventoryLibrary[card.c[ID]]?.q ?? 0;
   const hardUsedTotal = getHardTotal(usedLibrary[HARD][card.c[ID]]);
 
   return (
-    <tr
-      key={card.c[ID]}
-      className="row-bg h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark"
-    >
-      <td className="min-w-[28px] border-r border-bgSecondary bg-blue/5 dark:border-bgSecondaryDark sm:min-w-[35px]">
+    <Tr key={card.c[ID]}>
+      <td className="min-w-[28px] border-bgSecondary border-r bg-blue/5 sm:min-w-[35px] dark:border-bgSecondaryDark">
         {inventoryMode ? (
           <ConditionalTooltip overlay={<UsedPopover cardid={card.c[ID]} />} disabled={isMobile}>
             <div
               className={twMerge(
-                'flex justify-center text-lg',
+                "mx-1 flex justify-center text-lg",
                 inInventory < card.q
-                  ? 'bg-bgError text-white dark:bg-bgErrorDark dark:text-whiteDark'
-                  : inInventory - hardUsedTotal < card.q && 'bg-bgWarning dark:bg-bgWarningDark',
+                  ? "bg-bgError text-white dark:bg-bgErrorDark dark:text-whiteDark"
+                  : inInventory - hardUsedTotal < card.q && "bg-bgWarning dark:bg-bgWarningDark",
               )}
             >
               {card.q}
@@ -57,14 +52,16 @@ const TwdResultLibraryKeyCardsTableRow = ({ card, handleClick, shouldShowModal }
           noPadding
         >
           <div className="flex cursor-pointer">
-            <ResultName card={card.c} isBanned={limitedMode && !inLimited} />
+            <ResultName card={card.c} />
           </div>
         </ConditionalTooltip>
       </td>
-      {!isMobile && (
-        <ResultLibraryTableRowReqClanDis card={card.c} handleClick={() => handleClick(card.c)} />
-      )}
-    </tr>
+      <ResultLibraryTableRowReqClanDis
+        className="max-sm:hidden"
+        card={card.c}
+        handleClick={() => handleClick(card.c)}
+      />
+    </Tr>
   );
 };
 

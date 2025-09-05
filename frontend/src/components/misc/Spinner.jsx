@@ -1,7 +1,6 @@
-import React from 'react';
-import ThreeDots from '@icons/three-dots.svg?react';
+import ThreeDots from "@icons/three-dots.svg?react";
 
-const Spinner = ({ className = '' }) => {
+const Spinner = ({ className = "" }) => {
   return (
     <div className="animate-spin">
       <ThreeDots className={className} />

@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from "react";
 
-const SIDE_CARD_MODE = 'SIDE_CARD_MODE';
-const MAIN_CARD_MODE = 'MAIN_CARD_MODE';
+const SIDE_CARD_MODE = "SIDE_CARD_MODE";
+const MAIN_CARD_MODE = "MAIN_CARD_MODE";
 
 const useModalCardController = (mainCards = [], sideCards = []) => {
   const [cardid, setCardid] = useState(null);
@@ -12,12 +12,12 @@ const useModalCardController = (mainCards = [], sideCards = []) => {
 
   const handleModalCardOpen = (i) => {
     setMode(MAIN_CARD_MODE);
-    setCardid(isNaN(i) ? mainList.indexOf(i) : i);
+    setCardid(Number.isInteger(i) ? i : mainList.indexOf(i));
   };
 
   const handleModalSideCardOpen = (i) => {
     setMode(SIDE_CARD_MODE);
-    setCardid(isNaN(i) ? sideList.indexOf(i) : i);
+    setCardid(Number.isInteger(i) ? i : sideList.indexOf(i));
   };
 
   const handleModalCardChange = (d) => {
@@ -31,17 +31,12 @@ const useModalCardController = (mainCards = [], sideCards = []) => {
     }
   };
 
-  const handleModalCardClose = () => {
-    setCardid(null);
-  };
+  const handleModalCardClose = () => setCardid(null);
 
   const shouldShowModal = useMemo(() => cardid !== null, [cardid]);
-
   const isSideMode = useMemo(() => mode === SIDE_CARD_MODE, [mode]);
-
   const currentModalCard = useMemo(() => {
     if (cardid === null) return null;
-
     return (isSideMode ? sideList : mainList)[cardid];
   }, [mainList, sideList, mode, cardid]);
 

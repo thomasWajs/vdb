@@ -1,6 +1,5 @@
-import React from 'react';
-import { ResultDisciplineImage } from '@/components';
-import virtuesList from '@/assets/data/virtuesList.json';
+import virtuesList from "@/assets/data/virtuesList.json";
+import { ResultDisciplineImage } from "@/components";
 
 const DisciplinesCryptSummary = ({ disciplinesDetailed }) => {
   const disciplinesSorted = Object.keys(disciplinesDetailed).toSorted((a, b) => {

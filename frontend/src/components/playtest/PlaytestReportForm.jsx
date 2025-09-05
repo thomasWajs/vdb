@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import ChevronBarExpand from '@icons/chevron-bar-expand.svg?react';
-import ChevronBarContract from '@icons/chevron-bar-contract.svg?react';
-import ChatLeftQuoteFill from '@icons/chat-left-quote-fill.svg?react';
+import ChatLeftQuoteFill from "@icons/chat-left-quote-fill.svg?react";
+import ChevronBarContract from "@icons/chevron-bar-contract.svg?react";
+import ChevronBarExpand from "@icons/chevron-bar-expand.svg?react";
+import { useEffect, useState } from "react";
 import {
   Button,
+  Checkbox,
+  ConditionalTooltipOrModal,
   Input,
   InputLabel,
-  Textarea,
-  ConditionalTooltipOrModal,
+  PlaytestReportsOneButton,
   PlaytestScores,
-  Checkbox,
-} from '@/components';
-import { useFetch } from '@/hooks';
-import { useApp } from '@/context';
-import { playtestServices } from '@/services';
-import { ID, VALUE, PRECONS, TEXT, CARDS, SCORE } from '@/constants';
-const IS_PLAYED = 'isPlayed';
+  Textarea,
+} from "@/components";
+import { CARDS, DECK, ID, NAME, PRECONS, SCORE, TEXT, VALUE } from "@/constants";
+import { useApp } from "@/context";
+import { useFetch } from "@/hooks";
+import { playtestServices } from "@/services";
+
+const IS_PLAYED = "isPlayed";
 
 const Title = ({ isPrecon }) => {
   return (
@@ -30,7 +32,7 @@ const Title = ({ isPrecon }) => {
               more specific guidelines.
             </div>
             <div>
-              Score represent how STRONG {isPrecon ? 'precon' : 'card'} is, not how balanced or
+              Score represent how STRONG {isPrecon ? "precon" : "card"} is, not how balanced or
               well-designed it is:
             </div>
             <div>
@@ -57,11 +59,11 @@ const Title = ({ isPrecon }) => {
   );
 };
 
-const PlaytestReportForm = ({ id, setIsHotkeysDisabled, isPrecon = false }) => {
-  const { isMobile } = useApp();
+const PlaytestReportForm = ({ id, deck, setIsHotkeysDisabled, isPrecon = false }) => {
+  const { isPlaytestAdmin } = useApp();
   const [isFolded, setIsFolded] = useState(true);
   const [report, setReport] = useState({
-    [TEXT]: '',
+    [TEXT]: "",
     [SCORE]: 0,
     [IS_PLAYED]: false,
     [ID]: null,
@@ -101,11 +103,17 @@ const PlaytestReportForm = ({ id, setIsHotkeysDisabled, isPrecon = false }) => {
   };
 
   const handleIsPlayedChange = (event) => {
-    setReport((prevState) => ({ ...prevState, [IS_PLAYED]: !event.currentTarget.value }));
+    setReport((prevState) => ({
+      ...prevState,
+      [IS_PLAYED]: !event.currentTarget.value,
+    }));
   };
 
   const handleScoreChange = (value) => {
-    setReport((prevState) => ({ ...prevState, [SCORE]: value == prevState[SCORE] ? 0 : value }));
+    setReport((prevState) => ({
+      ...prevState,
+      [SCORE]: value === prevState[SCORE] ? 0 : value,
+    }));
   };
 
   const handleTextChange = (event) => {
@@ -116,25 +124,31 @@ const PlaytestReportForm = ({ id, setIsHotkeysDisabled, isPrecon = false }) => {
     <div className="flex flex-col gap-3">
       <div className="flex justify-between">
         <Title />
-        {isMobile && (
-          <Checkbox
-            label="seen in play"
-            value={report[IS_PLAYED]}
-            checked={report[IS_PLAYED]}
-            onChange={handleIsPlayedChange}
-          />
-        )}
+        <Checkbox
+          className="sm:hidden"
+          label="seen in play"
+          value={report[IS_PLAYED]}
+          checked={report[IS_PLAYED]}
+          onChange={handleIsPlayedChange}
+        />
       </div>
       <div className="flex w-full items-center justify-between gap-4">
         <PlaytestScores value={report[SCORE]} handleClick={handleScoreChange} />
-        {!isMobile && (
+        <div className="flex items-center justify-between gap-2">
           <Checkbox
+            className="max-sm:hidden"
             label="seen in play"
             value={report[IS_PLAYED]}
             checked={report[IS_PLAYED]}
             onChange={handleIsPlayedChange}
           />
-        )}
+          {isPrecon && isPlaytestAdmin && (
+            <PlaytestReportsOneButton
+              value={{ [DECK]: deck, [NAME]: deck[NAME], [ID]: id }}
+              isPrecon
+            />
+          )}
+        </div>
       </div>
       <form className="flex" onSubmit={submit}>
         <InputLabel title="Description">

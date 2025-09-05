@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from 'react';
-import { useSnapshot } from 'valtio';
-import { Select } from '@/components';
-import { deckStore } from '@/context';
-import { byTimestamp } from '@/utils';
-import { DECK, DECKS, DECKID, TIMESTAMP, BRANCHES, BRANCH_NAME, MASTER, NAME } from '@/constants';
+import { useMemo, useState } from "react";
+import { useSnapshot } from "valtio";
+import { Select } from "@/components";
+import { BRANCH_NAME, BRANCHES, DECK, DECKID, DECKS, MASTER, NAME, TIMESTAMP } from "@/constants";
+import { deckStore } from "@/context";
+import { byTimestamp } from "@/utils";
 
 const DeckBranchSelect = ({ deck, handleSelect }) => {
   const decks = useSnapshot(deckStore)[DECKS];
@@ -20,7 +20,7 @@ const DeckBranchSelect = ({ deck, handleSelect }) => {
   };
 
   if (target[BRANCHES]) {
-    target[BRANCHES].map((i) => {
+    target[BRANCHES].forEach((i) => {
       b[i] = {
         [DECKID]: decks[i][DECKID],
         [BRANCH_NAME]: decks[i][BRANCH_NAME],
@@ -30,7 +30,7 @@ const DeckBranchSelect = ({ deck, handleSelect }) => {
     });
   }
 
-  if (JSON.stringify(branches) != JSON.stringify(b)) {
+  if (JSON.stringify(branches) !== JSON.stringify(b)) {
     setBranches(b);
   }
 
@@ -38,19 +38,16 @@ const DeckBranchSelect = ({ deck, handleSelect }) => {
     return Object.keys(branches)
       .filter((i) => decks[i])
       .toSorted((a, b) => byTimestamp(decks[a], decks[b]))
-      .map((i) => {
-        return {
-          value: i,
-          name: DECK,
-          label: decks[i][BRANCH_NAME],
-        };
-      });
+      .map((i) => ({
+        value: i,
+        name: DECK,
+        label: decks[i][BRANCH_NAME],
+      }));
   }, [branches]);
 
   return (
     <Select
       options={options}
-      isSearchable={false}
       value={options.find((obj) => obj.value === deck[DECKID])}
       onChange={handleSelect}
     />

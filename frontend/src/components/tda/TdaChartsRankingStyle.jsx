@@ -1,31 +1,31 @@
-import React, { useMemo } from 'react';
-import { BubbleChart } from '@/components';
-import { capitalize, getClan } from '@/utils';
-import { useApp } from '@/context';
+import { useMemo } from "react";
+import { BubbleChart } from "@/components";
 import {
   ALLY,
   AUTHOR,
+  BASE,
   BLEED,
   BLOCK,
+  CLAN,
   COMBAT,
   CRYPT,
+  IN_SEARCH,
+  INDEX,
   LIBRARY,
   MULTI,
   PLAYERS,
   RANK,
   RUSH,
+  SCORE,
   STEALTH,
+  SUPERIOR,
   SWARM,
   TAGS,
-  VOTE,
-  SCORE,
-  CLAN,
-  IN_SEARCH,
-  INDEX,
   VALUE,
-  SUPERIOR,
-  BASE,
-} from '@/constants';
+  VOTE,
+} from "@/constants";
+import { useApp } from "@/context";
+import { capitalize, deepClone, getClan } from "@/utils";
 
 const TdaChartsRankingStyle = ({ info, decks, searchResults }) => {
   const { isMobile, isDesktop, isWide } = useApp();
@@ -54,20 +54,24 @@ const TdaChartsRankingStyle = ({ info, decks, searchResults }) => {
         [INDEX]: -1,
       };
 
-      deck[TAGS][SUPERIOR].filter((t) => allowedTags.includes(t)).forEach((t) => {
-        d[t][position] = {
-          ...def,
-          [VALUE]: 1,
-        };
-      });
-      deck[TAGS][BASE].filter((t) => allowedTags.includes(t)).forEach((t) => {
-        d[t][position] = {
-          ...def,
-          [VALUE]: 0.4,
-        };
-      });
+      deck[TAGS][SUPERIOR]
+        .filter((t) => allowedTags.includes(t))
+        .forEach((t) => {
+          d[t][position] = {
+            ...def,
+            [VALUE]: 1,
+          };
+        });
+      deck[TAGS][BASE]
+        .filter((t) => allowedTags.includes(t))
+        .forEach((t) => {
+          d[t][position] = {
+            ...def,
+            [VALUE]: 0.4,
+          };
+        });
     });
-    return d;
+    return deepClone(d);
   }, [searchResults, decks, info]);
 
   return (

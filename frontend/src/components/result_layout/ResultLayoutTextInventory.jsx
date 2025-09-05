@@ -1,12 +1,11 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
-import ArchiveFill from '@icons/archive-fill.svg?react';
-import CalculatorFill from '@icons/calculator-fill.svg?react';
-import { InventoryText, UsedDescription } from '@/components';
-import { inventoryStore, usedStore, deckStore } from '@/context';
-import { getHardTotal, getSoftMax } from '@/utils';
-import { ID, SOFT, HARD, CRYPT, LIBRARY, DECKS } from '@/constants';
+import ArchiveFill from "@icons/archive-fill.svg?react";
+import CalculatorFill from "@icons/calculator-fill.svg?react";
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
+import { InventoryText, UsedDescription } from "@/components";
+import { CRYPT, DECKS, HARD, ID, LIBRARY, SOFT } from "@/constants";
+import { deckStore, inventoryStore, usedStore } from "@/context";
+import { getHardTotal, getSoftMax } from "@/utils";
 
 const ResultLayoutTextInventory = ({ card, inPopover, setIsHotkeysDisabled }) => {
   const decks = useSnapshot(deckStore)[DECKS];
@@ -21,7 +20,7 @@ const ResultLayoutTextInventory = ({ card, inPopover, setIsHotkeysDisabled }) =>
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className={twMerge('flex gap-1.5', inPopover ? 'flex-col' : 'max-md:flex-col')}>
+      <div className={twMerge("flex gap-1.5", inPopover ? "flex-col" : "max-md:flex-col")}>
         <div className="flex basis-full flex-col gap-0.5 md:basis-1/3">
           <div className="flex items-center gap-1.5">
             <div className="opacity-40">
@@ -39,24 +38,22 @@ const ResultLayoutTextInventory = ({ card, inPopover, setIsHotkeysDisabled }) =>
           </div>
         </div>
         {(softUsedMax > 0 || hardUsedTotal > 0) && (
-          <>
-            <div className="flex basis-full flex-col gap-0.5 md:basis-2/3">
-              {softUsedMax > 0 && (
-                <UsedDescription
-                  usedCards={usedCards[SOFT][card[ID]]}
-                  decks={decks}
-                  inventoryType="s"
-                />
-              )}
-              {hardUsedTotal > 0 && (
-                <UsedDescription
-                  usedCards={usedCards[HARD][card[ID]]}
-                  decks={decks}
-                  inventoryType="h"
-                />
-              )}
-            </div>
-          </>
+          <div className="flex basis-full flex-col gap-0.5 md:basis-2/3">
+            {softUsedMax > 0 && (
+              <UsedDescription
+                usedCards={usedCards[SOFT][card[ID]]}
+                decks={decks}
+                inventoryType="s"
+              />
+            )}
+            {hardUsedTotal > 0 && (
+              <UsedDescription
+                usedCards={usedCards[HARD][card[ID]]}
+                decks={decks}
+                inventoryType="h"
+              />
+            )}
+          </div>
         )}
       </div>
       {(!inPopover || text) && (

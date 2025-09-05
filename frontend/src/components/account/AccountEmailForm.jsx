@@ -1,6 +1,5 @@
-import React from 'react';
-import { Input } from '@/components';
-import { EMAIL } from '@/constants';
+import { Input } from "@/components";
+import { EMAIL } from "@/constants";
 
 const AccountEmailForm = ({ defaultValue }) => {
   return (

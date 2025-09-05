@@ -1,25 +1,21 @@
-import React, { useState } from 'react';
-import ky from 'ky';
-import { useNavigate } from 'react-router';
-import { Tab } from '@headlessui/react';
-import Download from '@icons/download.svg?react';
-import Printer from '@icons/printer.svg?react';
-import Arrow90DegLeft from '@icons/arrow-90deg-left.svg?react';
+import { TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import Arrow90DegLeft from "@icons/arrow-90deg-left.svg?react";
+import Download from "@icons/download.svg?react";
+import Printer from "@icons/printer.svg?react";
+import ky from "ky";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import {
-  TabButton,
   ButtonIconed,
   FlexGapped,
   Hr,
   PlaytestReportsAllCardsWrapper,
-  PlaytestReportsAllPreconsWrapper,
   PlaytestReportsAllGeneral,
+  PlaytestReportsAllPreconsWrapper,
   SortButton,
+  TabButton,
   Toggle,
-} from '@/components';
-import { useFetch } from '@/hooks';
-import { useApp } from '@/context';
-import { playtestServices } from '@/services';
-import { capitalize } from '@/utils';
+} from "@/components";
 import {
   ALL,
   CARDS,
@@ -30,10 +26,14 @@ import {
   NAME,
   PLAYTEST,
   PRECONS,
+  SCORE,
   TEXT,
   XLSX,
-  SCORE,
-} from '@/constants';
+} from "@/constants";
+import { useApp } from "@/context";
+import { useFetch } from "@/hooks";
+import { playtestServices } from "@/services";
+import { capitalize } from "@/utils";
 
 const PlaytestReportsAll = () => {
   const {
@@ -47,8 +47,8 @@ const PlaytestReportsAll = () => {
   const navigate = useNavigate();
   const [sortMethod, setSortMethod] = useState(NAME);
   const sortMethods = {
-    [NAME]: 'N',
-    [CLAN_DISCIPLINE]: 'C/D',
+    [NAME]: "N",
+    [CLAN_DISCIPLINE]: "C/D",
   };
 
   const exportReports = async (target, format) => {
@@ -59,7 +59,7 @@ const PlaytestReportsAll = () => {
       [GENERAL]: reportsGeneral,
     };
     let file;
-    let exportText = '';
+    let exportText = "";
 
     switch (format) {
       case XLSX: {
@@ -73,7 +73,7 @@ const PlaytestReportsAll = () => {
           preconDecks,
         );
         file = new File([data], `${target}.xlsx`, {
-          type: 'application/octet-stream',
+          type: "application/octet-stream",
         });
         break;
       }
@@ -82,23 +82,23 @@ const PlaytestReportsAll = () => {
           let name;
           switch (target) {
             case PRECONS:
-              if (id == GENERAL || !isNaN(id)) return;
+              if (id === GENERAL || Number.isInteger(Number.parseInt(id))) return;
               name = preconDecks[`${PLAYTEST}:${id}`][NAME];
               exportText += `Precon: ${name}\n\n`;
               break;
             case CARDS:
-              if (isNaN(id)) return;
+              if (!Number.isInteger(Number.parseInt(id))) return;
               try {
                 name = id > 200000 ? cryptCardBase[id][NAME] : libraryCardBase[id][NAME];
               } catch {
                 console.log(`Skipping (not in this Round) - ${id}`);
                 break;
               }
-              exportText += `${id > 200000 ? 'Crypt' : 'Library'}: ${name}\n\n`;
+              exportText += `${id > 200000 ? "Crypt" : "Library"}: ${name}\n\n`;
               break;
             default:
-              if (id != GENERAL) return;
-              exportText += 'General Opinions\n\n';
+              if (id !== GENERAL) return;
+              exportText += "General Opinions\n\n";
           }
 
           Object.keys(reports[id]).forEach((user, uIdx) => {
@@ -109,24 +109,24 @@ const PlaytestReportsAll = () => {
                 break;
               default:
                 exportText += `Score: ${reports[id][user][SCORE]}\n`;
-                exportText += `Seen in Play: ${reports[id][user].isPlayed ? 'Yes' : 'No'}\n`;
+                exportText += `Seen in Play: ${reports[id][user].isPlayed ? "Yes" : "No"}\n`;
                 if (reports[id][user][TEXT]) exportText += `${reports[id][user][TEXT]}\n`;
             }
             if (uIdx + 1 < Object.keys(reports[id]).length) {
-              exportText += '\n-----\n\n';
+              exportText += "\n-----\n\n";
             }
           });
           if (idx + 1 < Object.keys(reports).length) {
-            exportText += '\n=====\n\n';
+            exportText += "\n=====\n\n";
           }
         });
 
         file = new File([exportText], `Reports - ${capitalize(target)}.txt`, {
-          type: 'text/plain;charset=utf-8',
+          type: "text/plain;charset=utf-8",
         });
     }
 
-    let { saveAs } = await import('file-saver');
+    const { saveAs } = await import("file-saver");
     saveAs(file);
   };
 
@@ -156,10 +156,10 @@ const PlaytestReportsAll = () => {
   const maxReportsSameScorePrecons = reportsPrecons && getMaxReportsSameScore(reportsPrecons);
 
   return (
-    <div className="playtest-reports-container mx-auto">
+    <div className="playtest-reports-container mx-auto print:dark:bg-bgPrimary">
       <div className="flex flex-col gap-3 max-sm:p-2 sm:gap-4">
         <div className="flex justify-between gap-1 sm:gap-4 print:hidden">
-          <div className="flex justify-between gap-1 max-sm:w-full max-sm:flex-col sm:gap-4">
+          <div className="flex gap-1 max-sm:w-full max-sm:flex-col">
             <ButtonIconed
               className="w-full whitespace-nowrap"
               onClick={() => exportReports(CARDS)}
@@ -196,19 +196,21 @@ const PlaytestReportsAll = () => {
               icon={<Printer width="18" height="18" viewBox="0 0 18 16" />}
             />
           </div>
-          <div className="flex justify-between gap-1 max-sm:flex-col sm:gap-4">
-            <ButtonIconed
-              onClick={() => navigate('/playtest')}
-              title="Back"
-              icon={<Arrow90DegLeft />}
-              text="Back"
-            />
-            <SortButton
-              className="h-full min-w-[80px]"
-              sortMethods={sortMethods}
-              sortMethod={sortMethod}
-              setSortMethod={setSortMethod}
-            />
+          <div className="flex gap-1 max-sm:flex-col max-sm:justify-between sm:gap-3">
+            <div className="flex justify-between gap-1 max-sm:flex-col">
+              <ButtonIconed
+                onClick={() => navigate("/playtest")}
+                title="Back"
+                icon={<Arrow90DegLeft />}
+                text="Back"
+              />
+              <SortButton
+                className="h-full min-w-[80px]"
+                sortMethods={sortMethods}
+                sortMethod={sortMethod}
+                setSortMethod={setSortMethod}
+              />
+            </div>
             <div className="flex justify-end">
               <Toggle
                 isOn={hidePlaytestNames}
@@ -219,30 +221,30 @@ const PlaytestReportsAll = () => {
             </div>
           </div>
         </div>
-        <Tab.Group manual className="flex flex-col gap-3 sm:gap-4">
-          <Tab.List className="flex gap-1.5 print:hidden">
+        <TabGroup manual className="flex flex-col gap-3 sm:gap-4">
+          <TabList className="flex gap-1.5 print:hidden">
             <TabButton>Crypt</TabButton>
             <TabButton>Library</TabButton>
             <TabButton>General / Precons</TabButton>
-          </Tab.List>
-          <Tab.Panels>
-            <Tab.Panel>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
               <PlaytestReportsAllCardsWrapper
                 maxSameScore={maxReportsSameScoreCrypt}
                 reports={reportsCrypt}
                 target={CRYPT}
                 sortMethod={sortMethod}
               />
-            </Tab.Panel>
-            <Tab.Panel>
+            </TabPanel>
+            <TabPanel>
               <PlaytestReportsAllCardsWrapper
                 maxSameScore={maxReportsSameScoreLibrary}
                 reports={reportsLibrary}
                 target={LIBRARY}
                 sortMethod={sortMethod}
               />
-            </Tab.Panel>
-            <Tab.Panel>
+            </TabPanel>
+            <TabPanel>
               <FlexGapped className="flex-col">
                 <PlaytestReportsAllGeneral reports={reportsGeneral} />
                 <Hr isThick className="print:hidden" />
@@ -251,9 +253,9 @@ const PlaytestReportsAll = () => {
                   maxSameScore={maxReportsSameScorePrecons}
                 />
               </FlexGapped>
-            </Tab.Panel>
-          </Tab.Panels>
-        </Tab.Group>
+            </TabPanel>
+          </TabPanels>
+        </TabGroup>
       </div>
     </div>
   );

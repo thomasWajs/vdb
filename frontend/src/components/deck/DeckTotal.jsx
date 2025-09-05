@@ -1,7 +1,6 @@
-import React from 'react';
-import { useSnapshot } from 'valtio';
-import { deckStore } from '@/context';
-import { TAGS, DECKS } from '@/constants';
+import { useSnapshot } from "valtio";
+import { DECKS, TAGS } from "@/constants";
+import { deckStore } from "@/context";
 
 const DeckSelectAdvTotal = ({ tagsFilter, setTagsFilter }) => {
   const decks = useSnapshot(deckStore)[DECKS];
@@ -14,9 +13,9 @@ const DeckSelectAdvTotal = ({ tagsFilter, setTagsFilter }) => {
     }
   };
 
-  Object.values(decks).map((deck) => {
+  Object.values(decks).forEach((deck) => {
     if (deck[TAGS]) {
-      deck[TAGS].map((tag) => {
+      deck[TAGS].forEach((tag) => {
         if (byTags[tag]) {
           byTags[tag] += 1;
         } else {

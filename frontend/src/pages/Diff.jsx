@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSnapshot } from 'valtio';
-import { useParams } from 'react-router';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
   ButtonFloatClose,
   ButtonFloatMenu,
@@ -14,25 +14,25 @@ import {
   ErrorMessage,
   FlexGapped,
   Modal,
-} from '@/components';
-import { useApp, deckStore, setDeck } from '@/context';
-import { deckServices } from '@/services';
-import { parseDeck, getRestrictions, getIsEditable } from '@/utils';
+} from "@/components";
 import {
   BRANCHES,
   CARDS,
   CRYPT,
+  DECK,
   DECKID,
   DECKID_FROM,
   DECKID_TO,
+  DECKS,
   IS_BRANCHES,
   IS_PUBLIC,
   LIBRARY,
   MASTER,
   PUBLIC_PARENT,
-  DECK,
-  DECKS,
-} from '@/constants';
+} from "@/constants";
+import { deckStore, setDeck, useApp } from "@/context";
+import { deckServices } from "@/services";
+import { getIsEditable, getRestrictions, parseDeck } from "@/utils";
 
 const Diff = () => {
   const {
@@ -41,7 +41,6 @@ const Diff = () => {
     playtestMode,
     cryptCardBase,
     libraryCardBase,
-    isMobile,
     showFloatingButtons,
     setShowFloatingButtons,
     showMenuButtons,
@@ -65,17 +64,17 @@ const Diff = () => {
     } catch (e) {
       switch (e.response.status) {
         case 400:
-          setE('NO DECK WITH THIS ID');
+          setE("NO DECK WITH THIS ID");
           break;
         default:
-          setE('CONNECTION PROBLEM');
+          setE("CONNECTION PROBLEM");
       }
       setD(undefined);
       return;
     }
 
     setE(false);
-    const cardsData = parseDeck(deckData[CARDS], cryptCardBase, libraryCardBase);
+    const cardsData = parseDeck(cryptCardBase, libraryCardBase, deckData[CARDS]);
     const d = {
       ...deckData,
       [CRYPT]: cardsData[CRYPT],
@@ -90,15 +89,15 @@ const Diff = () => {
 
   useEffect(() => {
     if (cryptCardBase && libraryCardBase && decks !== undefined) {
-      if (deckidFrom && deckStore[DECK]?.[DECKID] != deckidFrom) {
+      if (deckidFrom && deckStore[DECK]?.[DECKID] !== deckidFrom) {
         if (deckStore[DECKS][deckidFrom]) {
           setDeck(deckStore[DECKS][deckidFrom]);
-        } else if (deckidFrom.includes(':')) {
+        } else if (deckidFrom.includes(":")) {
           if (preconDecks?.[deckidFrom]) {
             setDeck(preconDecks[deckidFrom]);
           } else {
             setDeck(undefined);
-            setErrorFrom('NO DECK WITH THIS ID');
+            setErrorFrom("NO DECK WITH THIS ID");
           }
         } else {
           getDeck(deckidFrom, setDeck, setErrorFrom);
@@ -109,15 +108,15 @@ const Diff = () => {
 
   useEffect(() => {
     if (cryptCardBase && libraryCardBase && deckStore[DECKS] !== undefined) {
-      if (deckidTo && deckTo?.[DECKID] != deckidTo) {
+      if (deckidTo && deckTo?.[DECKID] !== deckidTo) {
         if (deckStore[DECKS][deckidTo]) {
           setDeckTo(deckStore[DECKS][deckidTo]);
-        } else if (deckidTo.includes(':')) {
+        } else if (deckidTo.includes(":")) {
           if (preconDecks?.[deckidTo]) {
             setDeckTo(preconDecks[deckidTo]);
           } else {
             setDeckTo(undefined);
-            setErrorTo('NO DECK WITH THIS ID');
+            setErrorTo("NO DECK WITH THIS ID");
           }
         } else {
           getDeck(deckidTo, setDeckTo, setErrorTo);
@@ -178,27 +177,27 @@ const Diff = () => {
             </FlexGapped>
           )}
         </FlexGapped>
-        {!isMobile && (
-          <div className="basis-2/12 max-lg:hidden">
-            <div className="top-[77px] z-20 bg-bgPrimary dark:bg-bgPrimaryDark">
-              <DiffButtons
-                deckFrom={deck}
-                deckTo={deckTo}
-                setShowMissing={setShowMissing}
-                setShowProxySelect={setShowProxySelect}
-              />
-            </div>
+        <div className="basis-2/12 max-lg:hidden">
+          <div className="top-[77px] z-20 bg-bgPrimary dark:bg-bgPrimaryDark">
+            <DiffButtons
+              deckFrom={deck}
+              deckTo={deckTo}
+              setShowMissing={setShowMissing}
+              setShowProxySelect={setShowProxySelect}
+            />
           </div>
-        )}
+        </div>
       </FlexGapped>
-      {isEditable && isMobile && showFloatingButtons && (
+      {isEditable && showFloatingButtons && (
         <>
           <DeckNewCardFloating
+            className="sm:hidden"
             target={CRYPT}
             deckid={deck[DECKID]}
             cards={Object.values(deck[CRYPT])}
           />
           <DeckNewCardFloating
+            className="sm:hidden"
             target={LIBRARY}
             deckid={deck[DECKID]}
             cards={Object.values(deck[LIBRARY])}

@@ -1,9 +1,8 @@
-import React from 'react';
-import { DeckMissingModal } from '@/components';
-import { useDeckMissing } from '@/hooks';
-import { NAME, CRYPT, LIBRARY } from '@/constants';
+import { DeckMissingModal } from "@/components";
+import { CRYPT, LIBRARY, NAME } from "@/constants";
+import { useDeckMissing } from "@/hooks";
 
-const DeckMissingModalWrapper = ({ deck, setShow = { setShow } }) => {
+const DeckMissingModalWrapper = ({ deck, setShow }) => {
   const { missingCrypt, missingLibrary } = useDeckMissing(deck);
 
   return (

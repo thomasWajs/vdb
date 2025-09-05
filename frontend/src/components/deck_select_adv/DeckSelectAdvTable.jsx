@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
-import { getClan, decksSort } from '@/utils';
-import { DeckSelectAdvTableRow, DeckSelectAdvTableHeader, ResultClanImage } from '@/components';
-import { CRYPT, NAME, LIBRARY, TAGS, MASTER, DECKID, INVENTORY_TYPE, ANY } from '@/constants';
+import { useMemo, useState } from "react";
+import { DeckSelectAdvTableHeader, DeckSelectAdvTableRow, ResultClanImage } from "@/components";
+import { ANY, CRYPT, DECKID, INVENTORY_TYPE, LIBRARY, MASTER, NAME, TAGS } from "@/constants";
+import { decksSort, getClan } from "@/utils";
 
 const DeckSelectAdvTable = ({
   allTagsOptions,
@@ -19,7 +19,7 @@ const DeckSelectAdvTable = ({
 }) => {
   const [invFilter, setInvFilter] = useState(ANY);
   const [revFilter, setRevFilter] = useState(false);
-  const [nameFilter, setNameFilter] = useState('');
+  const [nameFilter, setNameFilter] = useState("");
   const [clanFilter, setClanFilter] = useState(ANY);
 
   const allDecksClans = [];
@@ -34,11 +34,11 @@ const DeckSelectAdvTable = ({
   const clanOptions = [
     {
       value: ANY,
-      label: 'ANY',
+      label: "ANY",
     },
     {
-      value: '',
-      label: 'NONE',
+      value: "",
+      label: "NONE",
     },
   ];
 
@@ -52,13 +52,14 @@ const DeckSelectAdvTable = ({
   const isCardInDeck = (deck, query) => {
     const normalizedQuery = query
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '');
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
 
     return Object.values({ ...deck[CRYPT], ...deck[LIBRARY] }).some((card) => {
-      const normalizedCardName = card.c[NAME].toLowerCase()
-        .normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '');
+      const normalizedCardName = card.c[NAME]
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "");
 
       return normalizedCardName.includes(normalizedQuery);
     });
@@ -67,11 +68,12 @@ const DeckSelectAdvTable = ({
   const isDeckNameMatch = (deck, query) => {
     const normalizedNameFilter = query
       .toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '');
-    const normalizedDeckName = deck[NAME].toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '');
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
+    const normalizedDeckName = deck[NAME]
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "");
 
     return normalizedDeckName.includes(normalizedNameFilter);
   };
@@ -86,7 +88,7 @@ const DeckSelectAdvTable = ({
 
       if (clanFilter !== ANY) {
         filtered = filtered.filter((deck) => {
-          const clan = getClan(deck[CRYPT]) || '';
+          const clan = getClan(deck[CRYPT]) || "";
           return clan.toLowerCase() === clanFilter;
         });
       }
@@ -94,7 +96,7 @@ const DeckSelectAdvTable = ({
       if (nameFilter.length > 2) {
         filtered = filtered.filter((deck) => {
           if (isDeckNameMatch(deck, nameFilter)) return true;
-          if (isCardInDeck(deck, nameFilter)) return true;
+          return isCardInDeck(deck, nameFilter);
         });
       }
 
@@ -102,9 +104,9 @@ const DeckSelectAdvTable = ({
         filtered = filtered.filter((deck) => {
           let counter = 0;
           tagsFilter.forEach((tag) => {
-            if (deck[TAGS] && deck[TAGS].includes(tag)) counter += 1;
+            if (deck[TAGS].includes(tag)) counter += 1;
           });
-          if (counter >= tagsFilter.length) return true;
+          return counter >= tagsFilter.length;
         });
       }
 
@@ -113,7 +115,8 @@ const DeckSelectAdvTable = ({
       }
 
       return decksSort(filtered, sortMethod);
-    } else return [];
+    }
+    return [];
   }, [decks, invFilter, clanFilter, nameFilter, tagsFilter, revFilter, sortMethod]);
 
   const toggleSelect = (deckid) => {
@@ -141,7 +144,7 @@ const DeckSelectAdvTable = ({
   };
 
   return (
-    <table className="border-bgSecondary dark:border-bgSecondaryDark sm:border">
+    <table className="border-bgSecondary sm:border dark:border-bgSecondaryDark">
       <DeckSelectAdvTableHeader
         allTagsOptions={allTagsOptions}
         clanOptions={clanOptions}

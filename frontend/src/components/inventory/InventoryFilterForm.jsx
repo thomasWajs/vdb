@@ -1,17 +1,14 @@
-import React from 'react';
 import {
-  Select,
-  ResultLibraryTypeImage,
-  ResultDisciplineImage,
   ResultClanImage,
-} from '@/components';
-import { ALL, CRYPT, TYPE, DISCIPLINE, NONE } from '@/constants';
+  ResultDisciplineImage,
+  ResultLibraryTypeImage,
+  Select,
+} from "@/components";
+import { ALL, CRYPT, DISCIPLINE, NONE, TYPE } from "@/constants";
 
 const InventoryFilterForm = ({ value, setValue, values, target, byTotal, byUnique }) => {
-  const options = [];
-
-  values.map((i) => {
-    options.push({
+  const options = values.map((i) => {
+    return {
       value: i,
       label: (
         <div className="flex justify-between">
@@ -56,7 +53,7 @@ const InventoryFilterForm = ({ value, setValue, values, target, byTotal, byUniqu
               {[ALL, NONE].includes(i) ? (
                 <div className="flex items-center">
                   <div className="flex w-[40px]" />
-                  {i === ALL ? 'All Disciplines' : NONE}
+                  {i === ALL ? "All Disciplines" : NONE}
                 </div>
               ) : (
                 <div className="flex items-center">
@@ -73,7 +70,7 @@ const InventoryFilterForm = ({ value, setValue, values, target, byTotal, byUniqu
           </div>
         </div>
       ),
-    });
+    };
   });
 
   return (

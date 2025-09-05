@@ -13,19 +13,18 @@ import {
   QUANTITY,
   QUANTITYx,
   SECT,
-} from '@/constants';
-
+} from "@/constants";
 import {
-  bySect,
+  byCapacity,
   byCardName,
   byClan,
-  byCapacity,
-  byGroup,
-  byQuantity,
-  byPlayer,
-  byDateWin,
   byDatePrint,
-} from '@/utils';
+  byDateWin,
+  byGroup,
+  byPlayer,
+  byQuantity,
+  bySect,
+} from "@/utils";
 
 const cryptSort = (cards, sortMethod) => {
   if (cards) {

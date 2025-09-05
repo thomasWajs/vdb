@@ -1,24 +1,21 @@
-import React from 'react';
-import dayjs from 'dayjs';
-import EyeFill from '@icons/eye-fill.svg?react';
-import Shuffle from '@icons/shuffle.svg?react';
-import PinAngleFill from '@icons/pin-angle-fill.svg?react';
-import At from '@icons/at.svg?react';
+import At from "@icons/at.svg?react";
+import EyeFill from "@icons/eye-fill.svg?react";
+import PinAngleFill from "@icons/pin-angle-fill.svg?react";
+import Shuffle from "@icons/shuffle.svg?react";
+import dayjs from "dayjs";
 import {
+  Button,
+  ConditionalTooltip,
   DeckPreview,
   DeckTags,
   InventoryDeckAddButton,
   InventoryDeckDeleteButton,
   ResultClanImage,
-  ConditionalTooltip,
-  Button,
-} from '@/components';
-import { getClan } from '@/utils';
-import { useDeckInInventory } from '@/hooks';
-import { useApp, deckToggleInventoryState } from '@/context';
+  Tr,
+} from "@/components";
 import {
-  BRANCHES,
   BRANCH_NAME,
+  BRANCHES,
   CRYPT,
   DECKID,
   H,
@@ -28,34 +25,34 @@ import {
   NAME,
   S,
   TIMESTAMP,
-} from '@/constants';
+} from "@/constants";
+import { deckToggleInventoryState } from "@/context";
+import { useDeckInInventory } from "@/hooks";
+import { getClan } from "@/utils";
 
 const InventoryAddDeckRow = ({ deck, allTagsOptions }) => {
-  const { isDesktop, isMobile } = useApp();
   const inInventory = useDeckInInventory(deck);
   const clan = getClan(deck[CRYPT]);
 
   return (
-    <tr className="row-bg border-y border-bgSecondary dark:border-bgSecondaryDark">
-      {!isMobile && (
-        <td>
-          <Button onClick={() => deckToggleInventoryState(deck[DECKID])}>
-            <div
-              title={
-                deck[INVENTORY_TYPE] === S
-                  ? 'Flexible'
-                  : deck[INVENTORY_TYPE] === H
-                    ? 'Fixed'
-                    : 'Virtual'
-              }
-            >
-              {deck[INVENTORY_TYPE] == S && <Shuffle />}
-              {deck[INVENTORY_TYPE] == H && <PinAngleFill />}
-              {!deck[INVENTORY_TYPE] && <At />}
-            </div>
-          </Button>
-        </td>
-      )}
+    <Tr>
+      <td className="max-sm:hidden">
+        <Button onClick={() => deckToggleInventoryState(deck[DECKID])}>
+          <div
+            title={
+              deck[INVENTORY_TYPE] === S
+                ? "Flexible"
+                : deck[INVENTORY_TYPE] === H
+                  ? "Fixed"
+                  : "Virtual"
+            }
+          >
+            {deck[INVENTORY_TYPE] === S && <Shuffle />}
+            {deck[INVENTORY_TYPE] === H && <PinAngleFill />}
+            {!deck[INVENTORY_TYPE] && <At />}
+          </div>
+        </Button>
+      </td>
       <td className="min-w-[50px]">
         <div className="flex justify-center">{clan && <ResultClanImage value={clan} />}</div>
       </td>
@@ -72,37 +69,31 @@ const InventoryAddDeckRow = ({ deck, allTagsOptions }) => {
           )}
         </div>
       </td>
-      {isDesktop && (
-        <td className="min-w-[30px] sm:min-w-[45px]">
-          <div className="flex justify-center">
-            <ConditionalTooltip size="xl" overlay={<DeckPreview deck={deck} />}>
-              <EyeFill />
-            </ConditionalTooltip>
-          </div>
-        </td>
-      )}
-      {!isMobile && (
-        <td className="min-w-[100px] whitespace-nowrap">
-          {dayjs(deck[TIMESTAMP]).format('YYYY-MM-DD')}
-        </td>
-      )}
-      {!isMobile && (
-        <td className="w-full">
-          <DeckTags
-            deck={{ ...deck, [IS_AUTHOR]: false }}
-            allTagsOptions={allTagsOptions}
-            isBordered
-            noAutoTags
-          />
-        </td>
-      )}
+      <td className="min-w-[30px] max-lg:hidden sm:min-w-[45px]">
+        <div className="flex justify-center">
+          <ConditionalTooltip size="xl" overlay={<DeckPreview deck={deck} />}>
+            <EyeFill />
+          </ConditionalTooltip>
+        </div>
+      </td>
+      <td className="min-w-[100px] whitespace-nowrap text-center max-sm:hidden">
+        {dayjs(deck[TIMESTAMP]).format("YYYY-MM-DD")}
+      </td>
+      <td className="w-full px-1 max-sm:hidden">
+        <DeckTags
+          deck={{ ...deck, [IS_AUTHOR]: false }}
+          allTagsOptions={allTagsOptions}
+          isBordered
+          noAutoTags
+        />
+      </td>
       <td className="min-w-[110px]">
         <div className="flex justify-end gap-1">
           <InventoryDeckAddButton deck={deck} inInventory={inInventory} />
           <InventoryDeckDeleteButton deck={deck} inInventory={inInventory} />
         </div>
       </td>
-    </tr>
+    </Tr>
   );
 };
 

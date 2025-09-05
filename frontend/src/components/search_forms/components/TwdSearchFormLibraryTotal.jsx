@@ -1,10 +1,9 @@
-import React from 'react';
-import { ButtonGroup } from '@/components';
-import { LIBRARY_TOTAL } from '@/constants';
+import { ButtonGroup } from "@/components";
+import { LIBRARY_TOTAL } from "@/constants";
 
 const TwdSearchFormLibraryTotal = ({ value, onChange }) => {
   const name = LIBRARY_TOTAL;
-  const options = ['60-67', '68-75', '76-83', '84-90'];
+  const options = ["60-67", "68-75", "76-83", "84-90"];
 
   return (
     <div className="flex items-center">

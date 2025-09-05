@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
-import Upload from '@icons/upload.svg?react';
-import { ButtonIconed } from '@/components';
-import { AUTHOR } from '@/constants';
+import Upload from "@icons/upload.svg?react";
+import { useRef } from "react";
+import { ButtonIconed } from "@/components";
+import { AUTHOR } from "@/constants";
 
 const TdaLoadCustomButtons = ({ tempDecks, setTempDecks, setTempArchon, getDeck, setError }) => {
   const fileInputDecks = useRef();
@@ -24,7 +24,7 @@ const TdaLoadCustomButtons = ({ tempDecks, setTempDecks, setTempArchon, getDeck,
     const decks = Object.keys(files).map(async (i) => {
       const result = await new Promise((resolve) => {
         const file = files[i];
-        let fileReader = new FileReader();
+        const fileReader = new FileReader();
         fileReader.onload = () => resolve(getDeck(fileReader.result));
         fileReader.readAsText(file);
       });
@@ -35,7 +35,7 @@ const TdaLoadCustomButtons = ({ tempDecks, setTempDecks, setTempArchon, getDeck,
     Promise.all(decks).then((v) => {
       const d = {};
       v.forEach((i) => {
-        d[parseInt(i[AUTHOR])] = i;
+        d[Number.parseInt(i[AUTHOR])] = i;
       });
 
       setTempDecks(d);
@@ -67,14 +67,14 @@ const TdaLoadCustomButtons = ({ tempDecks, setTempDecks, setTempArchon, getDeck,
         accept=".txt"
         type="file"
         onChange={() => handleLoadDecks()}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
       />
       <input
         ref={fileInputArchon}
         accept=".xlsx"
         type="file"
         onChange={() => handleLoadArchon()}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
       />
     </div>
   );

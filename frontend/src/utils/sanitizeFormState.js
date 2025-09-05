@@ -1,6 +1,4 @@
-import { deepClone } from '@/utils';
 import {
-  TDA,
   ANY,
   BLOOD,
   CAPACITY,
@@ -23,6 +21,7 @@ import {
   SECT,
   SET,
   TAGS,
+  TDA,
   TEXT,
   TITLE,
   TITLES,
@@ -30,7 +29,8 @@ import {
   TWD,
   TYPE,
   VALUE,
-} from '@/constants';
+} from "@/constants";
+import { deepClone } from "@/utils";
 
 const sanitizeFormState = (target, state) => {
   const input = deepClone(state);
@@ -50,7 +50,7 @@ const sanitizeFormState = (target, state) => {
       Object.entries(j).forEach(([key, value]) => {
         switch (key) {
           case VALUE:
-            input[i] = input[i].filter((i) => i.value !== '');
+            input[i] = input[i].filter((i) => i.value !== "");
             break;
           default:
             if (input[i][idx] && !value) delete input[i][idx][key];
@@ -90,7 +90,9 @@ const sanitizeFormState = (target, state) => {
   }
   forms.forEach((i) => {
     Object.keys(input[i]).forEach((k) => {
-      (input[i][k] == 0 || input[i][k] == ANY) && delete input[i][k];
+      if (!input[i][k] || input[i][k] === ANY) {
+        delete input[i][k];
+      }
     });
   });
 
@@ -104,7 +106,9 @@ const sanitizeFormState = (target, state) => {
   }
   forms.forEach((i) => {
     Object.keys(input[i]).forEach((k) => {
-      (input[i][k] == 0 || input[i][k] == ANY) && delete input[i][k];
+      if (!input[i][k] || input[i][k] === ANY) {
+        delete input[i][k];
+      }
     });
     if (!input[i][CRYPT] && !input[i][LIBRARY]) delete input[i];
   });
@@ -138,7 +142,7 @@ const sanitizeFormState = (target, state) => {
       forms = [];
   }
   forms.forEach((i) => {
-    if (input[i][i] == ANY) {
+    if (input[i][i] === ANY) {
       delete input[i];
     }
   });
@@ -189,13 +193,15 @@ const sanitizeFormState = (target, state) => {
   }
   forms.forEach((i) => {
     Object.keys(input[i]).forEach((k) => {
-      input[i][k] == -1 && delete input[i][k];
+      if (Number.parseInt(input[i][k]) === -1) {
+        delete input[i][k];
+      }
     });
   });
 
   Object.keys(input).forEach((k) => {
     if (
-      input[k] == ANY ||
+      input[k] === ANY ||
       !input[k] ||
       input[k].length === 0 ||
       (input[k].value && input[k].value.length === 0) ||

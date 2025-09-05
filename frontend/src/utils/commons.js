@@ -1,4 +1,7 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
+import disciplinesList from "@/assets/data/disciplinesList.json";
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
+import virtuesList from "@/assets/data/virtuesList.json";
 import {
   ANY,
   BANNED,
@@ -7,6 +10,9 @@ import {
   DATE,
   DISCIPLINES,
   GROUP,
+  HAS_BANNED,
+  HAS_LIMITED,
+  HAS_PLAYTEST,
   ID,
   IS_AUTHOR,
   IS_FROZEN,
@@ -20,13 +26,7 @@ import {
   PROMO,
   SECT,
   SET,
-  HAS_BANNED,
-  HAS_LIMITED,
-  HAS_PLAYTEST,
-} from '@/constants';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
-import disciplinesList from '@/assets/data/disciplinesList.json';
-import virtuesList from '@/assets/data/virtuesList.json';
+} from "@/constants";
 
 export const getCardProperty = (card, property) => {
   return card.c ? card.c[property] : card[property];
@@ -57,7 +57,7 @@ export const countDisciplines = (cardsList) => {
 export const countTotalCost = (cardsList, type) => {
   if (!cardsList.length) return 0;
   return cardsList
-    .filter((card) => !isNaN(card.c[type]))
+    .filter((card) => Number.isInteger(card.c[type]))
     .reduce((acc, card) => acc + card.q * card.c[type], 0);
 };
 
@@ -66,17 +66,17 @@ export const getRestrictions = (deck, limitedCards) => {
 
   let hasPlaytest;
   let hasBanned;
-  let hasLimited;
+  let hasLimited = null;
   [...Object.values(deck[CRYPT]), ...Object.values(deck[LIBRARY])].forEach((card) => {
     if (card.q < 1) return;
     if (card.c[BANNED]) hasBanned = true;
     if (
       limitedCards &&
       ![...Object.keys(limitedCards[CRYPT]), ...Object.keys(limitedCards[LIBRARY])].includes(
-        card.c[ID],
+        card.c[ID].toString(),
       )
     ) {
-      hasLimited = true;
+      hasLimited += card.q;
     }
 
     const legalRestriction = getLegality(card.c);
@@ -95,26 +95,27 @@ export const getRestrictions = (deck, limitedCards) => {
 export const getLegality = (card) => {
   const sets = Object.keys(card[SET]).filter((s) => s !== PLAYTEST);
   if (sets.length > 1 || [POD, PROMO].includes(sets[0])) return false;
-  if (sets.length == 0) return PLAYTEST;
+  if (sets.length === 0) return PLAYTEST;
 
   const setDate = dayjs(setsAndPrecons[sets[0]][DATE]);
-  if (dayjs().diff(setDate, 'day') > 30) return false;
-  const legalDate = setDate.add(30, 'day').format('YYYY-MM-DD');
+  if (dayjs().diff(setDate, "day") >= 0) return false;
+  const legalDate = setsAndPrecons[sets[0]][DATE];
   return legalDate;
 };
 
 export const getGroups = (cards) => {
   const cryptGroupMin = cards
     .filter((card) => card.c[GROUP] !== ANY)
-    .reduce((acc, card) => (acc = card.c[GROUP] < acc ? card.c[GROUP] : acc), 10);
+    .reduce((acc, card) => (card.c[GROUP] < acc ? card.c[GROUP] : acc), 10);
 
   const cryptGroupMax = cards
     .filter((card) => card.c[GROUP] !== ANY)
-    .reduce((acc, card) => (acc = card.c[GROUP] > acc ? card.c[GROUP] : acc), 0);
+    .reduce((acc, card) => (card.c[GROUP] > acc ? card.c[GROUP] : acc), 0);
 
-  if (cryptGroupMax - cryptGroupMin == 1) {
+  if (cryptGroupMax - cryptGroupMin === 1) {
     return { cryptGroups: `${cryptGroupMin}-${cryptGroupMax}` };
-  } else if (cryptGroupMax - cryptGroupMin == 0) {
+  }
+  if (cryptGroupMax - cryptGroupMin === 0) {
     return { cryptGroups: cryptGroupMax };
   }
 
@@ -143,13 +144,13 @@ export const containCard = (cards, card) => {
 export const getHardTotal = (hardList) => {
   if (!hardList) return 0;
 
-  return Object.values(hardList).reduce((acc, q) => (acc += q), 0);
+  return Object.values(hardList).reduce((acc, q) => acc + q, 0);
 };
 
 export const getSoftMax = (softList) => {
   if (!softList) return 0;
 
-  return Object.values(softList).reduce((acc, q) => (acc = q > acc ? q : acc));
+  return Object.values(softList).reduce((acc, q) => (q > acc ? q : acc));
 };
 
 export const getCardsArray = (cardsList) => {
@@ -166,14 +167,16 @@ export const getClan = (crypt) => {
   const clans = {};
 
   Object.values(crypt)
-    .filter((card) => card.c[NAME] !== 'Anarch Convert')
+    .filter((card) => card.c[NAME] !== "Anarch Convert")
     .forEach((card) => {
-      const clan = card.c[PATH] ? card.c[PATH] : card.c[CLAN];
-      if (clans[clan]) {
-        clans[clan] += card.q;
-      } else {
-        clans[clan] = card.q;
-      }
+      [card.c[CLAN], card.c[PATH]].forEach((c) => {
+        if (!c) return;
+        if (clans[c]) {
+          clans[c] += card.q;
+        } else {
+          clans[c] = card.q;
+        }
+      });
     });
 
   const topClan = Object.keys(clans).reduce(
@@ -182,25 +185,22 @@ export const getClan = (crypt) => {
 
       if (clans[c] > acc.q) {
         return { clan: c, q: clans[c], t: t };
-      } else {
-        return { ...acc, t: t };
       }
+      acc[t] = t;
+      return acc;
     },
     { clan: null, q: 0, t: 0 },
   );
 
-  if (topClan.q / topClan.t > 0.5) {
-    return topClan[CLAN];
-  } else {
-    return null;
-  }
+  if (topClan.q / topClan.t > 0.5) return topClan[CLAN];
+  return null;
 };
 
 export const getSect = (crypt) => {
   const sects = {};
 
   Object.values(crypt)
-    .filter((card) => card.c[NAME] !== 'Anarch Convert')
+    .filter((card) => card.c[NAME] !== "Anarch Convert")
     .forEach((card) => {
       const sect = card.c[SECT];
       if (sects[sect]) {
@@ -215,28 +215,28 @@ export const getSect = (crypt) => {
       const t = acc.t + sects[c];
       if (sects[c] > acc.q) {
         return { sect: c, q: sects[c], t: t };
-      } else {
-        return { ...acc, t: t };
       }
+      acc[t] = t;
+      return acc;
     },
     { sect: null, q: 0, t: 0 },
   );
 
   if (topSect.q / topSect.t > 0.65) {
     return topSect.sect;
-  } else {
-    return null;
   }
+  return null;
 };
 
 export const getSwipedBg = (isSwiped, inInventory) => {
   if (isSwiped) {
-    return isSwiped === 'right'
-      ? 'bg-bgSuccess dark:bg-bgSuccessDark'
-      : 'bg-bgErrorSecondary dark:bg-bgErrorSecondaryDark';
-  } else {
-    return inInventory ? '' : 'row-bg';
+    return isSwiped === "right"
+      ? "bg-bgSuccess dark:bg-bgSuccessDark"
+      : "bg-bgErrorSecondary dark:bg-bgErrorSecondaryDark";
   }
+  return inInventory
+    ? ""
+    : "odd:bg-bgPrimary odd:dark:bg-bgPrimaryDark even:bg-bgThird even:dark:bg-bgThirdDark print:even:dark:bg-bgThird print:odd:dark:bg-bgPrimary";
 };
 
 export const deepClone = (v) => JSON.parse(JSON.stringify(v));
@@ -258,7 +258,7 @@ export const getTextDisciplines = (disciplines) => {
     }
   });
 
-  return [...supDisciplines, ...baseDisciplines].join(' ');
+  return [...supDisciplines, ...baseDisciplines].join(" ");
 };
 
 export const parseDeckHash = (hash, cryptCardBase, libraryCardBase) => {
@@ -267,17 +267,17 @@ export const parseDeckHash = (hash, cryptCardBase, libraryCardBase) => {
 
   hash
     .slice(1)
-    .split(';')
+    .split(";")
     .forEach((i) => {
-      const j = i.split('=');
+      const j = i.split("=");
       if (j[0] > 200000) {
         crypt[j[0]] = {
-          q: parseInt(j[1]),
+          q: Number.parseInt(j[1]),
           c: cryptCardBase[j[0]],
         };
       } else {
         library[j[0]] = {
-          q: parseInt(j[1]),
+          q: Number.parseInt(j[1]),
           c: libraryCardBase[j[0]],
         };
       }

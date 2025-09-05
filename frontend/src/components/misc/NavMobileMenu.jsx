@@ -1,12 +1,11 @@
-import React from 'react';
-import { NavLink } from 'react-router';
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
-import PersonFill from '@icons/person-fill.svg?react';
-import InfoCircleFill from '@icons/info-circle-fill.svg?react';
-import List from '@icons/list.svg?react';
-import StoplightsFill from '@icons/stoplights-fill.svg?react';
-import { NavMobileToggle, LanguageMenu, ThemeSelect, Hr } from '@/components';
-import { useApp } from '@/context';
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import InfoCircleFill from "@icons/info-circle-fill.svg?react";
+import List from "@icons/list.svg?react";
+import PersonFill from "@icons/person-fill.svg?react";
+import StoplightsFill from "@icons/stoplights-fill.svg?react";
+import { NavLink } from "react-router";
+import { Hr, LanguageMenu, NavMobileToggle, ThemeSelect } from "@/components";
+import { useApp } from "@/context";
 
 const LinkItem = ({ target, icon, text, handleClose }) => {
   return (
@@ -15,8 +14,8 @@ const LinkItem = ({ target, icon, text, handleClose }) => {
         to={target}
         onClick={handleClose}
         className={({ isActive }) =>
-          `text-fgThird dark:text-fgPrimaryDark flex items-center gap-2 px-3 py-1.5 ${
-            isActive ? 'bg-borderPrimary dark:bg-borderPrimaryDark' : ''
+          `flex items-center gap-2 px-3 py-1.5 text-fgThird dark:text-fgPrimaryDark ${
+            isActive ? "bg-borderPrimary dark:bg-borderPrimaryDark" : ""
           }`
         }
       >
@@ -27,8 +26,9 @@ const LinkItem = ({ target, icon, text, handleClose }) => {
   );
 };
 
-const NavMobileMenu = ({ isLimited, setShowMenu }) => {
+const NavMobileMenu = () => {
   const {
+    limitedPreset,
     limitedMode,
     inventoryMode,
     toggleLimitedMode,
@@ -47,12 +47,12 @@ const NavMobileMenu = ({ isLimited, setShowMenu }) => {
       >
         <List width="30" height="30" viewBox="0 0 16 16" />
       </PopoverButton>
-      <PopoverPanel anchor={{ to: 'top', gap: '9px', padding: '4px' }} className="z-50">
+      <PopoverPanel anchor={{ to: "top", gap: "9px", padding: "4px" }} className="z-50">
         {({ close }) => (
-          <div className="border-borderPrimary bg-bgPrimary text-fgPrimary dark:border-borderPrimaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark flex flex-col rounded-lg border text-lg">
+          <div className="flex flex-col rounded-lg border border-borderPrimary bg-bgPrimary text-fgPrimary text-lg dark:border-borderPrimaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark">
             <LinkItem
               target="/account"
-              text={username ? 'Account' : 'Login'}
+              text={username ? "Account" : "Login"}
               icon={<PersonFill height="20" width="20" viewBox="0 0 16 16" />}
               handleClose={close}
             />
@@ -70,7 +70,7 @@ const NavMobileMenu = ({ isLimited, setShowMenu }) => {
               icon={<InfoCircleFill height="20" width="20" viewBox="0 0 16 16" />}
               handleClose={close}
             />
-            <ThemeSelect setShowMenu={setShowMenu} />
+            <ThemeSelect />
             {username && (
               <NavMobileToggle
                 isOn={inventoryMode}
@@ -82,7 +82,7 @@ const NavMobileMenu = ({ isLimited, setShowMenu }) => {
                 Inventory Mode
               </NavMobileToggle>
             )}
-            {(isLimited || limitedMode) && (
+            {(limitedPreset || limitedMode) && (
               <NavMobileToggle
                 isOn={limitedMode}
                 handleClick={() => {

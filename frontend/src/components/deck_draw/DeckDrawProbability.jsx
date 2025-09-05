@@ -1,8 +1,7 @@
-import React from 'react';
-import { ConditionalTooltipOrModal, DeckDrawProbabilityText } from '@/components';
-import { drawProbability } from '@/utils';
-import { useApp } from '@/context';
-import cardtypeSortedFull from '@/assets/data/cardtypeSortedFull.json';
+import cardtypeSortedFull from "@/assets/data/cardtypeSortedFull.json";
+import { ConditionalTooltipOrModal, DeckDrawProbabilityText } from "@/components";
+import { useApp } from "@/context";
+import { drawProbability } from "@/utils";
 
 const DeckDrawProbability = ({ cardName, n, N, k }) => {
   const { setShowFloatingButtons } = useApp();
@@ -18,8 +17,8 @@ const DeckDrawProbability = ({ cardName, n, N, k }) => {
       <div
         className={
           cardtypeSortedFull.includes(cardName)
-            ? 'text-fgPrimary dark:text-fgPrimaryDark'
-            : 'text-fgSecondary dark:text-fgSecondaryDark'
+            ? "text-fgPrimary dark:text-fgPrimaryDark"
+            : "text-fgSecondary dark:text-fgSecondaryDark"
         }
       >
         {`${Math.round(drawProbability(1, N, n, k) * 100)}%`}

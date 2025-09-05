@@ -1,13 +1,12 @@
-import React from 'react';
 import {
-  FlexGapped,
-  Spinner,
-  ResultCryptTable,
   DeckRecommendationLibrary,
-  Modal,
+  FlexGapped,
   Header,
-} from '@/components';
-import { useApp } from '@/context';
+  Modal,
+  ResultCryptTable,
+  Spinner,
+} from "@/components";
+import { useApp } from "@/context";
 
 const DeckRecommendationModal = ({ handleClose, crypt, library }) => {
   const { isMobile } = useApp();

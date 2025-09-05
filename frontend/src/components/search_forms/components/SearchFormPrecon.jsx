@@ -1,16 +1,14 @@
-import React from 'react';
+import paths from "@/assets/data/paths.json";
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
 import {
+  Checkbox,
+  ResultPathImage,
   ResultPreconClan,
   SearchAdditionalForms,
   SearchFormButtonAdd,
   SearchFormButtonDel,
-  Checkbox,
   Select,
-  ResultPathImage,
-} from '@/components';
-import { useApp } from '@/context';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
-import paths from '@/assets/data/paths.json';
+} from "@/components";
 import {
   ANY,
   BCP,
@@ -25,11 +23,12 @@ import {
   PRINT,
   REPRINT,
   TITLE,
-} from '@/constants';
+  TWO_P,
+} from "@/constants";
+import { useApp } from "@/context";
 
 const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
-  const { playtestMode, isMobile, isXWide } = useApp();
-  const menuHeight = isXWide ? 500 : 350;
+  const { playtestMode, isMobile } = useApp();
   const name = PRECON;
 
   const options = [
@@ -56,14 +55,14 @@ const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
   ];
 
   Object.keys(setsAndPrecons)
-    .filter((set) => playtestMode || set !== PLAYTEST)
-    .map((set) => {
+    .filter((set) => (playtestMode || set !== PLAYTEST) && set !== TWO_P)
+    .forEach((set) => {
       if (setsAndPrecons[set][PRECONS]) {
         const year = setsAndPrecons[set][DATE] ? setsAndPrecons[set][DATE].slice(2, 4) : null;
 
-        Object.keys(setsAndPrecons[set][PRECONS]).map((precon) => {
+        Object.keys(setsAndPrecons[set][PRECONS]).forEach((precon) => {
           const fullName = setsAndPrecons[set][PRECONS][precon][NAME];
-          const clans = setsAndPrecons[set][PRECONS][precon][CLAN].split('/');
+          const clans = setsAndPrecons[set][PRECONS][precon][CLAN].split("/");
 
           options.push({
             value: `${set}:${precon}`,
@@ -73,7 +72,7 @@ const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
                 <div className="flex items-center">
                   <div
                     className={
-                      clans.length == 1 ? 'flex w-[40px] items-center justify-center' : 'inline'
+                      clans.length === 1 ? "flex w-[40px] items-center justify-center" : "inline"
                     }
                   >
                     {clans.map((clan) => {
@@ -87,7 +86,7 @@ const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
                   {fullName}
                 </div>
                 <div className="whitespace-nowrap text-sm">
-                  {set == PLAYTEST ? 'PLAYTEST' : set} {year && `'${year}`}
+                  {set === PLAYTEST ? "PLAYTEST" : set} {year && `'${year}`}
                 </div>
               </div>
             ),
@@ -114,7 +113,7 @@ const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
           <div className="font-bold text-fgSecondary dark:text-fgSecondaryDark">Precon:</div>
           {value.value[0] !== ANY && (
             <div className="flex justify-end gap-1 px-1">
-              {value.value.length == 1 ? (
+              {value.value.length === 1 ? (
                 <SearchFormButtonAdd searchForm={searchForm} name={name} />
               ) : (
                 <SearchFormButtonDel searchForm={searchForm} i={0} name={name} />
@@ -129,7 +128,6 @@ const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
             isClearable={value.value[0] !== ANY}
             filterOption={filterOption}
             name={0}
-            menuHeight={menuHeight}
             value={options.find((obj) => obj.value === value.value[0])}
             onChange={(e, id) => (e ? onChange(e, id) : onChange({ name: name, value: ANY }, id))}
           />
@@ -143,25 +141,24 @@ const SearchFormPrecon = ({ value, searchForm, onChange, onChangeOptions }) => {
           searchForm={searchForm}
           options={options}
           onChange={onChange}
-          menuHeight={menuHeight}
         />
       )}
       <div className="flex items-center justify-end gap-4">
         {[
           {
             value: ONLY,
-            label: 'Only In',
-            title: 'Printed only in selected Set',
+            label: "Only In",
+            title: "Printed only in selected Set",
           },
           {
             value: FIRST,
-            label: 'First Print',
-            title: 'Printed first in selected Set',
+            label: "First Print",
+            title: "Printed first in selected Set",
           },
           {
             value: REPRINT,
-            label: 'Reprint',
-            title: 'Reprinted in selected Set',
+            label: "Reprint",
+            title: "Reprinted in selected Set",
           },
         ].map((i) => {
           return (

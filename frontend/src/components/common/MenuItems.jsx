@@ -1,13 +1,13 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { Menu } from '@headlessui/react';
+import { Menu } from "@headlessui/react";
+import { twMerge } from "tailwind-merge";
 
-const MenuItems = ({ divided, children }) => {
+const MenuItems = ({ divided, anchor = { to: "bottom end", gap: "2px" }, children }) => {
   return (
     <Menu.Items
+      anchor={anchor}
       className={twMerge(
-        'border-borderThird bg-bgButton dark:border-borderThirdDark dark:bg-bgButtonDark absolute top-10 right-0 z-10 rounded-sm border py-1',
-        divided && 'divide-borderPrimary dark:divide-borderPrimaryDark divide-y',
+        "z-20 rounded-sm border border-borderThird bg-bgButton py-1 dark:border-borderThirdDark dark:bg-bgButtonDark",
+        divided && "divide-y divide-borderPrimary dark:divide-borderPrimaryDark",
       )}
     >
       {children}

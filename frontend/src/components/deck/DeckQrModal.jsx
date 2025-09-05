@@ -1,11 +1,11 @@
-import React, { Suspense } from 'react';
-import Snow from '@icons/snow.svg?react';
-import { Modal } from '@/components';
-import { useApp } from '@/context';
-import { NAME, IS_NON_EDITABLE } from '@/constants';
+import Snow from "@icons/snow.svg?react";
+import React, { Suspense } from "react";
+import { Modal } from "@/components";
+import { IS_NON_EDITABLE, NAME } from "@/constants";
+import { useApp } from "@/context";
 
 const DeckQrModal = ({ qrUrl, setQrUrl, deck }) => {
-  const QRCode = React.lazy(() => import('react-qr-code'));
+  const QRCode = React.lazy(() => import("react-qr-code"));
   const { setShowMenuButtons, setShowFloatingButtons } = useApp();
 
   const handleClose = () => {
@@ -21,7 +21,7 @@ const DeckQrModal = ({ qrUrl, setQrUrl, deck }) => {
       centered
       title={
         <div className="flex gap-3">
-          {(deck[IS_NON_EDITABLE] || qrUrl.includes('decks/deck?')) && (
+          {(deck[IS_NON_EDITABLE] || qrUrl.includes("decks/deck?")) && (
             <div
               className="flex items-center text-fgPrimary dark:text-fgPrimaryDark"
               title="Non-editable"

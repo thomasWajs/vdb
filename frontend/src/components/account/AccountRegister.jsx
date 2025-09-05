@@ -1,21 +1,21 @@
-import React, { useState, useActionState } from 'react';
-import PersonPlusFill from '@icons/person-plus-fill.svg?react';
+import PersonPlusFill from "@icons/person-plus-fill.svg?react";
+import { useActionState, useState } from "react";
 import {
   AccountEmailForm,
   AccountPasswordForm,
   AccountUsernameForm,
   ErrorOverlay,
-} from '@/components';
-import { useApp } from '@/context';
-import { userServices } from '@/services';
-import { USERNAME, PASSWORD, EMAIL } from '@/constants';
+} from "@/components";
+import { DECKS, EMAIL, PASSWORD, USERNAME } from "@/constants";
+import { deckStore, useApp } from "@/context";
+import { userServices } from "@/services";
 
 const AccountRegister = () => {
   const { setUsername, setEmail, setPublicName } = useApp();
   const [usernameError, setUsernameError] = useState(false);
   const [connectionError, setConnectionError] = useState(false);
 
-  const registerUser = async (prevState, formData) => {
+  const registerUser = async (_prevState, formData) => {
     const result = await userServices.register(
       formData.get(USERNAME),
       formData.get(PASSWORD),
@@ -24,15 +24,16 @@ const AccountRegister = () => {
 
     switch (result.error) {
       case 409:
-        setUsernameError('USER ALREADY EXIST');
+        setUsernameError("USER ALREADY EXIST");
         break;
       case 500:
-        setConnectionError('CONNECTION PROBLEM');
+        setConnectionError("CONNECTION PROBLEM");
         break;
       default:
         setUsername(formData.get(USERNAME));
         setPublicName(formData.get(USERNAME));
         setEmail(formData.get(EMAIL));
+        deckStore[DECKS] = {};
     }
 
     return {
@@ -46,7 +47,7 @@ const AccountRegister = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-xl font-bold text-fgSecondary dark:text-fgSecondaryDark">
+      <div className="flex items-center gap-2 font-bold text-fgSecondary text-xl dark:text-fgSecondaryDark">
         <div className="flex min-w-[23px] justify-center">
           <PersonPlusFill width="22" height="22" viewBox="0 0 16 16" />
         </div>

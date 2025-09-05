@@ -1,11 +1,10 @@
-import React from 'react';
 import {
-  DiffCopyUrlButton,
-  DiffBackButton,
-  DiffProxyButtonWrapper,
   DeckMissingButton,
-} from '@/components';
-import { DECKID } from '@/constants';
+  DiffBackButton,
+  DiffCopyUrlButton,
+  DiffProxyButtonWrapper,
+} from "@/components";
+import { DECKID } from "@/constants";
 
 const DiffButtons = ({ setShowProxySelect, setShowMissing, deckFrom, deckTo }) => {
   return (

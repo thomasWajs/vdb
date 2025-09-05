@@ -1,5 +1,187 @@
 [
   {
+    "version": "2025-08-25",
+    "changes": [
+      "Update TWDA",
+      "Update Rulings",
+      "Add Cardinal Benediction event to TDA",
+      "Add political, hecata, oblivion legacy images"
+    ]
+  },
+  {
+    "version": "2025-08-13",
+    "changes": [
+      "Hotfix"
+    ]
+  },
+  {
+    "version": "2025-08-10",
+    "changes": [
+      "Add Polish Grand Prix 2025 event to TDA",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-08-06",
+    "changes": [
+      "Add limited % in the deck to TWD and PDA",
+      "Add Garou Rim: Life in the City event to TDA",
+      "Add country flags to TDA events list",
+      "Add show full library button to TWD/PDA (toggle switch to select between Key Cards and Full)",
+      "Update Rulings",
+      "Slightly increased popup border contrast to better separate its content from the background",
+      "Fix TDA on mobile"
+    ]
+  },
+  {
+    "version": "2025-08-02",
+    "changes": [
+      "Add Polish Championship 2025 event to TDA",
+      "Add legacy reaction images",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-07-15",
+    "changes": [
+      "Update 2P card list",
+      "Update Rulings",
+      "Fix some legacy images on mobile"
+    ]
+  },
+  {
+    "version": "2025-07-08",
+    "changes": [
+      "Update TWDA",
+      "Update Rulings",
+      "Update V5 card list",
+      "Add legacy action modifiers images"
+    ]
+  },
+  {
+    "version": "2025-07-05",
+    "changes": [
+      "Update 2P cards/decks lists",
+      "Add limited mode selector to navigation bar",
+      "Add option to only show 2P or V5 decks in deck selector when limited mode is on. To use it toggle 'Only show Limited decks in Deck Selector' in /account page and add '2P' and/or 'V5' tags to the decks you want to see in selector for respective limited mode",
+      "Add % of restricted cards for current limited mode in deck crypt/library header",
+      "Add Lublin Fee Stake event",
+      "Update Rulings",
+      "Fix some legacy images",
+      "Fix deck clan/path icon sometimes being wrongly determined",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-06-05",
+    "changes": [
+      "Add Two Players and V5 limited format. Select limited option you want in Account page, then switch it on/off using Limited Mode toggle",
+      "Add Finnish Nationals 2025 event",
+      "Add date and players/decks in events list in PDA",
+      "Add batch (all selected) lock/unlock decks in Binocular deck selection menu",
+      "Update Rulings"
+    ]
+  },
+  {
+    "version": "2025-05-31",
+    "changes": [
+      "Add New Blood III (Hecata and Lasombra)",
+      "Add Action cards legacy layout images"
+    ]
+  },
+  {
+    "version": "2025-05-03",
+    "changes": [
+      "Add TDA event: Praxis Seizure: Garou Rim"
+    ]
+  },
+  {
+    "version": "2025-04-26",
+    "changes": [
+      "Update TWDA",
+      "Update Rulings",
+      "Add TDA event: Australian Continental 2024",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-04-09",
+    "changes": [
+      "Update TWDA",
+      "Add TDA event: Italian Grand Prix 2025"
+    ]
+  },
+  {
+    "version": "2025-04-05",
+    "changes": [
+      "Hotfix"
+    ]
+  },
+  {
+    "version": "2025-04-02",
+    "changes": [
+      "Add Master cards legacy layout images",
+      "Add TDA events: Dutch NC 2024 in Netherlands and Hurry Up! in Hungary",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-03-16",
+    "changes": [
+      "Update Rulings",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-03-06",
+    "changes": [
+      "Update TWDA",
+      "Update Rulings",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-02-28",
+    "changes": [
+      "Update with Hecata",
+      "Fix limited format indicator (was always 'on' for crypt/library)"
+    ]
+  },
+  {
+    "version": "2025-02-24",
+    "changes": [
+      "Deprecation of older browsers (older than Chrome 117, Firefox 119, Safari 17.4)",
+      "Update TWDA",
+      "Update Rulings"
+    ]
+  },
+  {
+    "version": "2025-02-15",
+    "changes": [
+      "Fix issues from previous update"
+    ]
+  },
+  {
+    "version": "2025-02-10",
+    "changes": [
+      "Lots of performance optimizations",
+      "Add 'not' tag search options to TWD/PDA/TDA",
+      "Add Hand size trait for crypt search",
+      "Update Rulings",
+      "Fix TDA search on mobile",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
+    "version": "2025-02-02",
+    "changes": [
+      "Add laibon legacy images. Now all clans are available in legacy layout! Great job, Thiago Sousa!",
+      "Improve 'binocular' deck selector on mobile (clan icon, flexible width tags)",
+      "Update Rulings",
+      "Small other fixes and improvements"
+    ]
+  },
+  {
     "version": "2025-01-25",
     "changes": [
       "Fix login issues and few small other things",
@@ -8,7 +190,7 @@
     ]
   },
   {
-    "version": "2025-01-18/1",
+    "version": "2025-01-18",
     "changes": [
       "Add antitribu legacy images for Brujah, Gangrel, Malkavian, Nosferatu and Toreador",
       "Update Rulings",

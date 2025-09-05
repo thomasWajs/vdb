@@ -11,7 +11,7 @@ def unauthorized_handler():
     abort(401)
 
 
-@app.route("/api/playtest/users", methods=["GET", "PUT", "DELETE"])
+@app.route("/api/playtest/users", methods=["GET", "PUT", "POST", "DELETE"])
 @login_required
 def playtesters_route():
     if not current_user.playtest_admin:
@@ -30,20 +30,12 @@ def playtesters_route():
             total_reports = cards_reports + precons_reports
 
             result[u.username] = {
-                "lang": (u.playtest_profile["lang"] if "lang" in u.playtest_profile else None),
-                "added_by": (
-                    u.playtest_profile["added_by"] if "added_by" in u.playtest_profile else None
-                ),
-                "added_date": (
-                    u.playtest_profile["added_date"] if "added_date" in u.playtest_profile else None
-                ),
-                "timestamp": (
-                    u.playtest_profile["timestamp"] if "timestamp" in u.playtest_profile else None
-                ),
-                "liaison": (
-                    u.playtest_profile["liaison"] if "liaison" in u.playtest_profile else None
-                ),
-                "games": (u.playtest_profile["games"] if "games" in u.playtest_profile else None),
+                "lang": u.playtest_profile.get("lang"),
+                "added_by": u.playtest_profile.get("added_by"),
+                "added_date": u.playtest_profile.get("added_date"),
+                "timestamp": u.playtest_profile.get("timestamp"),
+                "liaison": u.playtest_profile.get("liaison"),
+                "games": u.playtest_profile.get("games"),
                 "reports": total_reports,
                 "is_admin": u.playtest_admin,
             }
@@ -51,6 +43,20 @@ def playtesters_route():
         return jsonify(result)
 
     if request.method == "PUT":
+        u = User.query.filter_by(username=request.json["username"].lower()).first()
+        if not u:
+            abort(400)
+
+        profile = copy.deepcopy(u.playtest_profile)
+        if "lang" in request.json:
+            profile["lang"] = request.json["lang"]
+
+        u.playtest_profile = profile
+        db.session.commit()
+
+        return jsonify({"success": True})
+
+    if request.method == "POST":
         u = User.query.filter_by(username=request.json["username"].lower()).first()
         if not u:
             abort(400)
@@ -70,18 +76,12 @@ def playtesters_route():
         total_reports = cards_reports + precons_reports
 
         profile = {
-            "lang": (u.playtest_profile["lang"] if "lang" in u.playtest_profile else None),
-            "added_by": (
-                u.playtest_profile["added_by"] if "added_by" in u.playtest_profile else None
-            ),
-            "added_date": (
-                u.playtest_profile["added_date"] if "added_date" in u.playtest_profile else None
-            ),
-            "timestamp": (
-                u.playtest_profile["timestamp"] if "timestamp" in u.playtest_profile else None
-            ),
-            "liaison": (u.playtest_profile["liaison"] if "liaison" in u.playtest_profile else None),
-            "games": (u.playtest_profile["games"] if "games" in u.playtest_profile else None),
+            "lang": u.playtest_profile.get("lang"),
+            "added_by": u.playtest_profile.get("added_by"),
+            "added_date": u.playtest_profile.get("added_date"),
+            "timestamp": u.playtest_profile.get("timestamp"),
+            "liaison": u.playtest_profile.get("liaison"),
+            "games": u.playtest_profile.get("games"),
             "reports": total_reports,
             "is_admin": u.playtest_admin,
         }
@@ -118,14 +118,14 @@ def report_export_route(target, id):
 
     for p in playtesters:
         # defaulting lang to English if not specified
-        user_lang = p.playtest_profile["lang"] if "lang" in p.playtest_profile else "en-EN"
+        user_lang = p.playtest_profile.get("lang") or "en-EN"
         if user_lang != lang:
             continue
 
         report = copy.deepcopy(p.playtest_report)
 
         if target == "general":
-            general = p.playtest_profile["general"] if "general" in p.playtest_profile else None
+            general = p.playtest_profile.get("general")
             if not general:
                 continue
 
@@ -167,8 +167,8 @@ def report_route(target, id):
 
     if request.method == "GET":
         if (
-            not target in current_user.playtest_report
-            or not id in current_user.playtest_report[target]
+            target not in current_user.playtest_report
+            or id not in current_user.playtest_report[target]
         ):
             return {"text": "", "score": 0, "isPlayed": False}
         return current_user.playtest_report[target][id]
@@ -201,14 +201,15 @@ def update_profile_route():
         abort(401)
 
     profile = copy.deepcopy(current_user.playtest_profile)
-    if "liaison" in request.json:
-        profile["liaison"] = request.json["liaison"]
-    if "lang" in request.json:
-        profile["lang"] = request.json["lang"]
-    if "games" in request.json:
-        profile["games"] = request.json["games"]
-    if "general" in request.json:
-        profile["general"] = request.json["general"]
+    for k, v in request.json.items():
+        match k:
+            case "liaison":
+                profile["liaison"] = v
+            case "games":
+                profile["games"] = v
+            case "general":
+                profile["general"] = request.json["general"]
+
     current_user.playtest_profile = profile
 
     db.session.commit()

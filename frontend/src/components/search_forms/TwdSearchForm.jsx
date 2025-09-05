@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
-import { useSnapshot } from 'valtio';
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
   ButtonFloatClose,
   ButtonFloatSearch,
@@ -21,10 +21,7 @@ import {
   TwdSearchFormPlayer,
   TwdSearchFormPlayers,
   TwdSearchFormTags,
-} from '@/components';
-import { sanitizeFormState } from '@/utils';
-import { useApp, setTwdResults, searchTwdForm, clearSearchForm } from '@/context';
-import { archiveServices } from '@/services';
+} from "@/components";
 import {
   AUTHOR,
   CAPACITY,
@@ -40,23 +37,26 @@ import {
   MATCH_INVENTORY,
   MONOCLAN,
   NAME,
+  NEW,
   PLAYERS,
+  RANDOM,
   SCALING,
   SECT,
   STAR,
   TAGS,
   TRAITS,
   TWD,
-  RANDOM,
-  NEW,
-} from '@/constants';
+} from "@/constants";
+import { clearSearchForm, searchTwdForm, setTwdResults, useApp } from "@/context";
+import { archiveServices } from "@/services";
+import { sanitizeFormState } from "@/utils";
 
 const TwdSearchForm = ({ error, setError }) => {
   const { cryptCardBase, libraryCardBase, showFloatingButtons, inventoryMode, isMobile } = useApp();
   const twdFormState = useSnapshot(searchTwdForm);
   const [isLoading, setIsLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = JSON.parse(searchParams.get('q'));
+  const query = JSON.parse(searchParams.get("q"));
 
   useEffect(() => {
     if (query) {
@@ -64,7 +64,7 @@ const TwdSearchForm = ({ error, setError }) => {
         searchTwdForm[i] = query[i];
       });
       if (query[RANDOM]) searchRandom(query[RANDOM]);
-      if (query[NEW]) searchRandom(query[NEW]);
+      if (query[NEW]) searchNew(query[NEW]);
     }
   }, []);
 
@@ -77,57 +77,85 @@ const TwdSearchForm = ({ error, setError }) => {
       } else if (!searchTwdForm[EVENT] || searchTwdForm[EVENT].length > 2) {
         processSearch();
       }
-    } else if (isMobile && query && twdFormState && cryptCardBase && libraryCardBase) {
+    } else if (
+      isMobile &&
+      query &&
+      !(query[RANDOM] || query[NEW]) &&
+      twdFormState &&
+      cryptCardBase &&
+      libraryCardBase
+    ) {
       processSearch();
     }
   }, [twdFormState, cryptCardBase, libraryCardBase]);
 
-  const handleEventChange = (event) => {
-    searchTwdForm[EVENT] = event.target.value;
-  };
+  const handleEventChange = useCallback(
+    (event) => {
+      searchTwdForm[EVENT] = event.target.value;
+    },
+    [searchTwdForm],
+  );
 
-  const handleMultiSelectChange = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
-    searchTwdForm[name].value[i] = value;
-  };
+  const handleMultiSelectChange = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
+      searchTwdForm[name].value[i] = value;
+    },
+    [searchTwdForm],
+  );
 
-  const handleChangeWithOpt = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
-    searchTwdForm[i][name] = value;
-  };
+  const handleChangeWithOpt = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
+      searchTwdForm[i][name] = value;
+    },
+    [searchTwdForm],
+  );
 
-  const handleDisciplinesChange = (name) => {
-    searchTwdForm[DISCIPLINES][name] = !searchTwdForm[DISCIPLINES][name];
-  };
+  const handleDisciplinesChange = useCallback(
+    (name) => {
+      searchTwdForm[DISCIPLINES][name] = !searchTwdForm[DISCIPLINES][name];
+    },
+    [searchTwdForm],
+  );
 
-  const handleMultiChange = (event) => {
-    const { name, value } = event.currentTarget;
-    searchTwdForm[name][value] = !searchTwdForm[name][value];
-  };
+  const handleMultiChange = useCallback(
+    (event) => {
+      const { name, value } = event.currentTarget;
+      searchTwdForm[name][value] = !searchTwdForm[name][value];
+    },
+    [searchTwdForm],
+  );
 
-  const handleMatchInventoryScalingChange = (e) => {
-    if (e.target.checked) {
-      searchTwdForm[MATCH_INVENTORY][SCALING] = e.target[NAME];
-    } else {
-      searchTwdForm[MATCH_INVENTORY][SCALING] = false;
-    }
-  };
+  const handleTagsChange = useCallback(
+    (name, target, value) => {
+      searchTwdForm[name][target] = value;
+    },
+    [searchTwdForm],
+  );
 
-  const handleClear = () => {
+  const handleMatchInventoryScalingChange = useCallback(
+    (e) => {
+      searchTwdForm[MATCH_INVENTORY][SCALING] = e.currentTarget.value ? 0 : e.currentTarget[NAME];
+    },
+    [searchTwdForm],
+  );
+
+  const handleClear = useCallback(() => {
     setSearchParams();
     clearSearchForm(TWD);
     setError(false);
-  };
+  }, [clearSearchForm]);
 
   const handleError = (e) => {
     switch (e.response.status) {
       case 400:
-        setError('NO DECKS FOUND');
+        setError("NO DECKS FOUND");
         break;
       default:
-        setError('CONNECTION PROBLEM');
+        setError("CONNECTION PROBLEM");
     }
 
     setTwdResults(null);
@@ -141,7 +169,7 @@ const TwdSearchForm = ({ error, setError }) => {
     setError(false);
     const sanitizedForm = sanitizeFormState(TWD, searchTwdForm);
     if (Object.entries(sanitizedForm).length === 0) {
-      setError('EMPTY REQUEST');
+      setError("EMPTY REQUEST");
       return;
     }
 
@@ -201,17 +229,17 @@ const TwdSearchForm = ({ error, setError }) => {
           />
           <div className="flex justify-end gap-6">
             <Checkbox
-              name="60"
+              name={60}
               label="Scale to 60 cards"
-              checked={twdFormState[MATCH_INVENTORY][SCALING] == 60}
-              value={twdFormState[MATCH_INVENTORY][SCALING]}
+              checked={twdFormState[MATCH_INVENTORY][SCALING] === 60}
+              value={twdFormState[MATCH_INVENTORY][SCALING] === 60}
               onChange={handleMatchInventoryScalingChange}
             />
             <Checkbox
-              name="75"
+              name={75}
               label="Scale to 75 cards"
-              checked={twdFormState[MATCH_INVENTORY][SCALING] == 75}
-              value={twdFormState[MATCH_INVENTORY][SCALING]}
+              checked={twdFormState[MATCH_INVENTORY][SCALING] === 75}
+              value={twdFormState[MATCH_INVENTORY][SCALING] === 75}
               onChange={handleMatchInventoryScalingChange}
             />
           </div>
@@ -260,7 +288,7 @@ const TwdSearchForm = ({ error, setError }) => {
         onChange={handleDisciplinesChange}
       />
       <TwdSearchFormCardtypes value={twdFormState[CARDTYPES]} onChange={handleChangeWithOpt} />
-      <TwdSearchFormTags value={twdFormState[TAGS]} onChange={handleMultiChange} />
+      <TwdSearchFormTags value={twdFormState[TAGS]} onChange={handleTagsChange} />
       <TwdSearchFormEvent value={twdFormState[EVENT]} onChange={handleEventChange} />
       <TwdSearchFormLocation value={twdFormState[LOCATION]} form={searchTwdForm} />
       <TwdSearchFormPlayer value={twdFormState[AUTHOR]} form={searchTwdForm} />

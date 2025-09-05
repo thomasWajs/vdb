@@ -1,16 +1,16 @@
-import React, { useState, useMemo } from 'react';
-import { useSnapshot } from 'valtio';
-import { Select, DeckSortButton, InventoryAddDeckRow, Modal, Checkbox, Input } from '@/components';
-import { decksSort } from '@/utils';
-import { TAGS, MASTER, DECKID, DECKS, NAME } from '@/constants';
-import { useApp, deckStore } from '@/context';
+import { useMemo, useState } from "react";
+import { useSnapshot } from "valtio";
+import { InventoryAddDeckHeader, InventoryAddDeckRow, Modal } from "@/components";
+import { DECKID, DECKS, MASTER, NAME, TAGS } from "@/constants";
+import { deckStore, useApp } from "@/context";
+import { decksSort } from "@/utils";
 
 const InventoryAddDeckModal = ({ handleClose }) => {
-  const { isDesktop, isMobile } = useApp();
+  const { isMobile } = useApp();
   const decks = useSnapshot(deckStore)[DECKS];
   const [sortMethod, setSortMethod] = useState(NAME);
   const [revFilter, setRevFilter] = useState(false);
-  const [nameFilter, setNameFilter] = useState('');
+  const [nameFilter, setNameFilter] = useState("");
   const [tagsFilter, setTagsFilter] = useState([]);
 
   const handleChangeNameFilter = (event) => {
@@ -42,7 +42,7 @@ const InventoryAddDeckModal = ({ handleClose }) => {
 
       if (nameFilter) {
         filtered = filtered.filter((deck) => {
-          if (deck[NAME].toLowerCase().indexOf(nameFilter.toLowerCase()) >= 0) return true;
+          return deck[NAME].toLowerCase().indexOf(nameFilter.toLowerCase()) >= 0;
         });
       }
 
@@ -50,22 +50,21 @@ const InventoryAddDeckModal = ({ handleClose }) => {
         filtered = filtered.filter((deck) => {
           let counter = 0;
           tagsFilter.forEach((tag) => {
-            if (deck[TAGS] && deck[TAGS].includes(tag)) counter += 1;
+            if (deck[TAGS].includes(tag)) counter += 1;
           });
-          if (counter >= tagsFilter.length) return true;
+          return counter >= tagsFilter.length;
         });
       }
 
       if (!revFilter) {
         filtered = filtered.filter((deck) => {
-          if (!deck[MASTER]) return true;
+          return !deck[MASTER];
         });
       }
 
       return decksSort(filtered, sortMethod);
-    } else {
-      return [];
     }
+    return [];
   }, [decks, nameFilter, tagsFilter, revFilter, sortMethod]);
 
   return (
@@ -75,50 +74,19 @@ const InventoryAddDeckModal = ({ handleClose }) => {
       size="lg"
       title="Import Deck to Inventory"
     >
-      <table className="border-y border-bgSecondary dark:border-bgSecondaryDark sm:border-x">
-        <thead>
-          <tr>
-            <th className="min-w-[45px]"></th>
-            {!isMobile && <th className="min-w-[50px]"></th>}
-            <th className="max-sm:w-full sm:min-w-[250px] lg:min-w-[400px]">
-              <Input
-                placeholder="Filter by Name"
-                name="text"
-                autoComplete="off"
-                spellCheck="false"
-                value={nameFilter}
-                onChange={handleChangeNameFilter}
-              />
-            </th>
-            {isDesktop && <th className="min-w-[40px]"></th>}
-            {!isMobile && <th className="min-w-[100px]"></th>}
-            {!isMobile && (
-              <th className="w-full">
-                <Select
-                  variant="creatable"
-                  isMulti
-                  options={defaultTagsOptions}
-                  onChange={handleChangeTagsFilter}
-                  defaultValue={tagsFilter}
-                  placeholder="Filter by Tags"
-                />
-              </th>
-            )}
-            <th className="min-w-[105px]">
-              <div className="flex justify-end gap-1">
-                <Checkbox
-                  label={isMobile ? 'Rev' : 'Show Revisions'}
-                  checked={revFilter}
-                  onChange={() => setRevFilter(!revFilter)}
-                />
-                <div className="flex items-center">
-                  <DeckSortButton onChange={setSortMethod} noText />
-                </div>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
+      <table>
+        <InventoryAddDeckHeader
+          handleChangeNameFilter={handleChangeNameFilter}
+          handleChangeTagsFilter={handleChangeTagsFilter}
+          setRevFilter={setRevFilter}
+          setSortMethod={setSortMethod}
+          nameFilter={nameFilter}
+          revFilter={revFilter}
+          tagsFilter={tagsFilter}
+          defaultTagsOptions={defaultTagsOptions}
+          sortMethod={sortMethod}
+        />
+        <tbody className="border-bgSecondary sm:border-x dark:border-bgSecondaryDark">
           {sortedDecks.map((deck) => {
             return (
               <InventoryAddDeckRow

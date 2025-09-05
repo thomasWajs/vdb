@@ -1,9 +1,8 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { DisciplinesCryptSummary, ResultCryptCapacity } from '@/components';
-import { useApp } from '@/context';
-import { drawUniqueProbability, countCards, countTotalCost } from '@/utils';
-import { X, CAPACITY } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { DisciplinesCryptSummary, ResultCryptCapacity } from "@/components";
+import { CAPACITY, X } from "@/constants";
+import { useApp } from "@/context";
+import { countCards, countTotalCost, drawUniqueProbability } from "@/utils";
 
 const UniqueDraw = ({ cards }) => {
   const { isMobile } = useApp();
@@ -21,19 +20,15 @@ const UniqueDraw = ({ cards }) => {
   });
 
   return (
-    <div className={twMerge('flex', isMobile && Object.keys(probs).length > 2 ? 'gap-2' : 'gap-3')}>
-      <>
-        {Object.keys(probs).map((i) => {
-          return (
-            <div className="inline" key={i} title="Chance to draw X unique vampires">
-              <div className="inline font-bold text-fgSecondary dark:text-fgSecondaryDark">
-                {i}:
-              </div>{' '}
-              {probs[i]}%
-            </div>
-          );
-        })}
-      </>
+    <div className={twMerge("flex", isMobile && Object.keys(probs).length > 2 ? "gap-2" : "gap-3")}>
+      {Object.keys(probs).map((i) => {
+        return (
+          <div className="inline" key={i} title="Chance to draw X unique vampires">
+            <div className="inline font-bold text-fgSecondary dark:text-fgSecondaryDark">{i}:</div>{" "}
+            {probs[i]}%
+          </div>
+        );
+      })}
     </div>
   );
 };

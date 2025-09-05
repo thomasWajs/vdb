@@ -1,8 +1,7 @@
-import React from 'react';
-import { Outlet } from 'react-router';
-import { AppProvider, ThemeProvider } from '@/context';
-import Navigation from '@/pages/Navigation.jsx';
-import { OfflineNotification, UpdateNotification } from '@/components';
+import { Outlet } from "react-router";
+import { OfflineNotification, UpdateNotification } from "@/components";
+import { AppProvider, ThemeProvider } from "@/context";
+import Navigation from "@/pages/Navigation.jsx";
 
 const RootLayout = () => {
   return (

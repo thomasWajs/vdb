@@ -1,8 +1,7 @@
-import React from 'react';
-import Dice3 from '@icons/dice-3-fill.svg?react';
-import X from '@icons/x.svg?react';
-import { Toggle, Input, Button } from '@/components';
-import { NAME, STATE, RANDOM } from '@/constants';
+import Dice3 from "@icons/dice-3-fill.svg?react";
+import X from "@icons/x.svg?react";
+import { Button, Input, Toggle } from "@/components";
+import { NAME, RANDOM, STATE } from "@/constants";
 
 const SeatingPlayerSelector = ({ setPlayer, delPlayer, i, player }) => {
   const handleChange = (event) => {
@@ -13,7 +12,7 @@ const SeatingPlayerSelector = ({ setPlayer, delPlayer, i, player }) => {
       });
     } else {
       setPlayer(i, {
-        [NAME]: '',
+        [NAME]: "",
         [STATE]: false,
       });
     }
@@ -48,12 +47,12 @@ const SeatingPlayerSelector = ({ setPlayer, delPlayer, i, player }) => {
       <div className="flex w-full">
         <Input
           placeholder="Disabled"
-          value={player[STATE] ? (player[RANDOM] ? 'RANDOM' : player[NAME]) : ''}
+          value={player[STATE] ? (player[RANDOM] ? "RANDOM" : player[NAME]) : ""}
           onChange={handleChange}
           roundedStyle="rounded-sm rounded-r-none"
         />
         <Button
-          variant={player[RANDOM] && player[STATE] ? 'primary' : 'secondary'}
+          variant={player[RANDOM] && player[STATE] ? "primary" : "secondary"}
           onClick={handleClick}
           className="rounded-l-none"
         >
@@ -62,7 +61,7 @@ const SeatingPlayerSelector = ({ setPlayer, delPlayer, i, player }) => {
       </div>
       <Toggle isOn={player[STATE]} handleClick={toggle} size="lg" />
       <div
-        className="text-fgRed dark:text-fgRedDark flex cursor-pointer items-center p-0.5"
+        className="flex cursor-pointer items-center p-0.5 text-fgRed dark:text-fgRedDark"
         onClick={() => delPlayer(i)}
       >
         <X width="22" height="22" viewBox="0 0 16 16" />

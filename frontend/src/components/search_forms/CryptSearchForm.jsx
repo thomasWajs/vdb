@@ -1,34 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
-import { useSnapshot } from 'valtio';
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
-  ButtonFloatSearch,
   ButtonFloatClose,
-  SearchFormTextAndButtons,
-  SearchFormSet,
-  SearchFormPrecon,
-  SearchFormArtist,
-  CryptSearchFormDisciplines,
-  CryptSearchFormVirtues,
+  ButtonFloatSearch,
   CryptSearchFormCapacity,
   CryptSearchFormClan,
-  CryptSearchFormSect,
-  CryptSearchFormVotes,
-  CryptSearchFormTitles,
+  CryptSearchFormDisciplines,
   CryptSearchFormGroup,
+  CryptSearchFormSect,
+  CryptSearchFormTitles,
   CryptSearchFormTraits,
-} from '@/components';
-import { filterCrypt, getIsPlaytest, sanitizeFormState } from '@/utils';
-import { useDebounce } from '@/hooks';
-import {
-  useApp,
-  setCryptResults,
-  searchCryptForm,
-  clearSearchForm,
-  inventoryStore,
-  usedStore,
-  limitedStore,
-} from '@/context';
+  CryptSearchFormVirtues,
+  CryptSearchFormVotes,
+  SearchFormArtist,
+  SearchFormPrecon,
+  SearchFormSet,
+  SearchFormTextAndButtons,
+} from "@/components";
 import {
   AGE,
   ARTIST,
@@ -42,6 +31,7 @@ import {
   GROUP,
   HARD,
   ID,
+  IN,
   LE,
   NAME,
   NOT_NEWER,
@@ -59,7 +49,18 @@ import {
   TITLES,
   TRAITS,
   VOTES,
-} from '@/constants';
+} from "@/constants";
+import {
+  clearSearchForm,
+  inventoryStore,
+  limitedStore,
+  searchCryptForm,
+  setCryptResults,
+  useApp,
+  usedStore,
+} from "@/context";
+import { useDebounce } from "@/hooks";
+import { filterCrypt, getIsPlaytest, sanitizeFormState } from "@/utils";
 
 const CryptSearchForm = () => {
   const {
@@ -79,8 +80,8 @@ const CryptSearchForm = () => {
   const [error, setError] = useState(false);
   const [preresults, setPreresults] = useState();
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = JSON.parse(searchParams.get('q'));
-  const SHOW_LIMIT = 300;
+  const query = JSON.parse(searchParams.get("q"));
+  const SHOW_LIMIT = 400;
   const DISCIPLINES_DEBOUNCE_DELAY = 180;
 
   useEffect(() => {
@@ -96,10 +97,6 @@ const CryptSearchForm = () => {
       processSearch();
     }
   }, [cryptFormState, cryptCardBase]);
-
-  const handleTextChange = (formId, value) => {
-    searchCryptForm[TEXT][formId].value = value;
-  };
 
   useEffect(
     () => textInputsAndSearch(),
@@ -144,62 +141,83 @@ const CryptSearchForm = () => {
     }
   }, [preresults]);
 
-  const handleTextCheckboxesChange = (event) => {
-    const { name, value } = event.currentTarget;
+  const handleTextChange = useCallback(
+    (formId, value) => {
+      searchCryptForm[TEXT][formId].value = value;
+    },
+    [searchCryptForm],
+  );
 
-    if ([NAME, TEXT].includes(value)) {
-      searchCryptForm[TEXT][name]['in'] =
-        searchCryptForm[TEXT][name]['in'] === value ? false : value;
-    } else {
-      searchCryptForm[TEXT][name][value] = !searchCryptForm[TEXT][name][value];
-    }
-  };
+  const handleTextCheckboxesChange = useCallback(
+    (event) => {
+      const { name, value } = event.currentTarget;
 
-  const handleSelectChange = (event) => {
-    const { name, value } = event;
-    searchCryptForm[name] = value;
-  };
-
-  const handleMultiSelectChange = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
-
-    if ([CAPACITY].includes(name)) {
-      if ([LE, GE, EQ].includes(value)) {
-        searchCryptForm[name].value[i].moreless = value;
+      if ([NAME, TEXT].includes(value)) {
+        searchCryptForm[TEXT][name][IN] = searchCryptForm[TEXT][name][IN] === value ? false : value;
       } else {
-        searchCryptForm[name].value[i][name] = value;
+        searchCryptForm[TEXT][name][value] = !searchCryptForm[TEXT][name][value];
       }
-    } else {
-      searchCryptForm[name].value[i] = value;
-    }
-  };
+    },
+    [searchCryptForm],
+  );
 
-  const handleMultiChange = (event) => {
-    const { name, value } = event.currentTarget;
+  const handleSelectChange = useCallback(
+    (event) => {
+      const { name, value } = event;
+      searchCryptForm[name] = value;
+    },
+    [searchCryptForm],
+  );
 
-    if ([OR_NEWER, OR_OLDER, NOT_NEWER, NOT_OLDER].includes(value)) {
-      searchCryptForm[name][AGE] = searchCryptForm[name][AGE] === value ? false : value;
-    } else if ([ONLY, FIRST, REPRINT].includes(value)) {
-      searchCryptForm[name][PRINT] = searchCryptForm[name][PRINT] === value ? false : value;
-    } else {
-      searchCryptForm[name][value] = !searchCryptForm[name][value];
-    }
-  };
+  const handleMultiSelectChange = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
 
-  const handleDisciplinesChange = (name, max) => {
-    if (searchCryptForm[DISCIPLINES][name] < max) {
-      searchCryptForm[DISCIPLINES][name] += 1;
-    } else {
-      searchCryptForm[DISCIPLINES][name] = 0;
-    }
-  };
+      if ([CAPACITY].includes(name)) {
+        if ([LE, GE, EQ].includes(value)) {
+          searchCryptForm[name].value[i].moreless = value;
+        } else {
+          searchCryptForm[name].value[i][name] = value;
+        }
+      } else {
+        searchCryptForm[name].value[i] = value;
+      }
+    },
+    [searchCryptForm],
+  );
 
-  const handleClear = () => {
+  const handleMultiChange = useCallback(
+    (event) => {
+      const { name, value } = event.currentTarget;
+
+      if ([OR_NEWER, OR_OLDER, NOT_NEWER, NOT_OLDER].includes(value)) {
+        searchCryptForm[name][AGE] = searchCryptForm[name][AGE] === value ? false : value;
+      } else if ([ONLY, FIRST, REPRINT].includes(value)) {
+        searchCryptForm[name][PRINT] = searchCryptForm[name][PRINT] === value ? false : value;
+      } else {
+        searchCryptForm[name][value] = !searchCryptForm[name][value];
+      }
+    },
+    [searchCryptForm],
+  );
+
+  const handleDisciplinesChange = useCallback(
+    (name, max) => {
+      if (searchCryptForm[DISCIPLINES][name] < max) {
+        searchCryptForm[DISCIPLINES][name] += 1;
+      } else {
+        searchCryptForm[DISCIPLINES][name] = 0;
+      }
+    },
+    [searchCryptForm],
+  );
+
+  const handleClear = useCallback(() => {
     setSearchParams();
     clearSearchForm(CRYPT);
     setError(false);
-  };
+  }, [clearSearchForm]);
 
   const handleShowResults = () => {
     setCryptResults(preresults);
@@ -210,17 +228,17 @@ const CryptSearchForm = () => {
     const sanitizedForm = sanitizeFormState(CRYPT, searchCryptForm);
 
     if (Object.entries(sanitizedForm).length === 0) {
-      setError('EMPTY REQUEST');
+      setError("EMPTY REQUEST");
       return;
     }
 
     const filteredCards = filterCrypt(
-      limitedMode ? limitedCrypt : cryptCardBase,
       sanitizedForm,
+      limitedMode ? limitedCrypt : cryptCardBase,
     ).filter((card) => playtestMode || !getIsPlaytest(card[ID]));
 
-    if (isMobile && filteredCards.length == 0) {
-      setError('NO CARDS FOUND');
+    if (isMobile && filteredCards.length === 0) {
+      setError("NO CARDS FOUND");
       return;
     }
 

@@ -1,22 +1,18 @@
-import React from 'react';
+import sects from "@/assets/data/sectsList.json";
 import {
-  Select,
   SearchAdditionalForms,
-  SearchFormButtonLogicToggle,
   SearchFormButtonAdd,
   SearchFormButtonDel,
-} from '@/components';
-import { useApp } from '@/context';
-import { LOGIC, SECT, ANY, NOT_REQUIRED } from '@/constants';
-import sects from '@/assets/data/sectsList.json';
+  SearchFormButtonLogicToggle,
+  Select,
+} from "@/components";
+import { ANY, LOGIC, NOT_REQUIRED, SECT } from "@/constants";
 
 const CryptSearchFormSect = ({ value, searchForm, onChange }) => {
-  const { isXWide } = useApp();
-  const maxMenuHeight = isXWide ? 500 : 350;
   const name = SECT;
   const options = [
-    ['ANY', ANY],
-    ['Not Required', NOT_REQUIRED],
+    ["ANY", ANY],
+    ["Not Required", NOT_REQUIRED],
     ...sects.map((s) => [s, s.toLowerCase()]),
   ].map((i) => ({
     value: i[1],
@@ -43,7 +39,7 @@ const CryptSearchFormSect = ({ value, searchForm, onChange }) => {
                   searchForm={searchForm}
                 />
               </div>
-              {value.value.length == 1 ? (
+              {value.value.length === 1 ? (
                 <SearchFormButtonAdd searchForm={searchForm} name={name} />
               ) : (
                 <SearchFormButtonDel searchForm={searchForm} i={0} name={name} />
@@ -54,10 +50,8 @@ const CryptSearchFormSect = ({ value, searchForm, onChange }) => {
         <div className="w-3/4">
           <Select
             options={options}
-            isSearchable={false}
             isClearable={value.value[0] !== ANY}
             name={0}
-            maxMenuHeight={maxMenuHeight}
             value={options.find((obj) => obj.value === value.value[0])}
             onChange={(e, id) => (e ? onChange(e, id) : onChange({ name: name, value: ANY }, id))}
           />
@@ -71,7 +65,6 @@ const CryptSearchFormSect = ({ value, searchForm, onChange }) => {
           searchForm={searchForm}
           options={options}
           onChange={onChange}
-          maxMenuHeight={maxMenuHeight}
         />
       )}
     </>

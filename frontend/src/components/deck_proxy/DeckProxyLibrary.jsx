@@ -1,15 +1,15 @@
-import React from 'react';
+import { useCallback } from "react";
 import {
   DeckProxyLibraryTable,
+  FlexGapped,
+  Header,
   ResultLibraryType,
   ResultModal,
-  Header,
-  FlexGapped,
-} from '@/components';
-import { useApp } from '@/context';
-import { countCards } from '@/utils';
-import { PRINT, LIBRARY, INVENTORY_TYPE, TYPE_MASTER } from '@/constants';
-import { useModalCardController, useDeckLibrary } from '@/hooks';
+} from "@/components";
+import { INVENTORY_TYPE, LIBRARY, PRINT, TYPE_MASTER } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckLibrary, useModalCardController } from "@/hooks";
+import { countCards } from "@/utils";
 
 const DeckProxyLibrary = ({
   deck,
@@ -18,7 +18,7 @@ const DeckProxyLibrary = ({
   handleProxyCounter,
   handleProxySelector,
 }) => {
-  const { setShowFloatingButtons } = useApp();
+  const { setShowFloatingButtons, isDesktop } = useApp();
 
   const {
     library,
@@ -46,20 +46,26 @@ const DeckProxyLibrary = ({
     handleModalCardClose,
   } = useModalCardController(library, librarySide);
 
-  const handleClick = (card) => {
-    handleModalCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClick = useCallback(
+    (card) => {
+      handleModalCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [library, librarySide],
+  );
 
-  const handleClickSide = (card) => {
-    handleModalSideCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClickSide = useCallback(
+    (card) => {
+      handleModalSideCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [library, librarySide],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
-  };
+    !isDesktop && setShowFloatingButtons(true);
+  }, [library, librarySide]);
 
   return (
     <FlexGapped className="flex-col">
@@ -74,7 +80,7 @@ const DeckProxyLibrary = ({
                 <ResultLibraryType
                   cardtype={cardtype}
                   total={libraryByTypeTotal[cardtype]}
-                  trifleTotal={cardtype == TYPE_MASTER && trifleTotal}
+                  trifleTotal={cardtype === TYPE_MASTER && trifleTotal}
                 />
               </div>
               <DeckProxyLibraryTable
@@ -101,7 +107,7 @@ const DeckProxyLibrary = ({
                 <ResultLibraryType
                   cardtype={cardtype}
                   total={0}
-                  trifleTotal={cardtype == TYPE_MASTER && trifleTotal}
+                  trifleTotal={cardtype === TYPE_MASTER && trifleTotal}
                 />
                 <DeckProxyLibraryTable
                   inventoryType={deck[INVENTORY_TYPE]}

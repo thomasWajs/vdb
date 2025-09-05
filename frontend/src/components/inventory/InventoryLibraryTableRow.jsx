@@ -1,21 +1,18 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
+import { useCallback } from "react";
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
 import {
   CardPopover,
+  ConditionalTooltip,
   InventoryCardQuantity,
   InventoryCardQuantityDiff,
   ResultLibraryClan,
   ResultLibraryCost,
-  ResultLibraryTypeImage,
   ResultLibraryDisciplines,
+  ResultLibraryTypeImage,
   ResultMiscImage,
   ResultName,
-  ConditionalTooltip,
-} from '@/components';
-import { getSwipedBg, getHardTotal, getSoftMax } from '@/utils';
-import { useApp, inventoryStore, usedStore, limitedStore, inventoryCardChange } from '@/context';
-import { useSwipe } from '@/hooks';
+} from "@/components";
 import {
   BLOOD,
   BURN,
@@ -30,13 +27,14 @@ import {
   SOFT,
   TRIFLE,
   TYPE,
-} from '@/constants';
+} from "@/constants";
+import { inventoryCardChange, inventoryStore, useApp, usedStore } from "@/context";
+import { useSwipe } from "@/hooks";
+import { getHardTotal, getSoftMax, getSwipedBg } from "@/utils";
 
 const InventoryLibraryTableRow = ({ card, compact, newFocus, inShared, handleClick }) => {
-  const { isMobile, isNarrow, limitedMode } = useApp();
+  const { isMobile } = useApp();
   const usedLibrary = useSnapshot(usedStore)[LIBRARY];
-  const limitedLibrary = useSnapshot(limitedStore)[LIBRARY];
-  const inLimited = limitedLibrary[card.c[ID]];
   const softUsedMax = getSoftMax(usedLibrary[SOFT][card.c[ID]]);
   const hardUsedTotal = getHardTotal(usedLibrary[HARD][card.c[ID]]);
   const isEditable = !useSnapshot(inventoryStore)[IS_FROZEN] && !inShared;
@@ -46,21 +44,25 @@ const InventoryLibraryTableRow = ({ card, compact, newFocus, inShared, handleCli
     () => inventoryCardChange(card.c, card.q + 1),
   );
 
+  const onClick = useCallback(() => {
+    handleClick(card.c);
+  }, [card]);
+
   return (
     <div
       {...swipeHandlers}
-      className={twMerge('flex w-full items-center', getSwipedBg(isSwiped, true))}
+      className={twMerge("flex w-full items-center", getSwipedBg(isSwiped, true))}
     >
       <div
         className={twMerge(
-          'flex items-center justify-center',
+          "flex items-center justify-center",
           isEditable
-            ? 'min-w-[84px]'
-            : 'h-full min-w-[42px] border-r border-bgSecondary bg-blue/5 dark:border-bgSecondaryDark sm:min-w-[48px]',
+            ? "min-w-[84px]"
+            : "h-full min-w-[42px] border-bgSecondary border-r bg-blue/5 sm:min-w-[48px] dark:border-bgSecondaryDark",
         )}
       >
         {inShared ? (
-          <>{card.q || null}</>
+          card.q || null
         ) : (
           <InventoryCardQuantity
             card={card}
@@ -80,10 +82,10 @@ const InventoryLibraryTableRow = ({ card, compact, newFocus, inShared, handleCli
           />
         </div>
       )}
-      <div className="flex min-w-[40px] justify-center" onClick={() => handleClick(card.c)}>
+      <div className="flex min-w-[40px] justify-center" onClick={onClick}>
         <ResultLibraryTypeImage value={card.c[TYPE]} />
       </div>
-      <div className="flex w-full" onClick={() => handleClick(card.c)}>
+      <div className="flex w-full" onClick={onClick}>
         <ConditionalTooltip
           overlay={<CardPopover card={card.c} />}
           disabled={isMobile}
@@ -91,47 +93,45 @@ const InventoryLibraryTableRow = ({ card, compact, newFocus, inShared, handleCli
           noPadding
         >
           <div className="flex cursor-pointer">
-            <ResultName card={card.c} isBanned={limitedMode && !inLimited} />
+            <ResultName card={card.c} />
           </div>
         </ConditionalTooltip>
       </div>
       {isMobile ? (
-        <div className="flex min-w-[82px] justify-between" onClick={() => handleClick(card.c)}>
+        <div className="flex min-w-[82px] justify-between" onClick={onClick}>
           {!!(card.c[BLOOD] || card.c[POOL] || card.c[CONVICTION]) && (
             <div
-              className={twMerge('flex min-w-[22px] justify-center', card.c[BLOOD] && 'pb-1')}
-              onClick={() => handleClick(card.c)}
+              className={twMerge("flex min-w-[22px] justify-center", card.c[BLOOD] && "pb-1")}
+              onClick={onClick}
             >
               <ResultLibraryCost card={card.c} />
             </div>
           )}
-          <div className="flex w-full items-center justify-end" onClick={() => handleClick(card.c)}>
+          <div className="flex w-full items-center justify-end" onClick={onClick}>
             <ResultLibraryClan value={card.c[CLAN]} />
-            {card.c[DISCIPLINE] && card.c[CLAN] && '+'}
+            {card.c[DISCIPLINE] && card.c[CLAN] && "+"}
             <ResultLibraryDisciplines value={card.c[DISCIPLINE]} />
           </div>
         </div>
       ) : (
         <>
           <div
-            className={twMerge('flex min-w-[30px] justify-center', card.c[BLOOD] && 'pb-1')}
-            onClick={() => handleClick(card.c)}
+            className={twMerge("flex min-w-[30px] justify-center", card.c[BLOOD] && "pb-1")}
+            onClick={onClick}
           >
             <ResultLibraryCost card={card.c} />
           </div>
-          <div className="flex min-w-[82px] justify-center" onClick={() => handleClick(card.c)}>
+          <div className="flex min-w-[82px] justify-center" onClick={onClick}>
             <ResultLibraryClan value={card.c[CLAN]} />
-            {card.c[DISCIPLINE] && card.c[CLAN] && '+'}
+            {card.c[DISCIPLINE] && card.c[CLAN] && "+"}
             <ResultLibraryDisciplines value={card.c[DISCIPLINE]} />
           </div>
         </>
       )}
-      {!isNarrow && (
-        <div className="flex min-w-[30px] justify-center" onClick={() => handleClick(card.c)}>
-          {card.c[BURN] && <ResultMiscImage value={BURN} />}
-          {card.c[TRIFLE] && <ResultMiscImage value={TRIFLE} />}
-        </div>
-      )}
+      <div className="flex min-w-[30px] justify-center max-lg:hidden" onClick={onClick}>
+        {card.c[BURN] && <ResultMiscImage value={BURN} />}
+        {card.c[TRIFLE] && <ResultMiscImage value={TRIFLE} />}
+      </div>
     </div>
   );
 };

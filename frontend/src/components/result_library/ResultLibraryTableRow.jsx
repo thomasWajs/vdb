@@ -1,16 +1,15 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
 import {
-  AccountLimitedDelCard,
   ButtonAddCard,
+  LimitedDelCard,
   ResultLibraryTableRowCommon,
   ResultUsed,
-} from '@/components';
-import { useApp, deckStore, deckCardChange } from '@/context';
-import { useSwipe } from '@/hooks';
-import { getIsEditable, getSwipedBg } from '@/utils';
-import { ID, DECKID, LIBRARY, DECK } from '@/constants';
+} from "@/components";
+import { DECK, DECKID, ID, LIBRARY } from "@/constants";
+import { deckCardChange, deckStore, useApp } from "@/context";
+import { useSwipe } from "@/hooks";
+import { getIsEditable, getSwipedBg } from "@/utils";
 
 const ResultLibraryTableRow = ({ card, handleClick, inLimited, shouldShowModal }) => {
   const { addMode, inventoryMode } = useApp();
@@ -29,13 +28,13 @@ const ResultLibraryTableRow = ({ card, handleClick, inLimited, shouldShowModal }
     <tr
       {...swipeHandlers}
       className={twMerge(
-        'h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark',
+        "h-[38px] border-bgSecondary border-y dark:border-bgSecondaryDark",
         getSwipedBg(isSwiped),
       )}
     >
       {inLimited ? (
         <td className="min-w-[22px]">
-          <AccountLimitedDelCard cardid={card[ID]} target={inLimited} />
+          <LimitedDelCard cardid={card[ID]} target={inLimited} />
         </td>
       ) : (
         addMode && (

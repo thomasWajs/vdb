@@ -1,20 +1,20 @@
-import { proxy } from 'valtio';
-import { derive } from 'derive-valtio';
-import { update } from 'idb-keyval';
+import { derive } from "derive-valtio";
+import { update } from "idb-keyval";
+import { proxy } from "valtio";
 import {
-  SETS,
-  CRYPT,
-  LIBRARY,
-  BANNED,
   ALLOWED,
-  LIMITED_SETS,
+  BANNED,
+  CRYPT,
+  ID,
+  LIBRARY,
+  LIMITED_ALLOWED_CRYPT,
+  LIMITED_ALLOWED_LIBRARY,
   LIMITED_BANNED_CRYPT,
   LIMITED_BANNED_LIBRARY,
-  LIMITED_ALLOWED_LIBRARY,
-  LIMITED_ALLOWED_CRYPT,
-  ID,
+  LIMITED_SETS,
   SET,
-} from '@/constants';
+  SETS,
+} from "@/constants";
 
 export const limitedFullStore = proxy({
   [CRYPT]: {},
@@ -41,7 +41,7 @@ export const limitedStore = derive({
       .filter((card) => {
         if (banned[card[ID]]) return false;
         if (allowed[card[ID]]) return true;
-        if (Object.keys(card[SET]).some((i) => sets.includes(i))) return true;
+        return Object.keys(card[SET]).some((i) => sets.includes(i));
       })
       .forEach((card) => {
         cards[card[ID]] = card;
@@ -59,7 +59,7 @@ export const limitedStore = derive({
       .filter((card) => {
         if (banned[card[ID]]) return false;
         if (allowed[card[ID]]) return true;
-        if (Object.keys(card[SET]).some((i) => sets.includes(i))) return true;
+        return Object.keys(card[SET]).some((i) => sets.includes(i));
       })
       .forEach((card) => {
         cards[card[ID]] = card;

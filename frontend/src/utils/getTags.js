@@ -3,6 +3,7 @@ import {
   ADDITIONAL_STRIKE,
   AGGRAVATED,
   ALLY,
+  BASE,
   BLEED,
   BLEED_1,
   BLOCK,
@@ -22,6 +23,7 @@ import {
   STEALTH_1,
   STRENGTH,
   STRENGTH_1,
+  SUPERIOR,
   SWARM,
   TEXT,
   TYPE,
@@ -33,11 +35,9 @@ import {
   UNLOCK,
   VOTE,
   VOTES_TITLE,
-  SUPERIOR,
-  BASE,
-} from '@/constants';
-import { CryptTraitsRegexMap, LibraryTraitsRegexMap } from '@/utils/traitsRegexMaps';
-import { missingTrait } from '@/utils/cardFilters';
+} from "@/constants";
+import { missingTrait } from "@/utils/cardFilters";
+import { CryptTraitsRegexMap, LibraryTraitsRegexMap } from "@/utils/traitsRegexMaps";
 
 const getTags = (crypt, library) => {
   const deckTags = {
@@ -143,7 +143,7 @@ const getCryptTags = (card) => {
 };
 
 const getLibraryTags = (card) => {
-  let cardTags = [];
+  const cardTags = [];
   testLibraryAlly(card) && cardTags.push(ALLY);
   testLibraryBleed(card) && cardTags.push(BLEED);
   testLibraryAccel(card) && cardTags.push(ACCEL);
@@ -177,7 +177,7 @@ const testCryptCombat = (card) => {
 };
 
 const testCryptMmpa = (card) => {
-  if (['Anson', 'Cybele', 'Nana Buruku', 'Huitzilopochtli', 'Isanwayen'].includes(card[NAME]))
+  if (["Anson", "Cybele", "Nana Buruku", "Huitzilopochtli", "Isanwayen"].includes(card[NAME]))
     return true;
 };
 
@@ -194,8 +194,8 @@ const testCryptStealth = (card) => {
 };
 
 const testLibraryAlly = (card) => {
-  if (card[TYPE].split('/').includes(TYPE_ALLY)) return true;
-  if (['FBI Special Affairs Division', 'Unmasking, The'].includes(card[NAME])) return true;
+  if (card[TYPE].split("/").includes(TYPE_ALLY)) return true;
+  if (["FBI Special Affairs Division", "Unmasking, The"].includes(card[NAME])) return true;
 };
 
 const testLibraryBleed = (card) => {
@@ -215,7 +215,7 @@ const testLibraryBlock = (card) => {
   }
   if (
     haveTraits([UNLOCK], card, LibraryTraitsRegexMap) &&
-    card[TYPE].split('/').includes(TYPE_REACTION)
+    card[TYPE].split("/").includes(TYPE_REACTION)
   ) {
     return true;
   }
@@ -228,7 +228,7 @@ const testLibrarySwarm = (card) => {
 };
 
 const testLibraryCombat = (card) => {
-  if (card[TYPE].split('/').includes(TYPE_COMBAT) && missingTrait(COMBAT_ENDS, card, {})) {
+  if (card[TYPE].split("/").includes(TYPE_COMBAT) && missingTrait(COMBAT_ENDS, card, {})) {
     return true;
   }
   if (
@@ -243,11 +243,11 @@ const testLibraryCombat = (card) => {
 };
 
 const testLibraryMmpa = (card) => {
-  if (['Parthenon, The', 'Rumors of Gehenna'].includes(card[NAME])) return true;
+  if (["Parthenon, The", "Rumors of Gehenna"].includes(card[NAME])) return true;
 };
 
 const testLibraryRush = (card) => {
-  if (card[TYPE] == TYPE_REACTION) return false;
+  if (card[TYPE] === TYPE_REACTION) return false;
   if (haveTraits([ENTER_COMBAT], card, LibraryTraitsRegexMap)) {
     return true;
   }
@@ -260,7 +260,7 @@ const testLibraryStealth = (card) => {
 };
 
 const testLibraryVote = (card) => {
-  if (card[TYPE].split('/').includes(TYPE_POLITICAL_ACTION)) return true;
+  if (card[TYPE].split("/").includes(TYPE_POLITICAL_ACTION)) return true;
   if (haveTraits([VOTES_TITLE], card, LibraryTraitsRegexMap)) {
     return true;
   }
@@ -269,6 +269,6 @@ const testLibraryVote = (card) => {
 const haveTraits = (traits, card, traitsRegexMap) => {
   return traits.some((trait) => {
     const regex = traitsRegexMap[trait] ? traitsRegexMap[trait](card) : trait;
-    return RegExp(regex, 'i').test(card[TEXT]);
+    return RegExp(regex, "i").test(card[TEXT]);
   });
 };

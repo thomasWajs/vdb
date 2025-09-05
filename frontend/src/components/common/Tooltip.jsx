@@ -1,35 +1,35 @@
-import React, { useState, useRef } from 'react';
-import { twMerge } from 'tailwind-merge';
 import {
-  useFloating,
-  autoUpdate,
-  offset,
-  flip,
-  shift,
   arrow,
-  useHover,
-  useClick,
-  useFocus,
-  useDismiss,
-  useInteractions,
+  autoUpdate,
   FloatingPortal,
-} from '@floating-ui/react';
+  flip,
+  offset,
+  shift,
+  useClick,
+  useDismiss,
+  useFloating,
+  useFocus,
+  useHover,
+  useInteractions,
+} from "@floating-ui/react";
+import { useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 const Tooltip = ({
   children,
-  className = 'inline',
-  size = 'md',
+  className = "inline",
+  size = "md",
   overlay,
   noPadding,
-  placement = 'right',
+  placement = "right",
   show,
   noClick,
 }) => {
   const widthClass = {
-    sm: 'max-w-full sm:max-w-[300px]',
-    md: 'max-w-full sm:max-w-[450px]',
-    lg: 'max-w-full lg:max-w-[700px]',
-    xl: 'max-w-full xl:max-w-[1000px]',
+    sm: "max-w-full sm:max-w-[300px]",
+    md: "max-w-full sm:max-w-[450px]",
+    lg: "max-w-full lg:max-w-[700px]",
+    xl: "max-w-full xl:max-w-[1000px]",
   };
 
   const [open, setOpen] = useState(false);
@@ -58,18 +58,18 @@ const Tooltip = ({
   const { getReferenceProps, getFloatingProps } = useInteractions([click, hover, focus, dismiss]);
 
   const arrowOffset = {
-    bottom: 'top-[-7px]',
-    left: 'right-[-7px]',
-    right: 'left-[-7px]',
-    top: 'bottom-[-7px]',
-  }[arrowPlacement.split('-')[0]];
+    bottom: "top-[-7px]",
+    left: "right-[-7px]",
+    right: "left-[-7px]",
+    top: "bottom-[-7px]",
+  }[arrowPlacement.split("-")[0]];
 
   const arrowRotate = {
-    bottom: 'rotate-[135deg]',
-    left: 'rotate-[225deg]',
-    right: 'rotate-[45deg]',
-    top: 'rotate-[315deg]',
-  }[arrowPlacement.split('-')[0]];
+    bottom: "rotate-[135deg]",
+    left: "rotate-[225deg]",
+    right: "rotate-[45deg]",
+    top: "rotate-[315deg]",
+  }[arrowPlacement.split("-")[0]];
 
   return (
     <>
@@ -80,8 +80,8 @@ const Tooltip = ({
         {(show || open) && (
           <div
             className={twMerge(
-              'z-50 rounded-md border border-bgSecondary bg-bgPrimary text-fgPrimary dark:border-bgSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark',
-              !noPadding && 'p-3',
+              "z-50 rounded-md border border-borderPrimary bg-bgPrimary text-fgPrimary dark:border-borderPrimaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark",
+              !noPadding && "p-3",
               widthClass[size],
             )}
             ref={refs.setFloating}
@@ -96,13 +96,13 @@ const Tooltip = ({
             <div
               ref={arrowRef}
               className={twMerge(
-                'absolute z-[-1] h-[12px] w-[12px] border-b border-l border-bgSecondary bg-bgPrimary dark:border-bgSecondaryDark dark:bg-bgPrimaryDark',
+                "absolute z-[-1] h-[12px] w-[12px] border-borderPrimary border-b border-l bg-bgPrimary dark:border-borderPrimaryDark dark:bg-bgPrimaryDark",
                 arrowOffset,
                 arrowRotate,
               )}
               style={{
-                left: arrowX != null ? `${arrowX}px` : '',
-                top: arrowY != null ? `${arrowY}px` : '',
+                left: arrowX != null ? `${arrowX}px` : "",
+                top: arrowY != null ? `${arrowY}px` : "",
               }}
             />
           </div>

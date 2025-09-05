@@ -1,6 +1,5 @@
-import React from 'react';
-import { DiffCryptTableRow } from '@/components';
-import { ID } from '@/constants';
+import { DiffCryptTableRow } from "@/components";
+import { ID } from "@/constants";
 
 const DiffCryptTable = ({
   cardChange,
@@ -16,7 +15,7 @@ const DiffCryptTable = ({
   keyDisciplines,
 }) => {
   return (
-    <table className="w-full border-bgSecondary dark:border-bgSecondaryDark sm:border">
+    <table className="w-full border-bgSecondary sm:border dark:border-bgSecondaryDark">
       <tbody>
         {cards.map((card) => {
           return (

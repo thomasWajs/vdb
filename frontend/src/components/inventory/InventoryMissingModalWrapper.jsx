@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useSnapshot } from 'valtio';
-import { DeckMissingModal } from '@/components';
-import { useApp, inventoryStore } from '@/context';
-import { getIsPlaytest } from '@/utils';
-import { useInventoryCrypt, useInventoryLibrary } from '@/hooks';
-import { ID, CRYPT, LIBRARY, NAME, AUTHOR, DESCRIPTION, DECKID } from '@/constants';
+import { useMemo } from "react";
+import { useSnapshot } from "valtio";
+import { DeckMissingModal } from "@/components";
+import { AUTHOR, CRYPT, DECKID, DESCRIPTION, ID, LIBRARY, NAME } from "@/constants";
+import { inventoryStore, useApp } from "@/context";
+import { useInventoryCrypt, useInventoryLibrary } from "@/hooks";
+import { getIsPlaytest } from "@/utils";
 
 const InventoryMissingModalWrapper = ({
   clan,
@@ -40,7 +40,9 @@ const InventoryMissingModalWrapper = ({
         .filter((i) => {
           return missingByDiscipline[discipline][i.c[ID]];
         })
-        .map((i) => (missing[i.c[ID]] = i));
+        .forEach((i) => {
+          missing[i.c[ID]] = i;
+        });
       return missing;
     }
     return {};
@@ -53,23 +55,27 @@ const InventoryMissingModalWrapper = ({
     .filter((cardid) => {
       return !getIsPlaytest(cardid) && (!inventoryCrypt[cardid] || !inventoryCrypt[cardid]?.q);
     })
-    .map((cardid) => (missAllVtesCrypt[cardid] = { q: 1, c: cryptCardBase[cardid] }));
+    .forEach((cardid) => {
+      missAllVtesCrypt[cardid] = { q: 1, c: cryptCardBase[cardid] };
+    });
 
   Object.keys(libraryCardBase)
     .filter((cardid) => {
       return !getIsPlaytest(cardid) && (!inventoryLibrary[cardid] || !inventoryLibrary[cardid]?.q);
     })
-    .map((cardid) => (missAllVtesLibrary[cardid] = { q: 1, c: libraryCardBase[cardid] }));
+    .forEach((cardid) => {
+      missAllVtesLibrary[cardid] = { q: 1, c: libraryCardBase[cardid] };
+    });
 
   return (
     <DeckMissingModal
       deck={{
-        [NAME]: 'Missing cards for Inventory',
+        [NAME]: "Missing cards for Inventory",
         [AUTHOR]: publicName,
-        [DESCRIPTION]: '',
+        [DESCRIPTION]: "",
         [CRYPT]: missingCrypt,
         [LIBRARY]: missingLibrary,
-        [DECKID]: 'missingInInventory',
+        [DECKID]: "missingInInventory",
       }}
       missAllVtes={{ [CRYPT]: missAllVtesCrypt, [LIBRARY]: missAllVtesLibrary }}
       setShow={setShow}

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import InfoCircle from '@icons/info-circle.svg?react';
-import PlusLg from '@icons/plus-lg.svg?react';
-import { DeckCryptTotalInfo, DeckNewCard, Warning, Button, SortButton, Header } from '@/components';
-import { useApp } from '@/context';
-import { getIsEditable, getKeyDisciplines } from '@/utils';
-import { useDeckCrypt } from '@/hooks';
-import { DECKID, CRYPT, GROUPS, LIMITED, BANNED, PLAYTEST } from '@/constants';
+import InfoCircle from "@icons/info-circle.svg?react";
+import PlusLg from "@icons/plus-lg.svg?react";
+import { useState } from "react";
+import { Button, DeckCryptTotalInfo, DeckNewCard, Header, SortButton, Warning } from "@/components";
+import { BANNED, CRYPT, DECKID, GROUPS, LIMITED, PLAYTEST } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckCrypt } from "@/hooks";
+import { getIsEditable, getKeyDisciplines } from "@/utils";
 
 const DeckCryptHeader = ({
   cardChange,
@@ -20,7 +20,7 @@ const DeckCryptHeader = ({
   sortMethod,
   sortMethods,
 }) => {
-  const { limitedMode, isMobile } = useApp();
+  const { limitedMode } = useApp();
   const [showAdd, setShowAdd] = useState(false);
   const { disciplinesDetailed } = getKeyDisciplines(cards);
   const isEditable = forceIsEditable || getIsEditable(deck);
@@ -35,14 +35,24 @@ const DeckCryptHeader = ({
           <div className="flex basis-full items-center justify-between gap-2 px-2 font-bold">
             <div className="flex">
               Crypt [{cryptTotalDiff ?? cryptTotal}
-              {!inMissing && cryptTotal < 12 && ' of 12+'}] {cryptGroups && <>G{cryptGroups}</>}
+              {!inMissing && cryptTotal < 12 && " of 12+"}] {cryptGroups && <>G{cryptGroups}</>}
             </div>
             <div className="flex gap-2">
               {!inMissing && (
                 <>
                   {hasWrongGroups && <Warning type={GROUPS} />}
                   {hasBanned && <Warning type={BANNED} />}
-                  {limitedMode && hasLimited && <Warning type={LIMITED} />}
+                  {limitedMode && hasLimited && (
+                    <div className="flex gap-1">
+                      <Warning type={LIMITED} />
+                      <div
+                        className="flex font-normal text-fgRed dark:text-fgRedDark"
+                        title="Restricted Cards"
+                      >
+                        [{Math.round((hasLimited / cryptTotal) * 100)}%]
+                      </div>
+                    </div>
+                  )}
                   {hasPlaytest && <Warning type={PLAYTEST} />}
                 </>
               )}
@@ -65,8 +75,12 @@ const DeckCryptHeader = ({
             >
               <InfoCircle />
             </Button>
-            {isEditable && !isMobile && (
-              <Button className="min-h-10" title="Add Card" onClick={() => setShowAdd(!showAdd)}>
+            {isEditable && (
+              <Button
+                className="min-h-10 max-sm:hidden"
+                title="Add Card"
+                onClick={() => setShowAdd(!showAdd)}
+              >
                 <PlusLg width="15" height="15" viewBox="0 0 16 16" />
               </Button>
             )}

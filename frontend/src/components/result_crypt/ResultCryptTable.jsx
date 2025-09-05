@@ -1,11 +1,11 @@
-import React from 'react';
-import { ResultModal, ResultCryptTableRow } from '@/components';
-import { useApp } from '@/context';
-import { useModalCardController } from '@/hooks';
-import { ID } from '@/constants';
+import { useCallback } from "react";
+import { ResultCryptTableRow, ResultModal } from "@/components";
+import { ID } from "@/constants";
+import { useApp } from "@/context";
+import { useModalCardController } from "@/hooks";
 
 const ResultCryptTable = ({ resultCards, inRecommendation, inLimited }) => {
-  const { setShowFloatingButtons } = useApp();
+  const { setShowFloatingButtons, isDesktop } = useApp();
   const {
     currentModalCard,
     shouldShowModal,
@@ -14,19 +14,22 @@ const ResultCryptTable = ({ resultCards, inRecommendation, inLimited }) => {
     handleModalCardClose,
   } = useModalCardController(resultCards);
 
-  const handleClick = (card) => {
-    handleModalCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClick = useCallback(
+    (card) => {
+      handleModalCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [resultCards],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
-  };
+    !isDesktop && setShowFloatingButtons(true);
+  }, [resultCards]);
 
   return (
     <>
-      <table className="w-full border-bgSecondary dark:border-bgSecondaryDark sm:border">
+      <table className="w-full border-bgSecondary sm:border dark:border-bgSecondaryDark">
         <tbody>
           {resultCards.map((card) => {
             return (

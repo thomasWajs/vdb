@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
-import dayjs from 'dayjs';
-import { Disclosure, Tab } from '@headlessui/react';
-import { TabButton, TwdHallFameCardsPlayer } from '@/components';
-import { useApp } from '@/context';
-import { useFetch } from '@/hooks';
-import { byName } from '@/utils';
-import { RELEASE_DATE, SET, DATE, PLAYER, DECKID, TWD_DATE, ID, POD, PROMO } from '@/constants';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
+import { Disclosure, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import dayjs from "dayjs";
+import { useMemo } from "react";
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
+import { TabButton, TwdHallFameCardsPlayer } from "@/components";
+import { DATE, DECKID, ID, PLAYER, POD, PROMO, RELEASE_DATE, SET, TWD_DATE } from "@/constants";
+import { useApp } from "@/context";
+import { useFetch } from "@/hooks";
+import { byName } from "@/utils";
 
 const TwdHallOfFameCards = () => {
   const { cryptCardBase, libraryCardBase } = useApp();
   const INNOVATION_PERIOD = 2 * 365;
-  const IGNORED_BEFORE_DATE = '1999-04-11'; // first was 1997-04-11
+  const IGNORED_BEFORE_DATE = "1999-04-11"; // first was 1997-04-11
 
   const url = `${import.meta.env.VITE_BASE_URL}/data/twd_cards_history.json`;
   const { value } = useFetch(url, {}, []);
@@ -61,7 +61,8 @@ const TwdHallOfFameCards = () => {
       });
 
       return p;
-    } else return {};
+    }
+    return {};
   }, [value, cryptCardBase, libraryCardBase]);
 
   const byTotal = (a, b) => {
@@ -69,7 +70,7 @@ const TwdHallOfFameCards = () => {
   };
 
   const isInnovation = (card) => {
-    const twdAppearanceDelay = dayjs(card[TWD_DATE]).diff(dayjs(card[RELEASE_DATE]), 'day');
+    const twdAppearanceDelay = dayjs(card[TWD_DATE]).diff(dayjs(card[RELEASE_DATE]), "day");
 
     if (card[TWD_DATE] < IGNORED_BEFORE_DATE) return false;
     return twdAppearanceDelay > INNOVATION_PERIOD;
@@ -94,13 +95,13 @@ const TwdHallOfFameCards = () => {
 
   return (
     <div className="hof-cards-container mx-auto flex flex-col gap-1.5">
-      <Tab.Group manual className="flex flex-col gap-2">
-        <Tab.List className="flex gap-1.5">
+      <TabGroup manual className="flex flex-col gap-2">
+        <TabList className="flex gap-1.5">
           <TabButton>By Total</TabButton>
           <TabButton>By Innovation</TabButton>
-        </Tab.List>
-        <Tab.Panels>
-          <Tab.Panel>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
             <div className="flex flex-col gap-1.5">
               {players &&
                 Object.keys(players)
@@ -112,12 +113,12 @@ const TwdHallOfFameCards = () => {
                     </Disclosure>
                   ))}
             </div>
-          </Tab.Panel>
-          <Tab.Panel>
+          </TabPanel>
+          <TabPanel>
             <div className="flex flex-col gap-1.5">
-              <div className="border-borderPrimary dark:border-borderPrimaryDark rounded-sm border p-3">
+              <div className="rounded-sm border border-borderPrimary p-3 dark:border-borderPrimaryDark">
                 Only counts cards first appeared in TWD {INNOVATION_PERIOD / 365} years after card
-                print, and excluding cards from first 2 years of active tournaments (till{' '}
+                print, and excluding cards from first 2 years of active tournaments (till{" "}
                 {IGNORED_BEFORE_DATE})
               </div>
               {players &&
@@ -134,9 +135,9 @@ const TwdHallOfFameCards = () => {
                     </Disclosure>
                   ))}
             </div>
-          </Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
+          </TabPanel>
+        </TabPanels>
+      </TabGroup>
     </div>
   );
 };

@@ -1,5 +1,4 @@
-import React from 'react';
-import { AKA } from '@/constants';
+import { AKA } from "@/constants";
 
 const ResultNameAka = ({ card }) => {
   return (

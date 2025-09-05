@@ -1,17 +1,17 @@
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router';
-import { ErrorOverlay, DeckImportButton } from '@/components';
-import { useApp, deckAdd } from '@/context';
-import { importDeck } from '@/utils';
-import { formatServices, deckServices } from '@/services';
-import { SHOW, IS_ANONYMOUS, NAME, AUTHOR, CRYPT, LIBRARY, DECKID, BAD_CARDS } from '@/constants';
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router";
+import { DeckImportButton, ErrorOverlay } from "@/components";
+import { AUTHOR, BAD_CARDS, CRYPT, DECKID, IS_ANONYMOUS, LIBRARY, NAME, SHOW } from "@/constants";
+import { deckAdd, useApp } from "@/context";
+import { deckServices, formatServices } from "@/services";
+import { importDeck } from "@/utils";
 
 const DeckImport = ({
   isOnlyNew,
   setBadImportCards,
   setShowImportAmaranth,
   setShowImportText,
-  setShowInfo,
+  setShowInfo = () => {},
 }) => {
   const {
     isPlaytester,
@@ -52,14 +52,14 @@ const DeckImport = ({
   const createNewDeck = () => {
     setError(false);
     const d = {
-      [NAME]: 'New deck',
+      [NAME]: "New deck",
       [AUTHOR]: publicName,
     };
 
     deckServices
       .deckImport(d)
       .then((data) => {
-        setShowInfo && setShowInfo(true);
+        setShowInfo(true);
         setShowMenuButtons(false);
         setShowFloatingButtons(true);
         deckAdd({
@@ -81,7 +81,7 @@ const DeckImport = ({
     reader.readAsText(file);
     reader.onload = async () => {
       const deckText =
-        file.type === 'text/plain' ? reader.result : formatServices.convertDekToText(reader.result);
+        file.type === "text/plain" ? reader.result : formatServices.convertDekToText(reader.result);
 
       const d = await importDeck(deckText, cryptCardBase, libraryCardBase, isPlaytester);
 
@@ -109,7 +109,7 @@ const DeckImport = ({
         handleFileInputClick={handleFileInputClick}
         handleOpenTextModal={handleOpenTextModal}
         handleOpenAmaranthModal={handleOpenAmaranthModal}
-        variant={isOnlyNew ? 'primary' : null}
+        variant={isOnlyNew ? "primary" : null}
       />
       {!isOnlyNew && (
         <>
@@ -118,14 +118,14 @@ const DeckImport = ({
             accept=".txt, .dek"
             type="file"
             onChange={() => importDeckFromFile(fileInput, false)}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
           />
           <input
             ref={fileInputAnonymous}
             accept=".txt, .dek"
             type="file"
             onChange={() => importDeckFromFile(fileInputAnonymous, true)}
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
           />
         </>
       )}

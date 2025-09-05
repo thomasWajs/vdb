@@ -1,5 +1,4 @@
-import React from 'react';
-import { SeatingTablePlayer } from '@/components';
+import { SeatingTablePlayer } from "@/components";
 
 const Row = ({ children }) => {
   return <div className="flex w-full shrink-0 items-center justify-center py-4">{children}</div>;

@@ -1,12 +1,5 @@
-import { useMemo } from 'react';
-import {
-  countCards,
-  countTotalCost,
-  librarySort,
-  getTotalCardsGroupedBy,
-  containCard,
-  getRestrictions,
-} from '@/utils';
+import { useMemo } from "react";
+import { useSnapshot } from "valtio";
 import {
   ANY,
   BLOOD,
@@ -23,13 +16,23 @@ import {
   TYPE,
   TYPE_EVENT,
   TYPE_MASTER,
-} from '@/constants';
-import { limitedStore } from '@/context';
+} from "@/constants";
+import { limitedStore } from "@/context";
+import {
+  containCard,
+  countCards,
+  countTotalCost,
+  getRestrictions,
+  getTotalCardsGroupedBy,
+  librarySort,
+} from "@/utils";
 
-const useDeckLibrary = (cardsList, cardsToList = {}) => {
+const useDeckLibrary = (cardsList, cardsToList) => {
+  const limitedLibrary = useSnapshot(limitedStore)[LIBRARY];
+
   return useMemo(() => {
     const cardsFrom = Object.values(cardsList);
-    const cardsTo = Object.values(cardsToList);
+    const cardsTo = Object.values(cardsToList || {});
     const libraryFrom = cardsFrom.filter((card) => card.q > 0);
     const libraryTo = cardsTo.filter((card) => card.q > 0 && !containCard(libraryFrom, card));
     const libraryFromSide = cardsFrom.filter(
@@ -54,7 +57,10 @@ const useDeckLibrary = (cardsList, cardsToList = {}) => {
       [HAS_BANNED]: hasBanned,
       [HAS_LIMITED]: hasLimited,
       [HAS_PLAYTEST]: hasPlaytest,
-    } = getRestrictions({ [CRYPT]: {}, [LIBRARY]: library }, limitedStore);
+    } = getRestrictions(
+      { [CRYPT]: {}, [LIBRARY]: library },
+      { [CRYPT]: {}, [LIBRARY]: limitedLibrary },
+    );
 
     const trifleTotal = countCards(library.filter((card) => card.c[TRIFLE]));
     const libraryTotal = countCards(cardsFrom);
@@ -107,7 +113,7 @@ const useDeckLibrary = (cardsList, cardsToList = {}) => {
       libraryByClansTotal,
       libraryByDisciplinesTotal,
     };
-  }, [cardsList, cardsToList]);
+  }, [cardsList, cardsToList, limitedLibrary]);
 };
 
 export default useDeckLibrary;

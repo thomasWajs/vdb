@@ -1,13 +1,13 @@
-import React, { useMemo } from 'react';
-import { FlexGapped, PlaytestReportsAllCardOrPrecon } from '@/components';
-import { getIsPlaytest, cryptSort, librarySort } from '@/utils';
-import { useApp } from '@/context';
-import { PLAYTEST_OLD, CRYPT, ID } from '@/constants';
+import { useMemo } from "react";
+import { FlexGapped, PlaytestReportsAllCardOrPrecon } from "@/components";
+import { CRYPT, ID, PLAYTEST_OLD } from "@/constants";
+import { useApp } from "@/context";
+import { cryptSort, getIsPlaytest, librarySort } from "@/utils";
 
 const PlaytestReportsAllCardsWrapper = ({ reports, target, sortMethod, maxSameScore }) => {
   const { cryptCardBase, libraryCardBase } = useApp();
-  const sort = target == CRYPT ? cryptSort : librarySort;
-  const cardBase = target == CRYPT ? cryptCardBase : libraryCardBase;
+  const sort = target === CRYPT ? cryptSort : librarySort;
+  const cardBase = target === CRYPT ? cryptCardBase : libraryCardBase;
 
   const products = useMemo(
     () =>

@@ -1,27 +1,25 @@
-import React from 'react';
+import disciplinesExtraList from "@/assets/data/disciplinesExtraList.json";
+import disciplinesList from "@/assets/data/disciplinesList.json";
+import virtuesList from "@/assets/data/virtuesList.json";
 import {
-  Select,
   ResultDisciplineImage,
   SearchAdditionalForms,
-  SearchFormButtonLogicToggle,
   SearchFormButtonAdd,
   SearchFormButtonDel,
-} from '@/components';
-import disciplinesList from '@/assets/data/disciplinesList.json';
-import disciplinesExtraList from '@/assets/data/disciplinesExtraList.json';
-import virtuesList from '@/assets/data/virtuesList.json';
-import { useApp } from '@/context';
-import { LOGIC, DISCIPLINE, NOT_REQUIRED, ANY } from '@/constants';
+  SearchFormButtonLogicToggle,
+  Select,
+} from "@/components";
+import { ANY, DISCIPLINE, LOGIC, NOT_REQUIRED } from "@/constants";
+import { useApp } from "@/context";
 
 const LibrarySearchFormDiscipline = ({ value, onChange, searchForm }) => {
-  const { isXWide, isMobile } = useApp();
-  const maxMenuHeight = isXWide ? 500 : 350;
+  const { isMobile } = useApp();
   const name = DISCIPLINE;
   const disciplines = [...Object.keys(disciplinesList), ...disciplinesExtraList].toSorted();
 
   const options = [
-    ['ANY', ANY],
-    ['Not Required', NOT_REQUIRED],
+    ["ANY", ANY],
+    ["Not Required", NOT_REQUIRED],
     ...disciplines.map((d) => [d, d.toLowerCase()]),
     ...Object.keys(virtuesList).map((v) => [v, v.toLowerCase()]),
   ].map((i) => ({
@@ -51,7 +49,7 @@ const LibrarySearchFormDiscipline = ({ value, onChange, searchForm }) => {
                 withAnd
                 withOnly
               />
-              {value.value.length == 1 ? (
+              {value.value.length === 1 ? (
                 <SearchFormButtonAdd searchForm={searchForm} name={name} />
               ) : (
                 <SearchFormButtonDel searchForm={searchForm} i={0} name={name} />
@@ -65,7 +63,6 @@ const LibrarySearchFormDiscipline = ({ value, onChange, searchForm }) => {
             isSearchable={!isMobile}
             isClearable={value.value[0] !== ANY}
             name={0}
-            maxMenuHeight={maxMenuHeight}
             value={options.find((obj) => obj.value === value.value[0])}
             onChange={(e, id) => (e ? onChange(e, id) : onChange({ name: name, value: ANY }, id))}
           />
@@ -79,7 +76,6 @@ const LibrarySearchFormDiscipline = ({ value, onChange, searchForm }) => {
           searchForm={searchForm}
           options={options}
           onChange={onChange}
-          maxMenuHeight={maxMenuHeight}
         />
       )}
     </>

@@ -1,17 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router';
-import { CardImage, ConditionalTooltipOrModal } from '@/components';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
-import { useApp } from '@/context';
-import { PRECONS, DATE, NAME, SET, POD, PLAYTEST, PROMO } from '@/constants';
+import { Link } from "react-router";
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
+import { CardImage, ConditionalTooltipOrModal } from "@/components";
+import { DATE, NAME, PLAYTEST, POD, PRECONS, PROMO, SET, TWO_P } from "@/constants";
+import { useApp } from "@/context";
 
 const PreconsDetailed = ({ sets, set }) => {
   return Object.keys(sets[set]).map((i) => {
+    if (i === "DTC") return null;
     const abbrevs = {
-      U: 'Uncommon',
-      R: 'Rare',
-      C: 'Common',
-      V: 'Vampire',
+      U: "Uncommon",
+      R: "Rare",
+      C: "Common",
+      V: "Vampire",
     };
 
     if (setsAndPrecons[set][PRECONS]?.[i]) {
@@ -19,17 +19,16 @@ const PreconsDetailed = ({ sets, set }) => {
         <li key={`${set}-${i}`} className="whitespace-nowrap">
           <Link target="_blank" rel="noreferrer" to={`/decks/${set}:${i}`}>
             {setsAndPrecons[set][PRECONS][i][NAME]}
-          </Link>{' '}
+          </Link>{" "}
           - {sets[set][i]}x
         </li>
       );
-    } else {
-      if (set === PROMO) {
-        return <li key={`${set}-${i}`}>{i}</li>;
-      } else if (i !== 'DTC') {
-        return <li key={`${set}-${i}`}>{abbrevs[i]}</li>;
-      }
     }
+    if (set === PROMO) {
+      return <li key={`${set}-${i}`}>{i}</li>;
+    }
+
+    return <li key={`${set}-${i}`}>{abbrevs[i]}</li>;
   });
 };
 
@@ -59,10 +58,10 @@ const ResultLayoutTextSets = ({ card }) => {
   return (
     <div className="flex flex-wrap gap-x-2.5 gap-y-0.5">
       {Object.keys(card[SET])
-        .filter((set) => playtestMode || set !== PLAYTEST)
+        .filter((set) => (playtestMode || set !== PLAYTEST) && set !== TWO_P)
         .toSorted(byDate)
         .map((set) => {
-          const preconsShort = Object.keys(card[SET][set]).join('/');
+          const preconsShort = Object.keys(card[SET][set]).join("/");
           const year = setsAndPrecons[set][DATE].slice(2, 4) || null;
 
           return (
@@ -76,8 +75,8 @@ const ResultLayoutTextSets = ({ card }) => {
                 noPadding
               >
                 <div className="flex text-fgSecondary dark:text-fgPrimaryDark">
-                  {set == PLAYTEST ? 'PLAYTEST' : set}
-                  <div className="flex items-start text-sm text-fgFourth dark:text-fgFourthDark">
+                  {set === PLAYTEST ? "PLAYTEST" : set}
+                  <div className="flex items-start text-fgFourth text-sm dark:text-fgFourthDark">
                     {year ? `'${year}` : null}
                   </div>
                   <div className="inline text-midGray dark:text-midGrayDark">

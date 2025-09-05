@@ -1,7 +1,6 @@
-import React from 'react';
-import LightbulbFill from '@icons/lightbulb-fill.svg?react';
-import { useApp } from '@/context';
-import { ButtonIconed } from '@/components';
+import LightbulbFill from "@icons/lightbulb-fill.svg?react";
+import { ButtonIconed } from "@/components";
+import { useApp } from "@/context";
 
 const DeckRecommendationButton = ({ setShowRecommendation }) => {
   const { isDesktop, setShowFloatingButtons, setShowMenuButtons } = useApp();
@@ -14,7 +13,7 @@ const DeckRecommendationButton = ({ setShowRecommendation }) => {
 
   return (
     <ButtonIconed
-      variant={isDesktop ? 'secondary' : 'primary'}
+      variant={isDesktop ? "secondary" : "primary"}
       onClick={handleClick}
       title="Get Recommendation based on TWD with similar cards"
       icon={<LightbulbFill />}

@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import Check2 from '@icons/check2.svg?react';
-import PaletteFill from '@icons/palette-fill.svg?react';
-import { Input, InputLabel, Button } from '@/components';
-import { getIsEditable } from '@/utils';
-import { deckUpdate } from '@/context';
-import { BRANCH_NAME, DECKID, IS_AUTHOR } from '@/constants';
+import PaletteFill from "@icons/palette-fill.svg?react";
+import { useEffect, useState } from "react";
+import { Input, InputLabel } from "@/components";
+import { BRANCH_NAME, DECKID } from "@/constants";
+import { deckUpdate } from "@/context";
+import { getIsEditable } from "@/utils";
 
 const DeckChangeBranchName = ({ deck }) => {
-  const [value, setValue] = useState(deck[BRANCH_NAME] || '');
-  const [success, setSuccess] = useState(false);
+  const [value, setValue] = useState(deck[BRANCH_NAME] || "");
   const isEditable = getIsEditable(deck);
 
   useEffect(() => {
-    if (value !== deck[BRANCH_NAME]) setValue(deck[BRANCH_NAME] ?? '');
+    if (value !== deck[BRANCH_NAME]) setValue(deck[BRANCH_NAME] ?? "");
   }, [deck[BRANCH_NAME]]);
 
   const handleChange = (event) => {
@@ -21,10 +19,6 @@ const DeckChangeBranchName = ({ deck }) => {
 
   const deckChangeBranchName = () => {
     deckUpdate(deck[DECKID], BRANCH_NAME, value);
-    setSuccess(true);
-    setTimeout(() => {
-      setSuccess(false);
-    }, 1000);
   };
 
   const handleSubmit = (event) => {
@@ -33,7 +27,7 @@ const DeckChangeBranchName = ({ deck }) => {
   };
 
   const handleOnBlur = () => {
-    if (value != deck[BRANCH_NAME]) {
+    if (value !== deck[BRANCH_NAME]) {
       deckChangeBranchName();
     }
   };
@@ -50,15 +44,6 @@ const DeckChangeBranchName = ({ deck }) => {
         readOnly={!isEditable}
         roundedStyle="rounded-sm max-sm:rounded-none"
       />
-      {deck[IS_AUTHOR] && (
-        <Button
-          className="rounded-l-none sm:hidden"
-          variant={success ? 'success' : 'primary'}
-          type="submit"
-        >
-          <Check2 />
-        </Button>
-      )}
     </form>
   );
 };

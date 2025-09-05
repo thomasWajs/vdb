@@ -1,7 +1,6 @@
-import React from 'react';
-import { Select, SearchFormButtonAdd, SearchFormButtonDel } from '@/components';
-import { useApp } from '@/context';
-import { CAPACITY, MORELESS, ANY } from '@/constants';
+import { SearchFormButtonAdd, SearchFormButtonDel, Select } from "@/components";
+import { ANY, CAPACITY, MORELESS } from "@/constants";
+import { useApp } from "@/context";
 
 const SearchAdditionalForms = ({
   value,
@@ -12,8 +11,6 @@ const SearchAdditionalForms = ({
   morelessOptions,
   menuPlacement,
   searchForm,
-  menuHeight,
-  maxMenuHeight,
   isClearable = false,
 }) => {
   const { isMobile } = useApp();
@@ -26,7 +23,7 @@ const SearchAdditionalForms = ({
           <div key={i} className="flex items-center">
             <div className="flex w-1/4 justify-end">
               <div className="flex gap-1 px-1">
-                {i == value.value.length - 1 && (
+                {i === value.value.length - 1 && (
                   <SearchFormButtonAdd
                     name={name}
                     searchForm={searchForm}
@@ -41,7 +38,6 @@ const SearchAdditionalForms = ({
                 <div className="w-1/2">
                   <Select
                     options={morelessOptions}
-                    isSearchable={false}
                     menuPlacement={menuPlacement}
                     name={i}
                     value={morelessOptions.find((obj) => obj.value === value.value[i].moreless)}
@@ -51,7 +47,6 @@ const SearchAdditionalForms = ({
                 <div className="w-1/2">
                   <Select
                     options={options}
-                    isSearchable={false}
                     defaultMenuIsOpen={
                       value.value[i][
                         Object.keys(value.value[i]).filter((k) => {
@@ -59,8 +54,6 @@ const SearchAdditionalForms = ({
                         })[0]
                       ] === ANY
                     }
-                    menuHeight={menuHeight}
-                    maxMenuHeight={maxMenuHeight ? maxMenuHeight - 45 : isMobile ? 350 : 450}
                     menuPlacement={menuPlacement}
                     name={i}
                     value={options.find((obj) => obj.value === value.value[i][CAPACITY])}
@@ -77,7 +70,6 @@ const SearchAdditionalForms = ({
                   isClearable={isClearable && value.value[i] !== ANY}
                   defaultMenuIsOpen={value.value[i] === ANY}
                   menuPlacement={menuPlacement}
-                  maxMenuHeight={maxMenuHeight ? maxMenuHeight - 45 : isMobile ? 350 : 450}
                   name={i}
                   value={options.find((obj) => obj.value === value.value[i])}
                   onChange={(e, id) =>

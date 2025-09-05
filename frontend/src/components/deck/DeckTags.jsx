@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { twMerge } from 'tailwind-merge';
-import Spellcheck from '@icons/spellcheck.svg?react';
-import { Select, ButtonIconed } from '@/components';
-import { deckUpdate } from '@/context';
-import { getTags, getIsEditable } from '@/utils';
-import { SUPERIOR, BASE, DECKID, CRYPT, LIBRARY, TAGS } from '@/constants';
+import Spellcheck from "@icons/spellcheck.svg?react";
+import { useMemo } from "react";
+import { twMerge } from "tailwind-merge";
+import { ButtonIconed, Select } from "@/components";
+import { BASE, CRYPT, DECKID, LIBRARY, SUPERIOR, TAGS } from "@/constants";
+import { deckUpdate } from "@/context";
+import { getIsEditable, getTags } from "@/utils";
 
-const DeckTags = ({ deck, noAutotags, isBordered, allTagsOptions }) => {
+const DeckTags = ({ deck, noAutotags, justifyRight, isBordered, noBackground, allTagsOptions }) => {
   const isEditable = getIsEditable(deck);
 
   const tagList = useMemo(() => {
@@ -59,19 +59,23 @@ const DeckTags = ({ deck, noAutotags, isBordered, allTagsOptions }) => {
   return (
     <div className="flex">
       <Select
-        variant="creatable"
+        borderStyle={isEditable && !noAutotags ? "border-y border-l border-r-none" : "border"}
         className="w-full"
-        noBorder={!isBordered}
-        noRemove={!isEditable}
-        isMulti
         isDisabled={!isEditable}
-        options={options}
+        isSearchable
+        isMulti
+        noBackground={noBackground}
+        noBorder={!isBordered}
+        noOptionsMessage={() => "Enter new tag"}
+        noRemove={!isEditable}
         onChange={handleChange}
+        options={options}
+        placeholder={isEditable && "Click to add tags"}
+        roundedStyle={twMerge("rounded-sm", isEditable && !noAutotags && "rounded-r-none")}
         value={tagList}
-        placeholder="Click to add tags"
-        noOptionsMessage={() => 'Enter new tag'}
-        roundedStyle={twMerge('rounded-sm', isEditable && !noAutotags && 'rounded-r-none')}
-        borderStyle={isEditable && !noAutotags ? 'border-y border-l border-r-none' : 'border'}
+        variant="creatable"
+        justifyRight={justifyRight}
+        noDropdown
       />
       {!noAutotags && isEditable && (
         <ButtonIconed

@@ -1,11 +1,10 @@
-import React from 'react';
-import { DiffQuantityDiff } from '@/components';
+import { DiffQuantityDiff } from "@/components";
 
 const DiffCardsTotalDiff = ({ qTo, qFrom }) => {
   return (
     <>
       {qTo === qFrom ? (
-        <>{qTo}</>
+        qTo
       ) : (
         <div className="flex">
           {qFrom}

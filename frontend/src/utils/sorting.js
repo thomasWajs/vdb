@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import {
   ASCII,
   BLOOD,
@@ -8,14 +8,14 @@ import {
   GROUP,
   PLAYER,
   POOL,
+  RELEASE_DATE,
   SECT,
   TIMESTAMP,
   TWD_DATE,
   TYPE,
-  RELEASE_DATE,
-} from '@/constants';
+} from "@/constants";
 
-export const byName = (a, b) => a.localeCompare(b, 'en');
+export const byName = (a, b) => a.localeCompare(b, "en");
 
 export const byCardName = (a, b) => {
   const nameA = a.c ? a.c[ASCII] : a[ASCII];
@@ -69,18 +69,18 @@ export const byDiscipline = (a, b) => {
 export const byBloodCost = (a, b) => {
   const costA = a.c ? a.c[BLOOD] : a[BLOOD];
   const costB = b.c ? b.c[BLOOD] : b[BLOOD];
-  if (!isNaN(costA) && isNaN(costB)) return -1;
-  if (!isNaN(costB) && isNaN(costA)) return 1;
-  if (isNaN(costA) && isNaN(costB)) return 0;
+  if (Number.isInteger(costA) && !Number.isInteger(costB)) return -1;
+  if (Number.isInteger(costB) && !Number.isInteger(costA)) return 1;
+  if (!Number.isInteger(costA) && !Number.isInteger(costB)) return 0;
   return costB - costA;
 };
 
 export const byPoolCost = (a, b) => {
   const costA = a.c ? a.c[POOL] : a[POOL];
   const costB = b.c ? b.c[POOL] : b[POOL];
-  if (!isNaN(costA) && isNaN(costB)) return -1;
-  if (!isNaN(costB) && isNaN(costA)) return 1;
-  if (isNaN(costA) && isNaN(costB)) return 0;
+  if (Number.isInteger(costA) && !Number.isInteger(costB)) return -1;
+  if (Number.isInteger(costB) && !Number.isInteger(costA)) return 1;
+  if (!Number.isInteger(costA) && !Number.isInteger(costB)) return 0;
   return costB - costA;
 };
 

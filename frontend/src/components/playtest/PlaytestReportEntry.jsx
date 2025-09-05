@@ -1,13 +1,12 @@
-import React from 'react';
-import EyeFill from '@icons/eye-fill.svg?react';
-import EyeSlashFill from '@icons/eye-slash-fill.svg?react';
-import { Hr, PlaytestScores } from '@/components';
-import { useApp } from '@/context';
-import { SCORE, TEXT } from '@/constants';
+import EyeFill from "@icons/eye-fill.svg?react";
+import EyeSlashFill from "@icons/eye-slash-fill.svg?react";
+import { Hr, PlaytestScores } from "@/components";
+import { SCORE, TEXT } from "@/constants";
+import { useApp } from "@/context";
 
 const Report = ({ id, text, score, isPlayed }) => {
   const { hidePlaytestNames, isMobile } = useApp();
-  const maxLength = isMobile ? 10 : 25;
+  const maxLength = isMobile ? 15 : 30;
 
   return (
     <div className="flex flex-col gap-2 sm:gap-3">
@@ -18,16 +17,16 @@ const Report = ({ id, text, score, isPlayed }) => {
         >
           {!hidePlaytestNames && (
             <>
-              &lt;{id.substring(0, maxLength)}
-              {id.length > maxLength && '…'}&gt;
+              {id.substring(0, maxLength)}
+              {id.length > maxLength && "…"}
             </>
           )}
         </div>
         <div className="flex items-center justify-end gap-2 sm:gap-4">
           <PlaytestScores value={score} isSmall disabled />
           <div
-            className={isPlayed ? 'print:text-fgPrimary' : 'text-fgRed dark:text-fgRedDark'}
-            title={`Was ${isPlayed ? '' : 'not '}seen in play`}
+            className={isPlayed ? "print:text-fgPrimary" : "text-fgRed dark:text-fgRedDark"}
+            title={`Was ${isPlayed ? "" : "not "}seen in play`}
           >
             {isPlayed ? <EyeFill /> : <EyeSlashFill />}
           </div>
@@ -35,7 +34,7 @@ const Report = ({ id, text, score, isPlayed }) => {
       </div>
       {text && (
         <div className="print:dark:text-fgPrimary">
-          {text.split('\n').map((line, idx) => (
+          {text.split("\n").map((line, idx) => (
             <div key={idx}>{line}</div>
           ))}
         </div>

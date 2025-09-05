@@ -1,10 +1,9 @@
-import React from 'react';
-import { ButtonGroup } from '@/components';
-import { CAPACITY } from '@/constants';
+import { ButtonGroup } from "@/components";
+import { CAPACITY } from "@/constants";
 
 const TwdSearchFormCapacity = ({ value, onChange }) => {
   const name = CAPACITY;
-  const options = ['1-4', '4-6', '6-8', '8-11'];
+  const options = ["1-4", "4-6", "6-8", "8-11"];
 
   return (
     <div className="flex items-center">

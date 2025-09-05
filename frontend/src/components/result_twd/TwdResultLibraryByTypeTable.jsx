@@ -1,33 +1,34 @@
-import React from 'react';
+import cardtypeSortedFull from "@/assets/data/cardtypeSortedFull.json";
 import {
-  ResultLibraryTypeImage,
-  DeckLibraryTable,
-  ResultModal,
   ConditionalTooltip,
+  DeckLibraryTable,
   ResultLegalIcon,
   ResultLibraryCost,
-} from '@/components';
-import { useApp } from '@/context';
-import cardtypeSortedFull from '@/assets/data/cardtypeSortedFull.json';
-import { X, TYPE_MASTER, POOL, BLOOD, BANNED } from '@/constants';
-import { useDeckLibrary, useModalCardController } from '@/hooks';
+  ResultLibraryTypeImage,
+  ResultModal,
+  Tr,
+} from "@/components";
+import { BANNED, BLOOD, POOL, TYPE_MASTER, X } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckLibrary, useModalCardController } from "@/hooks";
 
 const TwdResultLibraryByTypeTable = ({ library }) => {
-  const { setShowFloatingButtons } = useApp();
+  const { limitedMode, setShowFloatingButtons, isDesktop } = useApp();
 
   const handleClickCard = (card) => {
     handleModalCardOpen(card);
-    setShowFloatingButtons(false);
+    !isDesktop && setShowFloatingButtons(false);
   };
 
   const handleClose = () => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
+    !isDesktop && setShowFloatingButtons(true);
   };
 
   const {
     libraryByType,
     hasBanned,
+    hasLimited,
     trifleTotal,
     libraryTotal,
     libraryByTypeTotal,
@@ -35,12 +36,9 @@ const TwdResultLibraryByTypeTable = ({ library }) => {
     bloodTotal,
   } = useDeckLibrary(library);
 
-  const cards = [];
-  cardtypeSortedFull
+  const cards = cardtypeSortedFull
     .filter((cardtype) => libraryByType[cardtype] !== undefined)
-    .map((cardtype) => {
-      cards.push(...libraryByType[cardtype]);
-    });
+    .map((cardtype) => libraryByType[cardtype]);
 
   const {
     currentModalCard,
@@ -54,7 +52,18 @@ const TwdResultLibraryByTypeTable = ({ library }) => {
     <div>
       <div className="flex h-[30px] items-center justify-between gap-2 px-1 font-bold text-fgSecondary dark:text-whiteDark">
         <div className="flex items-center gap-1.5 whitespace-nowrap">Library [{libraryTotal}]</div>
-        <div className="flex">{hasBanned && <ResultLegalIcon type={BANNED} />}</div>
+        <div className="flex gap-2">
+          {hasBanned && <ResultLegalIcon type={BANNED} />}
+          {limitedMode && hasLimited && (
+            <div
+              className="flex gap-0.5 font-normal text-fgRed dark:text-fgRedDark"
+              title="Restricted Cards"
+            >
+              <ResultLegalIcon />
+              {Math.round((hasLimited / libraryTotal) * 100)}%
+            </div>
+          )}
+        </div>
         <div className="flex gap-1.5 sm:gap-3">
           <div className="flex items-center gap-1" title="Total Blood Cost">
             <ResultLibraryCost card={{ [BLOOD]: X }} className="h-[30px] pb-1" />
@@ -66,16 +75,13 @@ const TwdResultLibraryByTypeTable = ({ library }) => {
           </div>
         </div>
       </div>
-      <table className="border-x border-bgSecondary dark:border-bgSecondaryDark">
+      <table className="border-bgSecondary border-x dark:border-bgSecondaryDark">
         <tbody>
           {cardtypeSortedFull
             .filter((cardtype) => libraryByType[cardtype] !== undefined)
             .map((cardtype) => {
               return (
-                <tr
-                  key={cardtype}
-                  className="row-bg h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark"
-                >
+                <Tr key={cardtype}>
                   <td className="min-w-[55px]">
                     <div className="flex justify-center">
                       <ResultLibraryTypeImage value={cardtype} />
@@ -96,11 +102,13 @@ const TwdResultLibraryByTypeTable = ({ library }) => {
                     >
                       <div className="cursor-pointer text-balance text-fgName dark:text-fgNameDark">
                         {cardtype} [{libraryByTypeTotal[cardtype]}]
-                        {cardtype == TYPE_MASTER && trifleTotal > 0 && <> - {trifleTotal} trifle</>}
+                        {cardtype === TYPE_MASTER && trifleTotal > 0 && (
+                          <> - {trifleTotal} trifle</>
+                        )}
                       </div>
                     </ConditionalTooltip>
                   </td>
-                </tr>
+                </Tr>
               );
             })}
         </tbody>

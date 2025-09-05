@@ -4,6 +4,8 @@ from deck_import import deck_import
 
 with open("playtest/precons.json", "r") as precons_file:
     precons = json.load(precons_file)
+    if len(precons.keys()) == 0:
+        print("PLAYTEST PRECONS DISABLED - NO PLAYTEST FILES FOUND")
 
 playtest_cards = {}
 
@@ -30,21 +32,20 @@ for file, precon in precons.items():
         print(f"{file} NOT FOUND")
 
 try:
-    with open("cardbase_crypt.json", "r+", encoding="utf8") as crypt_file, open(
-        "cardbase_crypt.min.json", "w", encoding="utf8"
-    ) as crypt_file_min, open(
-        "playtest/cardbase_crypt_playtest.json", "r+", encoding="utf8"
-    ) as crypt_playtest_file, open(
-        "playtest/cardbase_crypt_playtest.min.json", "w", encoding="utf8"
-    ) as crypt_playtest_file_min, open(
-        "cardbase_lib.json", "r+", encoding="utf8"
-    ) as library_file, open(
-        "cardbase_lib.min.json", "w", encoding="utf8"
-    ) as library_file_min, open(
-        "playtest/cardbase_lib_playtest.json", "r+", encoding="utf8"
-    ) as library_playtest_file, open(
-        "playtest/cardbase_lib_playtest.min.json", "w", encoding="utf8"
-    ) as library_playtest_file_min:
+    with (
+        open("cardbase_crypt.json", "r+", encoding="utf8") as crypt_file,
+        open("cardbase_crypt.min.json", "w", encoding="utf8") as crypt_file_min,
+        open("playtest/cardbase_crypt_playtest.json", "r+", encoding="utf8") as crypt_playtest_file,
+        open(
+            "playtest/cardbase_crypt_playtest.min.json", "w", encoding="utf8"
+        ) as crypt_playtest_file_min,
+        open("cardbase_lib.json", "r+", encoding="utf8") as library_file,
+        open("cardbase_lib.min.json", "w", encoding="utf8") as library_file_min,
+        open("playtest/cardbase_lib_playtest.json", "r+", encoding="utf8") as library_playtest_file,
+        open(
+            "playtest/cardbase_lib_playtest.min.json", "w", encoding="utf8"
+        ) as library_playtest_file_min,
+    ):
         crypt = json.load(crypt_file)
         crypt_playtest = json.load(crypt_playtest_file)
         library = json.load(library_file)

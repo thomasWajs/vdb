@@ -1,45 +1,58 @@
-import React from 'react';
-import ArrowRepeat from '@icons/arrow-repeat.svg?react';
-import StackIcon from '@icons/stack.svg?react';
+import ArrowRepeat from "@icons/arrow-repeat.svg?react";
+import StackIcon from "@icons/stack.svg?react";
 import {
   Button,
-  Modal,
-  ResultModal,
   DeckDrawCryptTable,
   DeckDrawLibraryTable,
-  ResultLibraryCost,
-  ResultCryptCapacity,
   ErrorMessage,
-  Header,
   FlexGapped,
-} from '@/components';
-import { useApp } from '@/context';
-import { useModalCardController } from '@/hooks';
-import { CAPACITY, BLOOD, POOL, X } from '@/constants';
+  Header,
+  Modal,
+  ResultCryptCapacity,
+  ResultLibraryCost,
+  ResultModal,
+} from "@/components";
+import { BLOOD, CAPACITY, POOL, X } from "@/constants";
+import { useApp } from "@/context";
+import { useModalCardController } from "@/hooks";
+import { countCards } from "@/utils";
 
 const DeckDrawModal = ({
-  burnCrypt,
-  burnLibrary,
-  burnedBloodTotal,
-  burnedCapacityTotal,
   burnedCrypt,
   burnedLibrary,
-  burnedPoolTotal,
-  crypt,
-  cryptTotal,
   drawedCrypt,
   drawedLibrary,
-  handleClose,
+  restCrypt,
+  restLibrary,
+  handleBurnCrypt,
+  handleBurnLibrary,
   handleCryptHandSize,
   handleLibraryHandSize,
   handleReDrawCrypt,
   handleReDrawLibrary,
   initialTransfers,
-  libraryTotal,
-  restCrypt,
-  restLibrary,
+  handleClose,
 }) => {
   const { isMobile, isNarrow } = useApp();
+
+  const cryptTotal = countCards([...drawedCrypt, ...restCrypt, ...burnedCrypt]);
+  const libraryTotal = countCards([...drawedLibrary, ...restLibrary, ...burnedLibrary]);
+
+  let burnedCapacityTotal = 0;
+  burnedCrypt.forEach((card) => {
+    burnedCapacityTotal += Number.parseInt(card[CAPACITY]);
+  });
+
+  let burnedPoolTotal = 0;
+  let burnedBloodTotal = 0;
+  burnedLibrary.forEach((card) => {
+    if (card[BLOOD] && Number.isInteger(card[BLOOD])) {
+      burnedBloodTotal += Number.parseInt(card[BLOOD]);
+    }
+    if (card[POOL] && Number.isInteger(card[POOL])) {
+      burnedPoolTotal += Number.parseInt(card[POOL]);
+    }
+  });
 
   const {
     currentModalCard,
@@ -98,8 +111,7 @@ const DeckDrawModal = ({
               </Header>
               {cryptTotal < 4 && <ErrorMessage>NOT ENOUGH CARDS FOR INITIAL DRAW</ErrorMessage>}
               <DeckDrawCryptTable
-                crypt={crypt}
-                handleClick={burnCrypt}
+                handleClick={handleBurnCrypt}
                 restCards={restCrypt}
                 resultCards={drawedCrypt}
               />
@@ -143,10 +155,10 @@ const DeckDrawModal = ({
             </Header>
             {libraryTotal < 7 && <ErrorMessage>NOT ENOUGH CARDS FOR INITIAL DRAW</ErrorMessage>}
             <DeckDrawLibraryTable
-              handleClick={burnLibrary}
+              handleClick={handleBurnLibrary}
               restCards={restLibrary}
               resultCards={drawedLibrary}
-              placement={isNarrow ? 'bottom' : 'right'}
+              placement={isNarrow ? "bottom" : "right"}
             />
           </div>
         </FlexGapped>
@@ -193,7 +205,7 @@ const DeckDrawModal = ({
                     handleClick={handleModalSideCardOpen}
                     shouldShowModal={shouldShowModal}
                     resultCards={burnedLibrary}
-                    placement={isNarrow ? 'bottom' : 'right'}
+                    placement={isNarrow ? "bottom" : "right"}
                     ashHeap
                   />
                 </div>

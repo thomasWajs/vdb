@@ -1,62 +1,62 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useApp } from '@/context';
-import { getCardImageUrl } from '@/utils';
-import { NAME, CLAN, ID, EN } from '@/constants';
-import legacyImagesClans from '@/assets/data/legacyImagesClansList.json';
+import { twMerge } from "tailwind-merge";
+import { CLAN, EN, ID, NAME, SECT, TYPE } from "@/constants";
+import { useApp } from "@/context";
+import { getCardImageUrl } from "@/utils";
 
-const CardImage = ({ card, set, className = 'max-sm:w-full', size = 'md', onClick }) => {
+const CardImage = ({ card, set, className = "max-sm:w-full", size = "md", onClick }) => {
   const { lang, showLegacyImage } = useApp();
-  const hasLegacyImage = card[ID] > 200000 && legacyImagesClans.includes(card[CLAN]);
   const { baseUrl, otherUrl, legacyUrl, legacyScanUrl } = getCardImageUrl(card, set, lang);
 
+  const hasLegacy =
+    (card[ID] > 200000 && card[CLAN] !== "Hecata" && card[SECT] !== "Imbued") ||
+    [
+      "Master",
+      "Action",
+      "Action/Reaction",
+      "Action/Combat",
+      "Political Action",
+      "Action Modifier",
+      "Action Modifier/Combat",
+      "Action Modifier/Reaction",
+      "Combat/Reaction",
+      "Reaction",
+    ].includes(card[TYPE]);
+
   const url =
-    showLegacyImage && (hasLegacyImage || legacyScanUrl)
-      ? legacyScanUrl
-        ? legacyScanUrl
+    showLegacyImage && hasLegacy
+      ? card[ID] > 200000
+        ? (legacyScanUrl ?? legacyUrl)
         : legacyUrl
-      : lang == EN
+      : lang === EN
         ? baseUrl
         : otherUrl;
 
   const resetImgSrc = (event) => {
-    if (event.target.src != `${baseUrl}.jpg`) {
+    if (event.target.src !== `${baseUrl}.jpg`) {
       event.target.src = `${baseUrl}.jpg`;
     }
   };
 
   const sizeStyle = {
-    sm: 'sm:min-w-[320px] sm:max-w-[320px]',
-    md: 'sm:min-w-[358px] sm:max-w-[358px]',
+    sm: "sm:min-w-[320px] sm:max-w-[320px]",
+    md: "sm:min-w-[358px] sm:max-w-[358px]",
   };
 
   return (
-    <>
-      {set || lang != EN ? (
-        <img
-          className={twMerge(sizeStyle[size], className)}
-          src={`${otherUrl}.jpg?v=${import.meta.env.VITE_IMAGE_VERSION}`}
-          alt={card[NAME]}
-          onClick={onClick}
-          onError={resetImgSrc}
-        />
-      ) : (
-        <picture>
-          <source
-            media="(max-width: 576px)"
-            srcSet={`${url}.webp?v=${import.meta.env.VITE_IMAGE_VERSION}`}
-            type="image/webp"
-          />
-          <img
-            className={twMerge(sizeStyle[size], className)}
-            src={`${url}.jpg?v=${import.meta.env.VITE_IMAGE_VERSION}`}
-            alt={card[NAME]}
-            onClick={onClick}
-            onError={resetImgSrc}
-          />
-        </picture>
-      )}
-    </>
+    <picture>
+      <source
+        media="(max-width: 576px)"
+        srcSet={`${set || lang !== EN ? otherUrl : url}.webp?v=${import.meta.env.VITE_IMAGE_VERSION}`}
+        type="image/webp"
+      />
+      <img
+        className={twMerge(sizeStyle[size], className)}
+        src={`${set || lang !== EN ? otherUrl : url}.jpg?v=${import.meta.env.VITE_IMAGE_VERSION}`}
+        alt={card[NAME]}
+        onClick={onClick}
+        onError={resetImgSrc}
+      />
+    </picture>
   );
 };
 

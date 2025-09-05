@@ -1,16 +1,15 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { Link } from 'react-router';
-import { NAME, DECKID } from '@/constants';
+import { Link } from "react-router";
+import { twMerge } from "tailwind-merge";
+import { DECKID, NAME } from "@/constants";
 
 const SeatingTablePlayer = ({ deck, isFirst }) => {
   return (
     <div
       className={twMerge(
-        'flex justify-center sm:whitespace-nowrap',
+        "flex justify-center sm:whitespace-nowrap",
         isFirst
-          ? 'rounded-md border-2 border-dashed border-borderPrimary p-3 font-bold dark:border-borderPrimaryDark'
-          : 'p-3.5',
+          ? "rounded-md border-2 border-borderPrimary border-dashed p-3 font-bold dark:border-borderPrimaryDark"
+          : "p-3.5",
       )}
     >
       {deck[DECKID] ? (
@@ -18,7 +17,7 @@ const SeatingTablePlayer = ({ deck, isFirst }) => {
           {deck[NAME]}
         </Link>
       ) : (
-        <>{deck[NAME]}</>
+        deck[NAME]
       )}
     </div>
   );

@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams, useLoaderData } from 'react-router';
-import { useSnapshot } from 'valtio';
-import { useImmer } from 'use-immer';
+import { useEffect, useState } from "react";
+import { useLoaderData, useLocation, useNavigate, useParams } from "react-router";
+import { useImmer } from "use-immer";
+import { useSnapshot } from "valtio";
 import {
-  ButtonFloatMenu,
   ButtonFloatClose,
-  DeckNewCardFloating,
+  ButtonFloatMenu,
   DeckDetails,
+  DeckNewCardFloating,
   ErrorMessage,
+  FlexGapped,
   Modal,
   ReviewButtons,
   ReviewCrypt,
   ReviewLibrary,
-  FlexGapped,
-} from '@/components';
-import { useApp, deckStore } from '@/context';
+} from "@/components";
 import {
   BRANCHES,
   CARDS,
   CRYPT,
+  DECK,
   DECKID,
   DECKS,
   DESCRIPTION,
@@ -28,15 +28,14 @@ import {
   IS_PUBLIC,
   LIBRARY,
   MASTER,
-  TAGS,
   PUBLIC_PARENT,
-  DECK,
-} from '@/constants';
-import { getTags, parseDeck, deepClone } from '@/utils';
+  TAGS,
+} from "@/constants";
+import { deckStore, useApp } from "@/context";
+import { deepClone, getTags, parseDeck } from "@/utils";
 
 const Review = () => {
   const {
-    isMobile,
     cryptCardBase,
     libraryCardBase,
     preconDecks,
@@ -61,17 +60,17 @@ const Review = () => {
     const deckData = await loaderData[DECK].catch((e) => {
       switch (e.response.status) {
         case 400:
-          setError('NO DECK WITH THIS ID');
+          setError("NO DECK WITH THIS ID");
           break;
         default:
-          setError('CONNECTION PROBLEM');
+          setError("CONNECTION PROBLEM");
       }
       setDeckTo(undefined);
       setDeckFrom(undefined);
     });
 
     setError(false);
-    const cardsData = parseDeck(deckData[CARDS], cryptCardBase, libraryCardBase);
+    const cardsData = parseDeck(cryptCardBase, libraryCardBase, deckData[CARDS]);
     if (deckid.length !== 9 || deckData[PUBLIC_PARENT]) {
       deckData[TAGS] = [];
       Object.values(getTags(cardsData[CRYPT], cardsData[LIBRARY])).forEach((v) => {
@@ -87,7 +86,7 @@ const Review = () => {
       [IS_PUBLIC]: !!deckData[PUBLIC_PARENT],
       [IS_NON_EDITABLE]: false,
     };
-    delete d.cards;
+    d.cards = undefined;
 
     setDeckTo(d);
     setDeckFrom(d);
@@ -95,7 +94,6 @@ const Review = () => {
 
   const getDiff = (cardsFrom, cardsTo) => {
     const diff = {};
-
     [...Object.keys(cardsFrom), ...Object.keys(cardsTo)].forEach((cardid) => {
       const fromQty = cardsFrom[cardid] ? cardsFrom[cardid].q : 0;
       const toQty = cardsTo[cardid] ? cardsTo[cardid].q : 0;
@@ -119,7 +117,7 @@ const Review = () => {
         cards.push(`${card}=${diff[card]};`);
       });
 
-      const u = cards.toString().replace(/,/g, '').replace(/;$/, '');
+      const u = cards.toString().replace(/,/g, "").replace(/;$/, "");
       setUrlDiff(u);
       navigate(`/review/${deckid}#${u}`);
     }
@@ -140,28 +138,33 @@ const Review = () => {
 
   useEffect(() => {
     if (hash && deckTo) {
-      const deckWithHash = deepClone({ [CRYPT]: deckTo[CRYPT], [LIBRARY]: deckTo[LIBRARY] });
+      const deckWithHash = deepClone({
+        [CRYPT]: deckTo[CRYPT],
+        [LIBRARY]: deckTo[LIBRARY],
+      });
 
       hash
         .slice(1)
-        .split(';')
+        .split(";")
         .forEach((i) => {
-          const j = i.split('=');
+          const j = i.split("=");
           if (j[0] > 200000) {
             deckWithHash[CRYPT][j[0]] = {
-              q: (deckTo[CRYPT][j[0]]?.q || 0) + parseInt(j[1]),
+              q: (deckTo[CRYPT][j[0]]?.q || 0) + Number.parseInt(j[1]),
               c: cryptCardBase[j[0]],
             };
           } else {
             deckWithHash[LIBRARY][j[0]] = {
-              q: (deckTo[LIBRARY][j[0]]?.q || 0) + parseInt(j[1]),
+              q: (deckTo[LIBRARY][j[0]]?.q || 0) + Number.parseInt(j[1]),
               c: libraryCardBase[j[0]],
             };
           }
         });
       if (
-        JSON.stringify({ [CRYPT]: deckFrom[CRYPT], [LIBRARY]: deckFrom[LIBRARY] }) !=
-        JSON.stringify(deckWithHash)
+        JSON.stringify({
+          [CRYPT]: deckFrom[CRYPT],
+          [LIBRARY]: deckFrom[LIBRARY],
+        }) !== JSON.stringify(deckWithHash)
       ) {
         setDeckFrom((draft) => {
           draft[CRYPT] = deckWithHash[CRYPT];
@@ -173,7 +176,7 @@ const Review = () => {
 
   useEffect(() => {
     if (cryptCardBase && libraryCardBase && deckid) {
-      if (!deckFrom || deckFrom[DECKID] != deckid) {
+      if (!deckFrom || deckFrom[DECKID] !== deckid) {
         getDeck();
       }
     }
@@ -185,7 +188,7 @@ const Review = () => {
 
   const parentId = deckFrom?.[DESCRIPTION].replace(
     `Review of ${import.meta.env.VITE_BASE_URL}/decks/`,
-    '',
+    "",
   );
   const inDecks = decks ? Object.keys(decks).includes(parentId) : null;
 
@@ -227,19 +230,21 @@ const Review = () => {
           )}
         </FlexGapped>
         <div className="min-w-[175px] max-lg:hidden">
-          <div className="sticky z-20 w-full bg-bgPrimary dark:bg-bgPrimaryDark lg:top-10">
+          <div className="sticky z-20 w-full bg-bgPrimary lg:top-10 dark:bg-bgPrimaryDark">
             <ReviewButtons deck={deckFrom} urlDiff={urlDiff} parentId={inDecks ? parentId : null} />
           </div>
         </div>
       </FlexGapped>
-      {isMobile && showFloatingButtons && (
+      {showFloatingButtons && (
         <>
           <DeckNewCardFloating
+            className="sm:hidden"
             target={CRYPT}
             deckid={deckFrom?.[DECKID]}
             cards={Object.values(deckFrom?.[CRYPT] ?? {})}
           />
           <DeckNewCardFloating
+            className="sm:hidden"
             target={LIBRARY}
             deckid={deckFrom?.[DECKID]}
             cards={Object.values(deckFrom?.[LIBRARY] ?? {})}

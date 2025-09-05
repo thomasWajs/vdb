@@ -1,32 +1,33 @@
-import React from 'react';
-import dayjs from 'dayjs';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
-import { useNavigate } from 'react-router';
-import EyeFill from '@icons/eye-fill.svg?react';
-import Shuffle from '@icons/shuffle.svg?react';
-import PinAngleFill from '@icons/pin-angle-fill.svg?react';
-import At from '@icons/at.svg?react';
+import At from "@icons/at.svg?react";
+import EyeFill from "@icons/eye-fill.svg?react";
+import PinAngleFill from "@icons/pin-angle-fill.svg?react";
+import Shuffle from "@icons/shuffle.svg?react";
+import dayjs from "dayjs";
+import { useNavigate } from "react-router";
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
+import paths from "@/assets/data/paths.json";
 import {
-  DeckPreview,
-  DeckTags,
-  DeckDeleteButton,
-  DeckHideButton,
-  DeckFreezeButton,
-  DeckBranchDeleteButton,
-  DeckCopyUrlButton,
-  DeckPublicToggleButton,
-  ResultClanImage,
-  ConditionalTooltip,
   ButtonIconed,
   Checkbox,
+  ConditionalTooltip,
+  DeckBranchDeleteButton,
+  DeckCopyUrlButton,
+  DeckDeleteButton,
+  DeckFreezeButton,
+  DeckHideButton,
+  DeckPreview,
+  DeckPublicToggleButton,
+  DeckTags,
+  ResultClanImage,
   ResultLegalIcon,
-} from '@/components';
-import { limitedStore, useApp, deckToggleInventoryState } from '@/context';
+  ResultPathImage,
+  Tr,
+} from "@/components";
 import {
   BANNED,
-  BRANCHES,
   BRANCH_NAME,
+  BRANCHES,
   CRYPT,
   DECKID,
   H,
@@ -34,14 +35,17 @@ import {
   HAS_LIMITED,
   HAS_PLAYTEST,
   INVENTORY_TYPE,
+  IS_AUTHOR,
   IS_FROZEN,
   MASTER,
   NAME,
   PLAYTEST,
   S,
+  TAGS,
   TIMESTAMP,
-} from '@/constants';
-import { getClan, getRestrictions } from '@/utils';
+} from "@/constants";
+import { deckToggleInventoryState, limitedStore, useApp } from "@/context";
+import { getClan, getRestrictions } from "@/utils";
 
 const DeckSelectAdvTableRow = ({
   deck,
@@ -53,7 +57,7 @@ const DeckSelectAdvTableRow = ({
   revFilter,
   short,
 }) => {
-  const { limitedMode, inventoryMode, isMobile, isNarrow, isDesktop } = useApp();
+  const { limitedMode, inventoryMode, isMobile, isNarrow } = useApp();
   const limitedCards = useSnapshot(limitedStore);
   const navigate = useNavigate();
 
@@ -75,9 +79,9 @@ const DeckSelectAdvTableRow = ({
   const clan = getClan(deck[CRYPT]);
 
   return (
-    <tr className="row-bg border-bgSecondary dark:border-bgSecondaryDark h-[41px] border-y">
-      {!(short || isMobile) && (
-        <td className="min-w-[30px]">
+    <Tr>
+      {!short && (
+        <td className="min-w-[30px] max-sm:hidden">
           <Checkbox
             checked={selectedDecks[deck[DECKID]] ?? false}
             onChange={() => toggleSelect(deck[DECKID])}
@@ -85,8 +89,8 @@ const DeckSelectAdvTableRow = ({
           />
         </td>
       )}
-      {inventoryMode && !isMobile && (
-        <td className="min-w-[52px]">
+      {inventoryMode && (
+        <td className="min-w-[52px] max-sm:hidden">
           <div className="flex h-full justify-center">
             <ButtonIconed
               className="w-full"
@@ -94,10 +98,10 @@ const DeckSelectAdvTableRow = ({
               onClick={() => deckToggleInventoryState(deck[DECKID])}
               title={
                 deck[INVENTORY_TYPE] === S
-                  ? 'Flexible'
+                  ? "Flexible"
                   : deck[INVENTORY_TYPE] === H
-                    ? 'Fixed'
-                    : 'Virtual'
+                    ? "Fixed"
+                    : "Virtual"
               }
               icon={
                 !deck[INVENTORY_TYPE] ? (
@@ -112,36 +116,74 @@ const DeckSelectAdvTableRow = ({
           </div>
         </td>
       )}
-      {(short || !isMobile) && (
-        <td className="min-w-[60px] sm:min-w-[70px]" onClick={handleClick}>
-          <div className="flex justify-center">{clan && <ResultClanImage value={clan} />}</div>
-        </td>
-      )}
-
-      <td
-        className={twMerge(short ? 'w-full' : 'min-w-[45vw]', 'cursor-pointer sm:min-w-[340px]')}
-        onClick={handleClick}
-      >
-        <div
-          className="text-fgName dark:text-fgNameDark flex justify-between gap-2"
-          title={deck[NAME]}
-        >
-          {deck[NAME]}
-          <div className="flex items-center justify-end gap-3">
-            {hasBanned && <ResultLegalIcon type={BANNED} />}
-            {limitedMode && hasLimited && <ResultLegalIcon />}
-            {hasPlaytest && <ResultLegalIcon type={PLAYTEST} />}
-            {deck[BRANCH_NAME] &&
-              (deck[MASTER] || (deck[BRANCHES] && deck[BRANCHES].length > 0)) && (
-                <div className="inline" title={deck[BRANCH_NAME]}>
-                  {deck[BRANCH_NAME]}
-                </div>
-              )}
-          </div>
+      <td className="max-sm:hidden max-sm:min-w-[60px] sm:min-w-[70px]" onClick={handleClick}>
+        <div className="flex justify-center">
+          {clan &&
+            (paths.includes(clan) ? (
+              <ResultPathImage value={clan} />
+            ) : (
+              <ResultClanImage value={clan} />
+            ))}
         </div>
       </td>
-      {isDesktop && (
-        <td className="min-w-[30px] sm:min-w-[45px]">
+      <td
+        colSpan={short ? 2 : 1}
+        className={twMerge(
+          short || isNarrow ? "w-full" : "min-w-[45vw]",
+          "cursor-pointer md:min-w-[340px]",
+        )}
+        onClick={handleClick}
+      >
+        <div className="flex w-full items-center justify-between gap-1">
+          <div
+            className="flex justify-between gap-2 text-fgName dark:text-fgNameDark"
+            title={deck[NAME]}
+          >
+            <div
+              className={twMerge(
+                "flex items-center justify-center gap-0.5",
+                !clan && "max-md:ps-1",
+              )}
+            >
+              {clan && (
+                <div className="w-[30px] sm:hidden">
+                  {paths.includes(clan) ? (
+                    <ResultPathImage value={clan} />
+                  ) : (
+                    <ResultClanImage value={clan} />
+                  )}
+                </div>
+              )}
+              {deck[NAME]}
+            </div>
+            <div className="flex items-center justify-end gap-3">
+              {hasBanned && <ResultLegalIcon type={BANNED} />}
+              {limitedMode && hasLimited && <ResultLegalIcon />}
+              {hasPlaytest && <ResultLegalIcon type={PLAYTEST} />}
+              {deck[BRANCH_NAME] &&
+                (deck[MASTER] || (deck[BRANCHES] && deck[BRANCHES].length > 0)) && (
+                  <div className="inline" title={deck[BRANCH_NAME]}>
+                    {deck[BRANCH_NAME]}
+                  </div>
+                )}
+            </div>
+          </div>
+          {deck[TAGS].length > 0 && (
+            <div className="max-w-[160px] p-1 md:hidden">
+              <DeckTags
+                deck={{ ...deck, [IS_AUTHOR]: false }}
+                allTagsOptions={allTagsOptions}
+                noAutotags
+                noBackground
+                noBorder
+                justifyRight
+              />
+            </div>
+          )}
+        </div>
+      </td>
+      {!short && (
+        <td className="min-w-[45px] max-xl:hidden">
           <div className="flex justify-center">
             <ConditionalTooltip size="xl" overlay={<DeckPreview deck={deck} />}>
               <EyeFill />
@@ -149,44 +191,33 @@ const DeckSelectAdvTableRow = ({
           </div>
         </td>
       )}
-      {(short || !isNarrow) && (
-        <td
-          className="min-w-[100px] cursor-pointer text-center whitespace-nowrap sm:min-w-[105px]"
-          onClick={handleClick}
-        >
-          {dayjs(deck[TIMESTAMP]).format('YYYY-MM-DD')}
+      <td
+        className="min-w-[100px] cursor-pointer whitespace-nowrap text-center max-md:hidden sm:min-w-[105px]"
+        onClick={handleClick}
+      >
+        {dayjs(deck[TIMESTAMP]).format("YYYY-MM-DD")}
+      </td>
+      {!short && (
+        <td className="w-full px-1 max-md:hidden">
+          <DeckTags deck={deck} allTagsOptions={allTagsOptions} isBordered noAutotags={isMobile} />
         </td>
       )}
       {!short && (
-        <>
-          <td className="w-full px-1 max-sm:px-0.5">
-            <DeckTags
-              deck={deck}
-              allTagsOptions={allTagsOptions}
-              isBordered
-              noAutotags={isMobile}
-            />
-          </td>
-          <td>
-            <div className="flex justify-end gap-1">
-              <DeckHideButton deck={deck} />
-              {!isMobile && <DeckFreezeButton deck={deck} />}
-              {isDesktop && (
-                <>
-                  <DeckPublicToggleButton deck={deck} inAdv />
-                  <DeckCopyUrlButton deck={deck} noText isAuthor />
-                  {revFilter && (deck[MASTER] || (deck[BRANCHES] && deck[BRANCHES].length > 0)) ? (
-                    <DeckBranchDeleteButton noText deck={deck} />
-                  ) : (
-                    <DeckDeleteButton noText deck={deck} />
-                  )}
-                </>
-              )}
-            </div>
-          </td>
-        </>
+        <td>
+          <div className="flex justify-end gap-1">
+            <DeckHideButton deck={deck} />
+            <DeckFreezeButton className="max-sm:hidden" deck={deck} />
+            <DeckPublicToggleButton className="max-lg:hidden" deck={deck} inAdv />
+            <DeckCopyUrlButton className="max-lg:hidden" deck={deck} noText isAuthor />
+            {revFilter && (deck[MASTER] || (deck[BRANCHES] && deck[BRANCHES].length > 0)) ? (
+              <DeckBranchDeleteButton className="max-sm:hidden" deck={deck} noText />
+            ) : (
+              <DeckDeleteButton className="max-sm:hidden" deck={deck} noText />
+            )}
+          </div>
+        </td>
       )}
-    </tr>
+    </Tr>
   );
 };
 

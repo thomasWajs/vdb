@@ -1,9 +1,8 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
-import PeopleFill from '@icons/people-fill.svg?react';
-import { ButtonIconed } from '@/components';
-import { useApp } from '@/context';
-import { PUBLIC_PARENT, PUBLIC_CHILD } from '@/constants';
+import PeopleFill from "@icons/people-fill.svg?react";
+import { useNavigate } from "react-router";
+import { ButtonIconed } from "@/components";
+import { PUBLIC_CHILD, PUBLIC_PARENT } from "@/constants";
+import { useApp } from "@/context";
 
 const DeckPublicSwitchButton = ({ deck }) => {
   const { isDesktop, setShowMenuButtons, setShowFloatingButtons } = useApp();
@@ -18,10 +17,10 @@ const DeckPublicSwitchButton = ({ deck }) => {
 
   return (
     <ButtonIconed
-      variant={isDesktop ? 'secondary' : 'primary'}
+      variant={isDesktop ? "secondary" : "primary"}
       onClick={handleClick}
-      title={isChild ? 'Go to Main Deck' : 'Go to Public Deck'}
-      text={isChild ? 'Go to Main Deck' : 'Go to Public Deck'}
+      title={isChild ? "Go to Main Deck" : "Go to Public Deck"}
+      text={isChild ? "Go to Main Deck" : "Go to Public Deck"}
       icon={<PeopleFill />}
     />
   );

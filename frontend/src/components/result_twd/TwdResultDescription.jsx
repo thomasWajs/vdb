@@ -1,12 +1,11 @@
-import React from 'react';
 import {
+  DeckCloneButton,
+  TwdOpenDeckButton,
   TwdResultDescriptionPlayers,
   TwdResultDescriptionText,
-  TwdOpenDeckButton,
-  DeckCloneButton,
-} from '@/components';
-import { useApp } from '@/context';
-import { PLAYERS, DECKID } from '@/constants';
+} from "@/components";
+import { DECKID, PLAYERS } from "@/constants";
+import { useApp } from "@/context";
 
 const TwdResultDescription = ({ deck }) => {
   const { username } = useApp();

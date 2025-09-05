@@ -1,4 +1,4 @@
-const parseDeck = (cards = {}, cryptCardBase, libraryCardBase) => {
+const parseDeck = (cryptCardBase, libraryCardBase, cards = {}) => {
   const crypt = {};
   const library = {};
 

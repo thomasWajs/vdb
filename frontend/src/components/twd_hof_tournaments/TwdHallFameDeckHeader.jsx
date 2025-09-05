@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { twMerge } from 'tailwind-merge';
-import PeopleFill from '@icons/people-fill.svg?react';
-import { useApp } from '@/context';
-import { Hr, TwdHallFameDeckBody } from '@/components';
-import { CREATION_DATE, PLAYERS, EVENT, LOCATION, DATE } from '@/constants';
+import PeopleFill from "@icons/people-fill.svg?react";
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { Hr, TwdHallFameDeckBody } from "@/components";
+import { CREATION_DATE, DATE, EVENT, LOCATION, PLAYERS } from "@/constants";
+import { useApp } from "@/context";
 
 const TwdHallFameDeckHeader = ({ deck, isStar }) => {
   const { isMobile } = useApp();
@@ -13,12 +13,12 @@ const TwdHallFameDeckHeader = ({ deck, isStar }) => {
   };
 
   return (
-    <div className="rounded-md border-2 border-borderPrimary bg-bgPrimary dark:border-borderPrimaryDark dark:bg-bgPrimaryDark">
+    <div className="cursor-pointer rounded-md border-2 border-borderPrimary bg-bgPrimary dark:border-borderPrimaryDark dark:bg-bgPrimaryDark">
       <div
         onClick={handleClick}
         className={twMerge(
-          'flex justify-between p-2.5 text-fgSecondary hover:underline dark:text-fgSecondaryDark',
-          isStar && 'font-bold',
+          "flex justify-between p-2.5 text-fgSecondary dark:text-fgSecondaryDark",
+          isStar && "font-bold",
         )}
       >
         <div className="flex items-center gap-4">

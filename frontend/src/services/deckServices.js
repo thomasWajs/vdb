@@ -1,14 +1,13 @@
-import ky from 'ky';
-import dayjs from 'dayjs';
-import { redirect } from 'react-router';
-import { getTags, getIsPlaytest, exportDeck, getTextDisciplines } from '@/utils';
+import dayjs from "dayjs";
+import ky from "ky";
+import { redirect } from "react-router";
 import {
   ADV,
   AUTHOR,
   BASE,
   BLOOD,
-  BRANCHES,
   BRANCH_NAME,
+  BRANCHES,
   CAPACITY,
   CARDS,
   CLAN,
@@ -38,8 +37,9 @@ import {
   TIMESTAMP,
   TYPE,
   XLSX,
-} from '@/constants';
-import { deckStore } from '@/context';
+} from "@/constants";
+import { deckStore } from "@/context";
+import { exportDeck, getIsPlaytest, getTags, getTextDisciplines } from "@/utils";
 
 export const update = (deckid, field, value) => {
   const url = `${import.meta.env.VITE_API_URL}/deck/${deckid}`;
@@ -90,8 +90,12 @@ export const deckClone = (deck) => {
   const url = `${import.meta.env.VITE_API_URL}/deck`;
   const name = `${deck[NAME]} [by ${deck[AUTHOR]}]`;
   const cards = {};
-  Object.keys(deck[CRYPT]).forEach((cardid) => (cards[cardid] = deck[CRYPT][cardid].q));
-  Object.keys(deck[LIBRARY]).forEach((cardid) => (cards[cardid] = deck[LIBRARY][cardid].q));
+  Object.keys(deck[CRYPT]).forEach((cardid) => {
+    cards[cardid] = deck[CRYPT][cardid].q;
+  });
+  Object.keys(deck[LIBRARY]).forEach((cardid) => {
+    cards[cardid] = deck[LIBRARY][cardid].q;
+  });
 
   const tags =
     deck[TAGS][BASE] && deck[TAGS][SUPERIOR]
@@ -135,8 +139,12 @@ export const deckClone = (deck) => {
 export const deckSnapshot = (deck) => {
   const url = `${import.meta.env.VITE_API_URL}/deck`;
   const cards = {};
-  Object.keys(deck[CRYPT]).forEach((cardid) => (cards[cardid] = deck[CRYPT][cardid].q));
-  Object.keys(deck[LIBRARY]).forEach((cardid) => (cards[cardid] = deck[LIBRARY][cardid].q));
+  Object.keys(deck[CRYPT]).forEach((cardid) => {
+    cards[cardid] = deck[CRYPT][cardid].q;
+  });
+  Object.keys(deck[LIBRARY]).forEach((cardid) => {
+    cards[cardid] = deck[LIBRARY][cardid].q;
+  });
 
   return ky
     .post(url, {
@@ -187,7 +195,7 @@ export const branchDelete = (deckid, decks) => {
       deckStore[DECKS][masterId][BRANCHES] = branches;
       deckStore[DECKS][masterId][IS_BRANCHES] = branches.length > 0;
       deckStore[DECKS][masterId][MASTER] = null;
-      branches.map((b) => {
+      branches.forEach((b) => {
         deckStore[DECKS][b][MASTER] = masterId;
       });
     }
@@ -200,7 +208,7 @@ export const branchDelete = (deckid, decks) => {
 export const branchCreate = (deck, branch) => {
   const master = deck[MASTER] ?? deck[DECKID];
   const url = `${import.meta.env.VITE_API_URL}/deck/${master}/branch`;
-  const date = dayjs().format('YYYY-MM-DD');
+  const date = dayjs().format("YYYY-MM-DD");
 
   return ky
     .post(url, { json: { [DECKID]: branch[DECKID] } })
@@ -219,7 +227,7 @@ export const branchCreate = (deck, branch) => {
         [TAGS]: branch[TAGS],
         [CRYPT]: { ...branch[CRYPT] },
         [LIBRARY]: { ...branch[LIBRARY] },
-        [INVENTORY_TYPE]: '',
+        [INVENTORY_TYPE]: "",
         [MASTER]: master,
         [BRANCH_NAME]: data[0][BRANCH_NAME],
         [IS_PUBLIC]: false,
@@ -249,9 +257,9 @@ export const publicCreateOrDelete = (deck) => {
   const parentId = deck[PUBLIC_PARENT] ?? deck[DECKID];
 
   const payload = isPublished
-    ? { method: 'DELETE' }
+    ? { method: "DELETE" }
     : {
-        method: 'POST',
+        method: "POST",
         json: { tags: getTags(deck[CRYPT], deck[LIBRARY]) },
       };
 
@@ -265,7 +273,7 @@ export const publicCreateOrDelete = (deck) => {
 
 export const getDeckFromAmaranth = async (deckUrl) => {
   const url = `${import.meta.env.VITE_AMARANTH_API_URL}/deck`;
-  const id = deckUrl.replace(/.*#deck\//i, '');
+  const id = deckUrl.replace(/.*#deck\//i, "");
 
   const deck = await ky
     .post(url, {
@@ -277,9 +285,9 @@ export const getDeckFromAmaranth = async (deckUrl) => {
 };
 
 export const exportDecks = async (decks, format) => {
-  const { default: JSzip } = await import('jszip');
+  const { default: JSzip } = await import("jszip");
   const zip = JSzip();
-  const date = dayjs().format('YYYY-MM-DD');
+  const date = dayjs().format("YYYY-MM-DD");
 
   if (format === XLSX) {
     const fetchPromises = Object.values(decks).map((deck) => {
@@ -300,7 +308,7 @@ export const exportDecks = async (decks, format) => {
       });
 
       zip
-        .generateAsync({ type: 'blob' })
+        .generateAsync({ type: "blob" })
         .then((blob) => saveFile(blob, `Decks ${date} [${format}].zip`));
     });
   } else {
@@ -314,17 +322,17 @@ export const exportDecks = async (decks, format) => {
     });
 
     zip
-      .generateAsync({ type: 'blob' })
+      .generateAsync({ type: "blob" })
       .then((blob) => saveFile(blob, `Decks ${date} [${format}].zip`));
   }
 };
 
 export const exportXlsx = async (deck) => {
-  const xlsx = await import('xlsx');
+  const xlsx = await import("xlsx");
   const crypt = Object.values(deck[CRYPT]).map((card) => {
     const c = card.c;
     let name = c[NAME];
-    if (c[ADV] && c[ADV][0]) name += ' (ADV)';
+    if (c[ADV]?.[0]) name += " (ADV)";
     if (c[NEW]) name += ` (G${c[GROUP]})`;
 
     return {
@@ -334,7 +342,7 @@ export const exportXlsx = async (deck) => {
       Capacity: c[CAPACITY],
       Group: c[GROUP],
       Clan: c[CLAN],
-      Text: c[TEXT].replace(/ ?\[\w+\]/g, ''),
+      Text: c[TEXT].replace(/ ?\[\w+\]/g, ""),
     };
   });
 
@@ -345,9 +353,9 @@ export const exportXlsx = async (deck) => {
       Card: c[NAME],
       Type: c[TYPE],
       Clan: c[CLAN],
-      'Blood Cost': c[BLOOD],
-      'Pool Cost': c[POOL],
-      Text: c[TEXT].replace(/ ?\[\w+\]/g, ''),
+      "Blood Cost": c[BLOOD],
+      "Pool Cost": c[POOL],
+      Text: c[TEXT].replace(/ ?\[\w+\]/g, ""),
     };
   });
 
@@ -355,21 +363,21 @@ export const exportXlsx = async (deck) => {
   const librarySheet = xlsx.utils.json_to_sheet(library);
 
   const workbook = xlsx.utils.book_new();
-  xlsx.utils.book_append_sheet(workbook, cryptSheet, 'Crypt');
-  xlsx.utils.book_append_sheet(workbook, librarySheet, 'Library');
-  return xlsx.write(workbook, { type: 'array', bookType: XLSX });
+  xlsx.utils.book_append_sheet(workbook, cryptSheet, "Crypt");
+  xlsx.utils.book_append_sheet(workbook, librarySheet, "Library");
+  return xlsx.write(workbook, { type: "array", bookType: XLSX });
 };
 
 const saveFile = async (file, name) => {
-  const { saveAs } = await import('file-saver');
+  const { saveAs } = await import("file-saver");
   saveAs(file, name);
 };
 
 export const deckLoader = ({ params }) => {
   const deckid = params[DECKID];
 
-  if (deckid === DECK || deckid.includes(':')) return null;
-  if (deckid.length == 32) {
+  if (deckid === DECK || deckid.includes(":")) return null;
+  if (deckid.length === 32) {
     return redirect(`/decks/${deckid.substring(0, 9)}`);
   }
 

@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { twMerge } from 'tailwind-merge';
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import {
-  DeckTags,
-  DeckChangeName,
-  DeckChangeBranchName,
   DeckChangeAuthor,
+  DeckChangeBranchName,
   DeckChangeDescription,
+  DeckChangeName,
+  DeckTags,
   PlaytestReportForm,
-} from '@/components';
-import { useApp } from '@/context';
+} from "@/components";
 import {
-  PLAYTEST_OLD,
   DECKID,
   IS_AUTHOR,
-  IS_PUBLIC,
   IS_BRANCHES,
-  TAGS,
+  IS_PUBLIC,
   PLAYTEST,
-} from '@/constants';
+  PLAYTEST_OLD,
+  TAGS,
+} from "@/constants";
+import { useApp } from "@/context";
 
 const DeckDetails = ({ deck, allTagsOptions = [] }) => {
   const { isPlaytester, isMobile } = useApp();
@@ -25,20 +25,20 @@ const DeckDetails = ({ deck, allTagsOptions = [] }) => {
   const playtestPrecon =
     deck[DECKID].includes(`${PLAYTEST}:`) &&
     !deck[PLAYTEST_OLD] &&
-    deck[DECKID].replace(`${PLAYTEST}:`, '');
+    deck[DECKID].replace(`${PLAYTEST}:`, "");
 
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex gap-2 max-sm:flex-col">
         <div
-          className={twMerge('basis-full', deck[IS_BRANCHES] ? 'sm:basis-6/12' : 'sm:basis-8/12')}
+          className={twMerge("basis-full", deck[IS_BRANCHES] ? "sm:basis-6/12" : "sm:basis-8/12")}
         >
           <DeckChangeName deck={deck} />
         </div>
         <div
           className={twMerge(
-            'flex basis-full gap-2 max-sm:flex-col',
-            deck[IS_BRANCHES] ? 'sm:basis-6/12' : 'sm:basis-4/12',
+            "flex basis-full gap-2 max-sm:flex-col",
+            deck[IS_BRANCHES] ? "sm:basis-6/12" : "sm:basis-4/12",
           )}
         >
           {deck[IS_BRANCHES] && (
@@ -51,10 +51,10 @@ const DeckDetails = ({ deck, allTagsOptions = [] }) => {
           </div>
         </div>
       </div>
-      <div className={twMerge('flex gap-2', (!isFolded || isMobile) && 'flex-col')}>
+      <div className={twMerge("flex gap-2", (!isFolded || isMobile) && "flex-col")}>
         {isPlaytester && playtestPrecon ? (
           <div className="basis-full">
-            <PlaytestReportForm id={playtestPrecon} isPrecon />
+            <PlaytestReportForm deck={deck} id={playtestPrecon} isPrecon />
           </div>
         ) : (
           <>

@@ -1,17 +1,16 @@
-import React from 'react';
-import { Select } from '@/components';
-import { capitalize } from '@/utils';
-import { MATCH_INVENTORY, ANY } from '@/constants';
+import { Select } from "@/components";
+import { ANY, MATCH_INVENTORY } from "@/constants";
+import { capitalize } from "@/utils";
 
-const TwdSearchFormMatchInventory = ({ value, target, onChange }) => {
+const TwdSearchFormMatchInventory = ({ value = ANY, target, onChange }) => {
   const name = MATCH_INVENTORY;
 
   const options = [
-    [ANY, 'ANY'],
-    ['0.7', '70%+'],
-    ['0.8', '80%+'],
-    ['0.9', '90%+'],
-    ['1.0', '100%'],
+    [ANY, "ANY"],
+    ["0.7", "70%+"],
+    ["0.8", "80%+"],
+    ["0.9", "90%+"],
+    ["1.0", "100%"],
   ].map((i) => ({
     value: i[0],
     name: target,
@@ -28,7 +27,6 @@ const TwdSearchFormMatchInventory = ({ value, target, onChange }) => {
       <div className="w-full">
         <Select
           options={options}
-          isSearchable={false}
           name={name}
           value={options.find((obj) => obj.value === value.toLowerCase())}
           onChange={onChange}

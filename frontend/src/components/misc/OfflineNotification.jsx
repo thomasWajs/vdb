@@ -1,7 +1,6 @@
-import React from 'react';
-import WifiOff from '@icons/wifi-off.svg?react';
-import { GlobalNotification } from '@/components';
-import { useApp } from '@/context';
+import WifiOff from "@icons/wifi-off.svg?react";
+import { GlobalNotification } from "@/components";
+import { useApp } from "@/context";
 
 const OfflineNotification = () => {
   const { isOnline } = useApp();

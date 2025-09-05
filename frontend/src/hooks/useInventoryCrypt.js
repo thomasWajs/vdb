@@ -1,16 +1,17 @@
-import { useMemo } from 'react';
-import { useSnapshot } from 'valtio';
-import imbuedClansList from '@/assets/data/imbuedClansList.json';
-import vampireClansList from '@/assets/data/vampireClansList.json';
-import { getIsPlaytest, getHardTotal, getSoftMax } from '@/utils';
-import { CLAN, SOFT, HARD, CRYPT, ALL, OK, NOK } from '@/constants';
-import { useApp, usedStore } from '@/context';
+import { useMemo } from "react";
+import { useSnapshot } from "valtio";
+import imbuedClansList from "@/assets/data/imbuedClansList.json";
+import vampireClansList from "@/assets/data/vampireClansList.json";
+import { ALL, CLAN, CRYPT, HARD, NOK, OK, SOFT } from "@/constants";
+import { useApp, usedStore } from "@/context";
+import { getHardTotal, getIsPlaytest, getSoftMax } from "@/utils";
 
-const useInventoryCrypt = (cards = {}, category = OK, compact, onlyNotes) => {
+const useInventoryCrypt = (crypt, category, compact, onlyNotes) => {
   const usedCrypt = useSnapshot(usedStore)[CRYPT];
   const { cryptCardBase } = useApp();
 
   const value = useMemo(() => {
+    const cards = crypt || {};
     const cardsByClan = {};
     const cardsByClanTotal = {};
     const cardsByClanUnique = {};
@@ -34,10 +35,7 @@ const useInventoryCrypt = (cards = {}, category = OK, compact, onlyNotes) => {
       });
     } else {
       Object.keys(cards)
-        .filter((cardid) => {
-          if (onlyNotes) return cards[cardid].t;
-          return true;
-        })
+        .filter((cardid) => (onlyNotes ? cards[cardid].t : true))
         .forEach((cardid) => {
           const clan = cards[cardid].c[CLAN];
           const softUsedMax = getSoftMax(usedCrypt[SOFT][cardid]);
@@ -154,7 +152,7 @@ const useInventoryCrypt = (cards = {}, category = OK, compact, onlyNotes) => {
       missingByClan,
       missingByClanTotal,
     };
-  }, [cards, category, compact, onlyNotes, usedCrypt]);
+  }, [crypt, category, compact, onlyNotes, usedCrypt]);
 
   return value;
 };

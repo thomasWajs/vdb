@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
-import { twMerge } from 'tailwind-merge';
-import { DeckCryptTable, DeckCryptHeader, ResultModal, FlexGapped } from '@/components';
-import { useApp } from '@/context';
-import { getKeyDisciplines } from '@/utils';
-import { useModalCardController, useDeckCrypt } from '@/hooks';
-import { CRYPT, CAPACITY, CLAN, GROUP, NAME, QUANTITYx, SECT } from '@/constants';
+import { useCallback, useMemo, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { DeckCryptHeader, DeckCryptTable, FlexGapped, ResultModal } from "@/components";
+import { CAPACITY, CLAN, CRYPT, GROUP, NAME, QUANTITYx, SECT } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckCrypt, useModalCardController } from "@/hooks";
+import { getKeyDisciplines } from "@/utils";
 
 const DeckCrypt = ({ inSearch, inPreview, inMissing, noDisciplines, deck }) => {
-  const { setShowFloatingButtons, cryptDeckSort, changeCryptDeckSort, isMobile } = useApp();
+  const { setShowFloatingButtons, cryptDeckSort, changeCryptDeckSort, isDesktop, isMobile } =
+    useApp();
   const [showInfo, setShowInfo] = useState(false);
 
   const sortMethods = {
-    [CAPACITY]: 'C',
-    [CLAN]: 'CL',
-    [GROUP]: 'G',
-    [NAME]: 'N',
-    [QUANTITYx]: 'Q',
-    [SECT]: 'S',
+    [CAPACITY]: "C",
+    [CLAN]: "CL",
+    [GROUP]: "G",
+    [NAME]: "N",
+    [QUANTITYx]: "Q",
+    [SECT]: "S",
   };
 
   const { crypt, cryptSide, sortedCards, sortedCardsSide, cryptTotal } = useDeckCrypt(
@@ -24,7 +25,9 @@ const DeckCrypt = ({ inSearch, inPreview, inMissing, noDisciplines, deck }) => {
     cryptDeckSort,
   );
 
-  const { disciplinesSet, keyDisciplines } = getKeyDisciplines(deck[CRYPT]);
+  const { disciplinesSet, keyDisciplines } = useMemo(() => {
+    return getKeyDisciplines(deck[CRYPT]);
+  }, [deck[CRYPT]]);
 
   const {
     currentModalCard,
@@ -35,30 +38,36 @@ const DeckCrypt = ({ inSearch, inPreview, inMissing, noDisciplines, deck }) => {
     handleModalCardClose,
   } = useModalCardController(sortedCards, sortedCardsSide);
 
-  const handleClick = (card) => {
-    handleModalCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClick = useCallback(
+    (card) => {
+      handleModalCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [sortedCards, sortedCardsSide],
+  );
 
-  const handleClickSide = (card) => {
-    handleModalSideCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClickSide = useCallback(
+    (card) => {
+      handleModalSideCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [sortedCards, sortedCardsSide],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
-  };
+    !isDesktop && setShowFloatingButtons(true);
+  }, [sortedCards, sortedCardsSide]);
 
   return (
     <FlexGapped
       className={twMerge(
-        'flex-col',
+        "flex-col",
         !inPreview &&
           !inMissing &&
           !inSearch &&
           !isMobile &&
-          'sticky bg-bgPrimary dark:bg-bgPrimaryDark sm:top-10',
+          "sticky top-10 bg-bgPrimary max-md:top-0 dark:bg-bgPrimaryDark",
       )}
     >
       <div>

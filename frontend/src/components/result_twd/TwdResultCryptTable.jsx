@@ -1,16 +1,13 @@
-import React from 'react';
-import { ResultModal, TwdResultCryptTableRow, Warning } from '@/components';
-import { useApp } from '@/context';
-import { countCards, countTotalCost } from '@/utils';
-import { useDeckCrypt, useModalCardController } from '@/hooks';
-import { ID, BANNED, GROUPS, CAPACITY } from '@/constants';
+import { ResultLegalIcon, ResultModal, TwdResultCryptTableRow, Warning } from "@/components";
+import { BANNED, CAPACITY, GROUPS, ID } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckCrypt, useModalCardController } from "@/hooks";
+import { countCards, countTotalCost } from "@/utils";
 
 const TwdResultCryptTable = ({ crypt }) => {
-  const { cryptDeckSort, setShowFloatingButtons } = useApp();
-  const { cryptGroups, hasBanned, hasWrongGroups, cryptTotal, sortedCards } = useDeckCrypt(
-    crypt,
-    cryptDeckSort,
-  );
+  const { limitedMode, cryptDeckSort, setShowFloatingButtons, isDesktop } = useApp();
+  const { cryptGroups, hasLimited, hasBanned, hasWrongGroups, cryptTotal, sortedCards } =
+    useDeckCrypt(crypt, cryptDeckSort);
 
   const {
     currentModalCard,
@@ -22,12 +19,12 @@ const TwdResultCryptTable = ({ crypt }) => {
 
   const handleClick = (card) => {
     handleModalCardOpen(card);
-    setShowFloatingButtons(false);
+    !isDesktop && setShowFloatingButtons(false);
   };
 
   const handleClose = () => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
+    !isDesktop && setShowFloatingButtons(true);
   };
 
   const cryptTotalQ = countCards(sortedCards);
@@ -43,10 +40,19 @@ const TwdResultCryptTable = ({ crypt }) => {
         <div className="flex gap-2">
           {hasWrongGroups && <Warning type={GROUPS} />}
           {hasBanned && <Warning type={BANNED} />}
+          {limitedMode && hasLimited && (
+            <div
+              className="flex gap-0.5 font-normal text-fgRed dark:text-fgRedDark"
+              title="Restricted Cards"
+            >
+              <ResultLegalIcon />
+              {Math.round((hasLimited / cryptTotal) * 100)}%
+            </div>
+          )}
         </div>
         <div title="Average capacity">~{cryptAvg}</div>
       </div>
-      <table className="border-x border-bgSecondary dark:border-bgSecondaryDark">
+      <table className="border-bgSecondary border-x dark:border-bgSecondaryDark">
         <tbody>
           {sortedCards.map((card) => {
             return (

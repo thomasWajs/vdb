@@ -1,21 +1,21 @@
-import React from 'react';
-import { Checkbox } from '@/components';
+import { Checkbox } from "@/components";
 import {
-  PRIMOGEN,
-  PRINCE,
-  NON_TITLED,
-  JUSTICAR,
-  INNER_CIRCLE,
+  ARCHBISHOP,
   BARON,
   BISHOP,
-  ARCHBISHOP,
-  PRISCUS,
   CARDINAL,
-  REGENT,
+  INNER_CIRCLE,
+  JUSTICAR,
   MAGAJI,
+  NON_TITLED,
+  PRIMOGEN,
+  PRINCE,
+  PRISCUS,
+  REGENT,
+  TITLES,
   VOTE_1,
   VOTE_2,
-} from '@/constants';
+} from "@/constants";
 
 const CryptSearchFormTitles = ({ value, onChange }) => {
   return (
@@ -24,17 +24,17 @@ const CryptSearchFormTitles = ({ value, onChange }) => {
       <div className="flex">
         <div className="flex basis-5/9 flex-col gap-0.5">
           {[
-            ['Primogen', PRIMOGEN],
-            ['Prince', PRINCE],
-            ['Justicar', JUSTICAR],
-            ['Inner Circle', INNER_CIRCLE],
-            ['Baron', BARON],
-            ['1 vote (titled)', VOTE_1],
-            ['2 votes (titled)', VOTE_2],
+            ["Primogen", PRIMOGEN],
+            ["Prince", PRINCE],
+            ["Justicar", JUSTICAR],
+            ["Inner Circle", INNER_CIRCLE],
+            ["Baron", BARON],
+            ["1 vote (titled)", VOTE_1],
+            ["2 votes (titled)", VOTE_2],
           ].map((i) => (
             <Checkbox
               key={i[1]}
-              name="titles"
+              name={TITLES}
               value={i[1]}
               label={i[0]}
               checked={value[i[1]]}
@@ -44,17 +44,17 @@ const CryptSearchFormTitles = ({ value, onChange }) => {
         </div>
         <div className="flex basis-4/9 flex-col gap-0.5">
           {[
-            ['Bishop', BISHOP],
-            ['Archbishop', ARCHBISHOP],
-            ['Priscus', PRISCUS],
-            ['Cardinal', CARDINAL],
-            ['Regent', REGENT],
-            ['Magaji', MAGAJI],
-            ['Non-titled', NON_TITLED],
+            ["Bishop", BISHOP],
+            ["Archbishop", ARCHBISHOP],
+            ["Priscus", PRISCUS],
+            ["Cardinal", CARDINAL],
+            ["Regent", REGENT],
+            ["Magaji", MAGAJI],
+            ["Non-titled", NON_TITLED],
           ].map((i) => (
             <Checkbox
               key={i[1]}
-              name="titles"
+              name={TITLES}
               value={i[1]}
               label={i[0]}
               checked={value[i[1]]}

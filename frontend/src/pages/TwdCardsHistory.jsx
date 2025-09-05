@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import { Tab } from '@headlessui/react';
-import { TabButton, TwdCardsHistoryCrypt, TwdCardsHistoryLibrary } from '@/components';
-import { useApp } from '@/context';
-import { byCardName } from '@/utils';
-import { useFetch } from '@/hooks';
-import { RELEASE_DATE, SET, DATE, PLAYER, DECKID, CRYPT, LIBRARY, POD, PROMO } from '@/constants';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
+import { TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
+import { useMemo } from "react";
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
+import { TabButton, TwdCardsHistoryCrypt, TwdCardsHistoryLibrary } from "@/components";
+import { CRYPT, DATE, DECKID, LIBRARY, PLAYER, POD, PROMO, RELEASE_DATE, SET } from "@/constants";
+import { useApp } from "@/context";
+import { useFetch } from "@/hooks";
+import { byCardName } from "@/utils";
 
 const TwdCardsHistory = () => {
   const { cryptCardBase, libraryCardBase } = useApp();
@@ -57,23 +57,24 @@ const TwdCardsHistory = () => {
         library,
         players,
       };
-    } else return {};
+    }
+    return {};
   }, [value, cryptCardBase, libraryCardBase]);
 
   return (
     <div className="hof-history-container mx-auto flex flex-col gap-1.5">
-      <Tab.Group className="flex flex-col gap-2" manual>
-        <Tab.List className="flex gap-1.5">
+      <TabGroup className="flex flex-col gap-2" manual>
+        <TabList className="flex gap-1.5">
           <TabButton>Crypt</TabButton>
           <TabButton>Library</TabButton>
-        </Tab.List>
-        <Tab.Panels>
-          <Tab.Panel>{crypt && <TwdCardsHistoryCrypt cards={crypt} players={players} />}</Tab.Panel>
-          <Tab.Panel>
+        </TabList>
+        <TabPanels>
+          <TabPanel>{crypt && <TwdCardsHistoryCrypt cards={crypt} players={players} />}</TabPanel>
+          <TabPanel>
             {library && <TwdCardsHistoryLibrary cards={library} players={players} />}
-          </Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
+          </TabPanel>
+        </TabPanels>
+      </TabGroup>
     </div>
   );
 };

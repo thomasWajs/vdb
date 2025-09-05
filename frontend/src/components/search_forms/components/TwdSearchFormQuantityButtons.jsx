@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { twMerge } from 'tailwind-merge';
-import { Button, ButtonCardChange } from '@/components';
-import { useApp } from '@/context';
-import { EQ, LT, LT0, GT } from '@/constants';
+import { useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { Button, ButtonCardChange } from "@/components";
+import { EQ, GT, LT, LT0 } from "@/constants";
+import { useApp } from "@/context";
 
 const TwdSearchFormQuantityButtons = ({ value, form, id }) => {
   const { isMobile } = useApp();
@@ -14,7 +14,7 @@ const TwdSearchFormQuantityButtons = ({ value, form, id }) => {
   }, [value[id].q]);
 
   const handleManualChange = (event) => {
-    setState(parseInt(event.target.value));
+    setState(Number.parseInt(event.target.value));
   };
 
   const handleSubmit = (event) => {
@@ -51,13 +51,13 @@ const TwdSearchFormQuantityButtons = ({ value, form, id }) => {
   const getIconAndText = (s) => {
     switch (s) {
       case GT:
-        return ['≥', 'More than or equal'];
+        return ["≥", "More than or equal"];
       case LT0:
-        return ['0≤', 'Less than or equal, and can be 0'];
+        return ["0≤", "Less than or equal, and can be 0"];
       case LT:
-        return ['1≤', 'Less than or equal, but not less than 1'];
+        return ["1≤", "Less than or equal, but not less than 1"];
       default:
-        return ['==', 'Equal'];
+        return ["==", "Equal"];
     }
   };
 
@@ -80,13 +80,13 @@ const TwdSearchFormQuantityButtons = ({ value, form, id }) => {
       )}
       <div
         tabIndex={0}
-        className={twMerge(!manual && 'flex w-[20px] justify-center')}
+        className={twMerge(!manual && "flex w-[20px] justify-center")}
         onFocus={() => setManual(true)}
       >
         {manual ? (
           <form onSubmit={handleSubmit}>
             <input
-              className="border-bgSecondary bg-bgPrimary text-fgPrimary outline-bgCheckboxSelected dark:border-bgSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark dark:outline-bgCheckboxSelectedDark w-[63px] rounded-sm border-2 text-center focus:outline"
+              className="w-[63px] rounded-sm border-2 border-bgSecondary bg-bgPrimary text-center text-fgPrimary outline-bgCheckboxSelected focus:outline dark:border-bgSecondaryDark dark:bg-bgPrimaryDark dark:text-fgPrimaryDark dark:outline-bgCheckboxSelectedDark"
               placeholder=""
               type="number"
               value={state}
@@ -96,7 +96,7 @@ const TwdSearchFormQuantityButtons = ({ value, form, id }) => {
             />
           </form>
         ) : (
-          <>{value[id].q}</>
+          value[id].q
         )}
       </div>
       {(!manual || isMobile) && (

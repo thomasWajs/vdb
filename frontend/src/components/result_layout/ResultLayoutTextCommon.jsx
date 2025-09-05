@@ -1,16 +1,15 @@
-import React from 'react';
-import PencilSquare from '@icons/pencil-square.svg?react';
-import { useApp } from '@/context';
+import PencilSquare from "@icons/pencil-square.svg?react";
 import {
-  ResultLayoutTextInventory,
-  ResultLayoutTextSets,
-  ResultLayoutTextRulings,
-  ResultLayoutTextArtist,
-  PlaytestReportForm,
   Hr,
-} from '@/components';
-import { PLAYTEST_OLD, ID, ARTIST, RULINGS } from '@/constants';
-import { getIsPlaytest } from '@/utils';
+  PlaytestReportForm,
+  ResultLayoutTextArtist,
+  ResultLayoutTextInventory,
+  ResultLayoutTextRulings,
+  ResultLayoutTextSets,
+} from "@/components";
+import { ARTIST, ID, PLAYTEST_OLD, RULINGS } from "@/constants";
+import { useApp } from "@/context";
+import { getIsPlaytest } from "@/utils";
 
 const ResultLayoutTextCommon = ({
   handleClose,

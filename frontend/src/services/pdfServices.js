@@ -1,5 +1,5 @@
-import { getCardImageUrl, countCards, cryptSort, librarySort } from '@/utils';
-import { QUANTITYx, ID, SET, EN, GROUPED_TYPE } from '@/constants';
+import { EN, GROUPED_TYPE, ID, QUANTITYx, SET } from "@/constants";
+import { countCards, cryptSort, getCardImageUrl, librarySort } from "@/utils";
 
 export const proxyCards = async (
   crypt,
@@ -8,7 +8,7 @@ export const proxyCards = async (
   cryptSortMethod = QUANTITYx,
   lang = EN,
   showLegacyImage = false,
-  name = 'Deck',
+  name = "Deck",
 ) => {
   const cryptSorted = cryptSort(
     Object.values(crypt).filter((card) => card.q > 0),
@@ -33,8 +33,8 @@ export const proxyCards = async (
   const sheetW = format.isLetter ? 215.9 : 210;
   const sheetH = format.isLetter ? 279.4 : 297;
 
-  let { jsPDF } = await import('jspdf');
-  const pdf = new jsPDF('p', 'mm', [sheetW, sheetH]);
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF("p", "mm", [sheetW, sheetH]);
 
   const w = 63;
   const h = 88;
@@ -107,7 +107,7 @@ export const proxyCards = async (
         marginTop + counterY * (h + gap),
         w + (counterX < 2 ? gap : 0),
         h + (counterY < 2 ? gap : 0),
-        'F',
+        "F",
       );
 
       try {
@@ -122,7 +122,7 @@ export const proxyCards = async (
           img.src = `${url}.jpg`;
           pdf.addImage(
             img,
-            'JPEG',
+            "JPEG",
             (w + gap) * counterX + marginLeft,
             (h + gap) * counterY + marginTop,
             w,
@@ -135,7 +135,7 @@ export const proxyCards = async (
         img.src = `${card.url.baseUrl}.jpg`;
         pdf.addImage(
           img,
-          'JPEG',
+          "JPEG",
           (w + gap) * counterX + marginLeft,
           (h + gap) * counterY + marginTop,
           w,
@@ -143,14 +143,14 @@ export const proxyCards = async (
         );
       }
 
-      if (counterX == 2) {
+      if (counterX === 2) {
         counterY += 1;
         counterX = 0;
       } else {
         counterX += 1;
       }
 
-      if (counterY == 3 && page * 9 < cardsTotal) {
+      if (counterY === 3 && page * 9 < cardsTotal) {
         page += 1;
         counterY = 0;
         pdf.addPage();

@@ -1,20 +1,20 @@
-import React from 'react';
+import { twMerge } from "tailwind-merge";
 import {
-  PlaytestScores,
   CardImage,
   DeckCrypt,
   FlexGapped,
   Hr,
   PlaytestReportEntry,
+  PlaytestScores,
   PlaytestScoresChart,
-} from '@/components';
-import { useApp } from '@/context';
-import { SCORE, NAME } from '@/constants';
+} from "@/components";
+import { NAME, SCORE } from "@/constants";
+import { useApp } from "@/context";
 
 const PlaytestReportsAllCardOrPrecon = ({ product, isPrecon, report, maxSameScore }) => {
   const { isMobile } = useApp();
 
-  const q = report && Object.keys(report).length;
+  const q = report && Object.values(report).filter((i) => i[SCORE] > 0).length;
   const score = report && Object.values(report).reduce((acc, value) => acc + value[SCORE], 0) / q;
   const scoreRounded = Math.round(score * 10) / 10;
   const scoreRoundedHalf = Math.round(score * 2) / 2;
@@ -28,7 +28,12 @@ const PlaytestReportsAllCardOrPrecon = ({ product, isPrecon, report, maxSameScor
               {product[NAME]}
             </div>
           ) : (
-            <FlexGapped className="w-[320px] flex-col print:max-w-[250px]">
+            <FlexGapped
+              className={twMerge(
+                "w-[320px] flex-col",
+                isPrecon ? "print:max-w-[320px]" : "print:max-w-[250px]",
+              )}
+            >
               <div className="flex flex-col gap-1">
                 <div className="flex font-bold text-fgSecondary dark:text-fgSecondaryDark print:dark:text-fgSecondary">
                   {product[NAME]}

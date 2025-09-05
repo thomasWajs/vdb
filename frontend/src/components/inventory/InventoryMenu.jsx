@@ -1,13 +1,12 @@
-import React from 'react';
-import { useSnapshot } from 'valtio';
+import { useSnapshot } from "valtio";
 import {
   Checkbox,
   InventoryButtons,
   InventoryFreezeButton,
   InventoryShowSelect,
-} from '@/components';
-import { inventoryStore } from '@/context';
-import { OK } from '@/constants';
+} from "@/components";
+import { OK } from "@/constants";
+import { inventoryStore } from "@/context";
 
 const InventoryMenu = ({
   sharedCrypt,

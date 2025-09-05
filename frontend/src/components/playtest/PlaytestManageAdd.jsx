@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import Check2 from '@icons/check2.svg?react';
-import { Spinner, Input, Button, ErrorOverlay } from '@/components';
-import { playtestServices } from '@/services';
-import { USERNAME } from '@/constants';
+import Check2 from "@icons/check2.svg?react";
+import { useState } from "react";
+import { Button, ErrorOverlay, Input, Spinner } from "@/components";
+import { ENABLED, USERNAME } from "@/constants";
+import { playtestServices } from "@/services";
 
 const PlaytestManageAdd = ({ playtesters, newPlaytesters, setNewPlaytesters }) => {
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
   const addPlaytester = () => {
     if ([...newPlaytesters, ...Object.keys(playtesters)].includes(username)) {
-      setError('ALREADY PLAYTESTER');
+      setError("ALREADY PLAYTESTER");
       return;
     }
 
@@ -19,7 +19,7 @@ const PlaytestManageAdd = ({ playtesters, newPlaytesters, setNewPlaytesters }) =
     setError(false);
 
     playtestServices
-      .changePlaytester(username)
+      .changePlaytester(username, ENABLED, true)
       .then((data) => {
         setNewPlaytesters([
           ...newPlaytesters,
@@ -28,9 +28,9 @@ const PlaytestManageAdd = ({ playtesters, newPlaytesters, setNewPlaytesters }) =
             ...data,
           },
         ]);
-        setUsername('');
+        setUsername("");
       })
-      .catch(() => setError('USER DOES NOT EXIST'))
+      .catch(() => setError("USER DOES NOT EXIST"))
       .finally(() => setIsLoading(false));
   };
 
@@ -50,7 +50,7 @@ const PlaytestManageAdd = ({ playtesters, newPlaytesters, setNewPlaytesters }) =
         <div className="relative flex w-full">
           <Input
             placeholder="Add Playtester (login)"
-            name="username"
+            name={USERNAME}
             value={username}
             onChange={handleChange}
             roundedStyle="rounded-sm rounded-r-none"

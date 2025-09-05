@@ -1,6 +1,4 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useApp } from '@/context';
+import { twMerge } from "tailwind-merge";
 import {
   ButtonCloseModal,
   CardPopover,
@@ -8,29 +6,30 @@ import {
   Hr,
   ResultClanImage,
   ResultCryptCapacity,
-  ResultCryptSect,
-  ResultCryptTitle,
   ResultCryptDisciplines,
   ResultCryptGroup,
-  ResultPathImage,
+  ResultCryptSect,
+  ResultCryptTitle,
+  ResultLayoutTextText,
   ResultName,
   ResultNameAka,
-  ResultLayoutTextText,
-} from '@/components';
-import { getLegality } from '@/utils';
+  ResultPathImage,
+} from "@/components";
 import {
+  ADV,
+  AKA,
+  BANNED,
+  CLAN,
+  DISCIPLINES,
+  GROUP,
+  ID,
   PATH,
+  PLAYTEST,
   SECT,
   TITLE,
-  CLAN,
-  ADV,
-  ID,
-  DISCIPLINES,
-  BANNED,
-  GROUP,
-  AKA,
-  PLAYTEST,
-} from '@/constants';
+} from "@/constants";
+import { useApp } from "@/context";
+import { getLegality } from "@/utils";
 
 const ResultCryptLayoutText = ({ card, setCard, handleClose, noClose, inPopover }) => {
   const { isNarrow, isMobile, cryptCardBase } = useApp();
@@ -40,15 +39,15 @@ const ResultCryptLayoutText = ({ card, setCard, handleClose, noClose, inPopover 
     <div className="flex flex-col gap-3">
       <div
         className={twMerge(
-          'flex justify-between gap-3 whitespace-nowrap',
-          card[AKA] ? 'items-start' : 'items-center',
+          "flex justify-between gap-3 whitespace-nowrap",
+          card[AKA] ? "items-start" : "items-center",
         )}
       >
         <div className="flex items-center justify-between">
           <div
             className={twMerge(
-              (isMobile || inPopover) && 'flex-col',
-              'flex justify-between gap-1 whitespace-nowrap sm:gap-3',
+              (isMobile || inPopover) && "flex-col",
+              "flex justify-between gap-1 whitespace-nowrap sm:gap-3",
             )}
           >
             <div className="flex items-center justify-between gap-2 whitespace-nowrap">
@@ -67,22 +66,23 @@ const ResultCryptLayoutText = ({ card, setCard, handleClose, noClose, inPopover 
                         onClick={() => setCard(cryptCardBase[card[ADV][1]])}
                       >
                         {inPopover ? (
-                          <>
-                            {!card[ADV][0] && (
-                              <div className="inline-flex items-center">
-                                [has
-                                <img
-                                  className="ml-1 inline-flex items-center"
-                                  src={`${import.meta.env.VITE_BASE_URL}/images/misc/advanced.svg`}
-                                  title="Advanced"
-                                  width="12"
-                                />
-                                ]
-                              </div>
-                            )}
-                          </>
+                          !card[ADV][0] && (
+                            <div className="inline-flex items-center">
+                              [has
+                              <img
+                                aria-label="Advanced"
+                                className="ml-1 inline-flex items-center"
+                                src={`${import.meta.env.VITE_BASE_URL}/images/misc/advanced.svg`}
+                                title="Advanced"
+                                width="12"
+                              />
+                              ]
+                            </div>
+                          )
                         ) : (
-                          <>[see {card[ADV][0] ? 'Base' : 'Adv'}]</>
+                          <div className="cursor-pointer">
+                            [see {card[ADV][0] ? "Base" : "Adv"}]
+                          </div>
                         )}
                       </div>
                     </ConditionalTooltip>
@@ -98,8 +98,8 @@ const ResultCryptLayoutText = ({ card, setCard, handleClose, noClose, inPopover 
           <div
             className={
               noClose || inPopover || isNarrow
-                ? 'hidden max-h-0 max-w-0 opacity-0'
-                : 'flex justify-center'
+                ? "hidden max-h-0 max-w-0 opacity-0"
+                : "flex justify-center"
             }
           >
             <ButtonCloseModal handleClick={handleClose} />

@@ -1,23 +1,29 @@
-import React, { useMemo } from 'react';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
-import paths from '@/assets/data/paths.json';
-import { ResultPathImage, Select, ResultPreconClan } from '@/components';
-import { useApp } from '@/context';
-import { DATE, NAME, CLAN, PRECONS, PRECON, PLAYTEST } from '@/constants';
+import { useMemo } from "react";
+import { twMerge } from "tailwind-merge";
+import paths from "@/assets/data/paths.json";
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
+import { ResultPathImage, ResultPreconClan, Select } from "@/components";
+import { CLAN, DATE, NAME, PLAYTEST, PRECON, PRECONS, TWO_P } from "@/constants";
+import { useApp } from "@/context";
 
 const DeckSelectPrecon = ({ deckid, handleSelect }) => {
-  const { isMobile, playtestMode } = useApp();
+  const { isMobile, playtestMode, limitedMode, limitedPreset } = useApp();
 
   const options = useMemo(() => {
     const opts = [];
     Object.keys(setsAndPrecons)
-      .filter((i) => (playtestMode || i !== PLAYTEST) && setsAndPrecons[i][PRECONS])
+      .filter(
+        (i) =>
+          (playtestMode || i !== PLAYTEST) &&
+          ((limitedPreset === TWO_P && limitedMode) || i !== TWO_P) &&
+          setsAndPrecons[i][PRECONS],
+      )
       .forEach((set) => {
         const year = setsAndPrecons[set][DATE] ? setsAndPrecons[set][DATE].slice(2, 4) : null;
 
         Object.keys(setsAndPrecons[set][PRECONS]).forEach((precon) => {
           const fullName = setsAndPrecons[set][PRECONS][precon][NAME];
-          const clans = setsAndPrecons[set][PRECONS][precon][CLAN].split('/');
+          const clans = setsAndPrecons[set][PRECONS][precon][CLAN].split("/");
 
           opts.push({
             value: `${set}:${precon}`,
@@ -26,9 +32,10 @@ const DeckSelectPrecon = ({ deckid, handleSelect }) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div
-                    className={
-                      clans.length == 1 ? 'flex w-[40px] items-center justify-center' : 'inline'
-                    }
+                    className={twMerge(
+                      "flex items-center justify-center gap-1 pr-1",
+                      clans.length === 1 && "w-[35px]",
+                    )}
                   >
                     {clans.map((clan) => {
                       return paths.includes(clan) ? (
@@ -41,7 +48,7 @@ const DeckSelectPrecon = ({ deckid, handleSelect }) => {
                   {fullName}
                 </div>
                 <div className="text-sm">
-                  {set == PLAYTEST ? 'PLAYTEST' : set} {year && `'${year}`}
+                  {set === PLAYTEST ? "PLAYTEST" : set} {year && `'${year}`}
                 </div>
               </div>
             ),
@@ -49,7 +56,7 @@ const DeckSelectPrecon = ({ deckid, handleSelect }) => {
         });
       });
     return opts;
-  }, [playtestMode]);
+  }, [playtestMode, limitedMode, limitedPreset]);
 
   const filterOption = ({ label }, string) => {
     const name = label.props.children[0].props.children[1];
@@ -63,7 +70,7 @@ const DeckSelectPrecon = ({ deckid, handleSelect }) => {
     <Select
       options={options}
       isSearchable={!isMobile}
-      name="decks"
+      name={PRECONS}
       maxMenuHeight={isMobile ? window.screen.height - 200 : 600}
       filterOption={filterOption}
       placeholder="Select Deck"

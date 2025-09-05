@@ -1,29 +1,27 @@
-import React from 'react';
 import {
-  DeckSearchSimilarButton,
-  DeckCloneButton,
-  DeckDeleteButton,
-  DeckDeletePlaytestButton,
-  DeckCopyUrlButton,
-  DeckImport,
-  DeckExportButton,
-  DeckProxyButtonWrapper,
-  DeckMissingButton,
-  DeckRecommendationButton,
-  DeckDrawButton,
-  DeckDiffButton,
-  DeckReviewButton,
   DeckBranchCreateButton,
   DeckBranchDeleteButton,
+  DeckCloneButton,
+  DeckCopyUrlButton,
+  DeckDeleteButton,
+  DeckDeletePlaytestButton,
+  DeckDiffButton,
+  DeckDrawButton,
+  DeckExportButton,
+  DeckImport,
+  DeckMissingButton,
+  DeckProxyButtonWrapper,
   DeckPublicSwitchButton,
   DeckPublicSyncButton,
   DeckPublicToggleButton,
+  DeckRecommendationButton,
+  DeckReviewButton,
+  DeckSearchSimilarButton,
   SeatingButton,
-  PlaytestReportsOneButton,
-} from '@/components';
-import { useApp } from '@/context';
-import { getRestrictions } from '@/utils';
-import { PLAYTEST, DECK, DECKID, NAME, ID } from '@/constants';
+} from "@/components";
+import { DECKID } from "@/constants";
+import { useApp } from "@/context";
+import { getRestrictions } from "@/utils";
 
 const DeckButtons = ({
   deck,
@@ -38,10 +36,8 @@ const DeckButtons = ({
   setShowImportText,
   setBadImportCards,
 }) => {
-  const { isPlaytestAdmin, playtestMode, inventoryMode, username } = useApp();
+  const { playtestMode, inventoryMode, username } = useApp();
   const { publicChild, isPublic, isAuthor, isBranches } = deck || {};
-  const playtestPrecon =
-    deck?.[DECKID].includes(`${PLAYTEST}:`) && deck[DECKID].replace(`${PLAYTEST}:`, '');
   const { hasPlaytest } = getRestrictions(deck);
   const isPlaytestSafe = playtestMode || !hasPlaytest;
 
@@ -61,12 +57,6 @@ const DeckButtons = ({
       )}
       {deck && isPlaytestSafe && (
         <>
-          {playtestMode && playtestPrecon && isPlaytestAdmin && (
-            <PlaytestReportsOneButton
-              value={{ [DECK]: deck, [NAME]: deck[NAME], [ID]: playtestPrecon }}
-              isPrecon
-            />
-          )}
           {username && <DeckCloneButton deck={deck} />}
           <DeckExportButton deck={deck} />
           {isAuthor && (

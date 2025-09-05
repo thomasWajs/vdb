@@ -1,26 +1,25 @@
-import React from 'react';
 import {
   Checkbox,
+  SearchAdditionalFormsTextForm,
   SearchFormButtonAddText,
   SearchFormButtonDel,
   SearchFormButtonLogicToggle,
-  SearchAdditionalFormsTextForm,
-} from '@/components';
-import { NAME, TEXT, VALUE, LABEL, LOGIC, IN, REGEX } from '@/constants';
+} from "@/components";
+import { IN, LABEL, LOGIC, NAME, REGEX, TEXT, VALUE } from "@/constants";
 
 const SearchAdditionalFormsText = ({ value, onChange, onChangeOptions, searchForm }) => {
   const options = [
     {
       [VALUE]: NAME,
-      [LABEL]: 'Only in Name',
+      [LABEL]: "Only in Name",
     },
     {
       [VALUE]: TEXT,
-      [LABEL]: 'Only in Text',
+      [LABEL]: "Only in Text",
     },
     {
       [VALUE]: REGEX,
-      [LABEL]: 'Regex',
+      [LABEL]: "Regex",
     },
   ];
 
@@ -36,7 +35,7 @@ const SearchAdditionalFormsText = ({ value, onChange, onChangeOptions, searchFor
             <div className="flex">
               <div className="flex w-1/5 gap-1">
                 <SearchFormButtonLogicToggle
-                  name="text"
+                  name={TEXT}
                   value={v[LOGIC]}
                   i={i}
                   searchForm={searchForm}

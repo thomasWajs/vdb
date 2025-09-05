@@ -1,30 +1,33 @@
-import React, { useState } from 'react';
-import { Menu } from '@headlessui/react';
-import { useSnapshot } from 'valtio';
-import { useNavigate, useParams } from 'react-router';
-import Download from '@icons/download.svg?react';
-import TrashFill from '@icons/trash-fill.svg?react';
+import { Menu } from "@headlessui/react";
+import Download from "@icons/download.svg?react";
+import LockFill from "@icons/lock-fill.svg?react";
+import TrashFill from "@icons/trash-fill.svg?react";
+import UnlockFill from "@icons/unlock-fill.svg?react";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
-  FlexGapped,
-  DeckSelectAdvTotal,
-  DeckSelectAdvTable,
-  Modal,
-  MenuItems,
-  MenuItem,
-  MenuButton,
   ButtonIconed,
+  DeckSelectAdvTable,
+  DeckSelectAdvTotal,
+  FlexGapped,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Modal,
   ModalConfirmation,
-} from '@/components';
-import { useApp, deckStore } from '@/context';
-import { deckServices } from '@/services';
-import { useDecksTagsAll } from '@/hooks';
-import { DECKID, DECKS, NAME, JOL, LACKEY, TEXT, XLSX } from '@/constants';
+} from "@/components";
+import { DECKID, DECKS, IS_FROZEN, JOL, LACKEY, NAME, TEXT, XLSX } from "@/constants";
+import { deckStore, deckUpdate, useApp } from "@/context";
+import { useDecksTagsAll } from "@/hooks";
+import { deckServices } from "@/services";
 
 const DeckSelectAdvModal = ({ onClick, setShow, short }) => {
-  const { isMobile, setShowFloatingButtons } = useApp();
+  const { isMobile, decksAdvSort, changeDecksAdvSort, setShowMenuButtons, setShowFloatingButtons } =
+    useApp();
+  const [isLocked, setIsLocked] = useState();
   const decks = useSnapshot(deckStore)[DECKS];
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [sortMethod, setSortMethod] = useState(NAME);
   const [isSelectedAll, setIsSelectedAll] = useState(false);
   const [selectedDecks, setSelectedDecks] = useState({});
   const [tagsFilter, setTagsFilter] = useState([]);
@@ -34,6 +37,7 @@ const DeckSelectAdvModal = ({ onClick, setShow, short }) => {
 
   const handleClose = () => {
     setShow(false);
+    setShowMenuButtons(false);
     setShowFloatingButtons(true);
   };
 
@@ -54,18 +58,28 @@ const DeckSelectAdvModal = ({ onClick, setShow, short }) => {
       .forEach((deckid) => {
         const deck = decks[deckid];
         deckServices.deckDelete(deck).then(() => {
-          if (deckid == activeDeckid) navigate('/decks');
+          if (deckid === activeDeckid) navigate("/decks");
         });
       });
 
     setShowDeleteConfirmation(false);
   };
 
+  const lockSelected = () => {
+    Object.keys(selectedDecks)
+      .filter((deckid) => !!selectedDecks[deckid])
+      .forEach((deckid) => {
+        const deck = decks[deckid];
+        deckUpdate(deck[DECKID], IS_FROZEN, !isLocked);
+      });
+    setIsLocked(!isLocked);
+  };
+
   return (
     <Modal
       noPadding={isMobile}
       handleClose={handleClose}
-      size={short ? 'sm' : 'xl'}
+      size={short ? "sm" : "xl"}
       title="Select Deck"
     >
       <FlexGapped className="flex-col">
@@ -74,15 +88,15 @@ const DeckSelectAdvModal = ({ onClick, setShow, short }) => {
             <DeckSelectAdvTotal
               tagsFilter={tagsFilter}
               setTagsFilter={setTagsFilter}
-              sortMethod={sortMethod}
-              setSortMethod={setSortMethod}
+              sortMethod={decksAdvSort}
+              setSortMethod={changeDecksAdvSort}
             />
           )}
           <DeckSelectAdvTable
             allTagsOptions={allTagsOptions}
             short={short}
             decks={decks}
-            sortMethod={sortMethod}
+            sortMethod={decksAdvSort}
             tagsFilter={tagsFilter}
             setTagsFilter={setTagsFilter}
             selectedDecks={selectedDecks}
@@ -93,19 +107,31 @@ const DeckSelectAdvModal = ({ onClick, setShow, short }) => {
             handleClose={handleClose}
           />
         </div>
-        {!(short || isMobile) && (
-          <div className="flex justify-end gap-2">
+        {!short && (
+          <div className="flex justify-end gap-2 max-sm:hidden">
+            <ButtonIconed
+              text="Lock Selected"
+              title="Lock Selected Decks"
+              onClick={lockSelected}
+              icon={
+                isLocked ? (
+                  <UnlockFill width="19" height="23" viewBox="0 0 16 16" />
+                ) : (
+                  <LockFill width="19" height="23" viewBox="0 0 16 16" />
+                )
+              }
+            />
             <ButtonIconed
               variant="danger"
               text="Delete Selected"
-              title="Delete Deck"
+              title="Delete Selected Decks"
               onClick={() =>
                 Object.keys(selectedDecks).filter((deckid) => !!selectedDecks[deckid]).length > 0 &&
                 setShowDeleteConfirmation(true)
               }
               icon={<TrashFill width="18" height="18" viewBox="0 0 18 16" />}
             />
-            <Menu as="div" className="relative">
+            <Menu>
               <MenuButton title="Export Selected" icon={<Download />} text="Export Selected" />
               <MenuItems>
                 <MenuItem onClick={() => exportSelected(TEXT)}>Text</MenuItem>

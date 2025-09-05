@@ -1,22 +1,21 @@
-import React from 'react';
-import { useSnapshot } from 'valtio';
-import EyeSlashFill from '@icons/eye-slash-fill.svg?react';
+import EyeSlashFill from "@icons/eye-slash-fill.svg?react";
+import { useSnapshot } from "valtio";
 import {
-  DeckSelectMy,
+  ButtonIconed,
   DeckBranchSelect,
   DeckCrypt,
-  DeckLibrary,
   DeckFreezeButton,
-  ButtonIconed,
+  DeckLibrary,
+  DeckSelectMy,
   ErrorMessage,
   FlexGapped,
-} from '@/components';
-import { getRestrictions } from '@/utils';
-import { setDeck, deckStore, useApp } from '@/context';
-import { DECKS, DECKID, MASTER, BRANCHES, IS_PUBLIC, IS_AUTHOR } from '@/constants';
+} from "@/components";
+import { BRANCHES, DECKID, DECKS, IS_AUTHOR, IS_PUBLIC, MASTER } from "@/constants";
+import { deckStore, setDeck, useApp } from "@/context";
+import { getRestrictions } from "@/utils";
 
 const DeckSelectorAndDisplay = () => {
-  const { playtestMode, isDesktop, addMode, toggleAddMode } = useApp();
+  const { playtestMode, addMode, toggleAddMode } = useApp();
   const { deck } = useSnapshot(deckStore);
   const isBranches = deck ? deck[MASTER] || (deck[BRANCHES] && deck[BRANCHES].length > 0) : null;
   const { hasPlaytest } = getRestrictions(deck);
@@ -27,7 +26,7 @@ const DeckSelectorAndDisplay = () => {
 
   return (
     <FlexGapped className="flex-col">
-      <div className="sticky z-10 flex gap-1 bg-bgPrimary dark:bg-bgPrimaryDark sm:top-10">
+      <div className="sticky z-10 flex gap-1 bg-bgPrimary md:top-10 dark:bg-bgPrimaryDark">
         {addMode && (
           <>
             <div className="w-full">
@@ -41,29 +40,26 @@ const DeckSelectorAndDisplay = () => {
             {deck?.[IS_AUTHOR] && !deck?.[IS_PUBLIC] && <DeckFreezeButton deck={deck} />}
           </>
         )}
-        {isDesktop && (
-          <ButtonIconed
-            title="Hide Deck Panel"
-            onClick={toggleAddMode}
-            icon={addMode ? <EyeSlashFill /> : null}
-            text={addMode ? null : <div className="whitespace-nowrap">Show Deck</div>}
-          />
-        )}
+        <ButtonIconed
+          className="max-xl:hidden"
+          title="Hide Deck Panel"
+          onClick={toggleAddMode}
+          icon={addMode ? <EyeSlashFill /> : null}
+          text={addMode ? null : <div className="whitespace-nowrap">Show Deck</div>}
+        />
       </div>
-      {deck && addMode && (
-        <>
-          {playtestMode || !hasPlaytest ? (
-            <>
-              <DeckCrypt deck={deck} inSearch />
-              <DeckLibrary deck={deck} inSearch />
-            </>
-          ) : (
-            <div className="flex">
-              <ErrorMessage>CONTAINS PLAYTEST CARDS</ErrorMessage>
-            </div>
-          )}
-        </>
-      )}
+      {deck &&
+        addMode &&
+        (playtestMode || !hasPlaytest ? (
+          <>
+            <DeckCrypt deck={deck} inSearch />
+            <DeckLibrary deck={deck} inSearch />
+          </>
+        ) : (
+          <div className="flex">
+            <ErrorMessage>CONTAINS PLAYTEST CARDS</ErrorMessage>
+          </div>
+        ))}
     </FlexGapped>
   );
 };

@@ -1,6 +1,5 @@
-import React from 'react';
-import { DeckTags } from '@/components';
-import { TAGS } from '@/constants';
+import { DeckTags } from "@/components";
+import { TAGS } from "@/constants";
 
 const TwdResultTags = ({ tags }) => {
   return (

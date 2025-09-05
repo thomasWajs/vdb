@@ -1,9 +1,8 @@
-import React from 'react';
-import { SortButton } from '@/components';
-import { NAME, DATE } from '@/constants';
+import { SortButton } from "@/components";
+import { DATE, NAME } from "@/constants";
 
 const DeckSortButton = ({ sortMethod, onChange, noText }) => {
-  const sortMethods = { [NAME]: 'Name', [DATE]: 'Date' };
+  const sortMethods = { [NAME]: "N", [DATE]: "D" };
 
   return (
     <SortButton

@@ -1,13 +1,14 @@
-import React from 'react';
-import { Tab } from '@headlessui/react';
+import { Tab } from "@headlessui/react";
+import { twMerge } from "tailwind-merge";
 
 const TabButton = ({ children }) => {
   return (
     <Tab
       className={({ selected }) =>
-        `border-borderPrimary dark:border-borderPrimaryDark w-full rounded-sm border px-3 py-1.5 ${
-          selected ? 'bg-bgSecondary dark:bg-bgSecondaryDark' : ''
-        }`
+        twMerge(
+          "w-full cursor-pointer rounded-sm border border-borderPrimary px-3 py-1.5 dark:border-borderPrimaryDark",
+          selected && "bg-bgSecondary dark:bg-bgSecondaryDark",
+        )
       }
     >
       {children}

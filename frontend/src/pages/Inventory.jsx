@@ -1,31 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSearchParams } from 'react-router';
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+import { twMerge } from "tailwind-merge";
 import {
-  LoginBlock,
+  ButtonFloat,
+  ButtonFloatClose,
+  ButtonFloatMenu,
+  ErrorMessage,
+  FlexGapped,
   InventoryAddDeckModal,
   InventoryAddPreconModal,
   InventoryCryptWrapper,
   InventoryLibraryWrapper,
   InventoryMenu,
   InventoryShareModal,
+  LoginBlock,
   Modal,
-  ButtonFloat,
-  ButtonFloatMenu,
-  ButtonFloatClose,
-  ErrorMessage,
-  FlexGapped,
-} from '@/components';
-import { useApp } from '@/context';
-import { inventoryServices } from '@/services';
-import { CRYPT, LIBRARY, ALL } from '@/constants';
+} from "@/components";
+import { ALL, CRYPT, LIBRARY } from "@/constants";
+import { useApp } from "@/context";
+import { inventoryServices, storageServices } from "@/services";
+
+const INVENTORY_CATEGORY = "inventoryCategory";
 
 const Inventory = () => {
   const {
     inventoryMode,
     setInventoryMode,
     username,
-    isMobile,
     isDesktop,
     showMenuButtons,
     setShowMenuButtons,
@@ -37,7 +38,7 @@ const Inventory = () => {
 
   const [inventoryError, setInventoryError] = useState();
   const [searchParams] = useSearchParams();
-  const sharedKey = searchParams.get('key');
+  const sharedKey = searchParams.get("key");
   const [sharedCrypt, setSharedCrypt] = useState();
   const [sharedLibrary, setSharedLibrary] = useState();
   const [showShareModal, setShowShareModal] = useState(false);
@@ -56,10 +57,10 @@ const Inventory = () => {
     } catch (e) {
       switch (e.response.status) {
         case 401:
-          setInventoryError('NO INVENTORY WITH THIS KEY');
+          setInventoryError("NO INVENTORY WITH THIS KEY");
           break;
         default:
-          setInventoryError('CONNECTION PROBLEM');
+          setInventoryError("CONNECTION PROBLEM");
       }
       return;
     }
@@ -73,7 +74,9 @@ const Inventory = () => {
     }
   }, [sharedKey, cryptCardBase, libraryCardBase]);
 
-  const [category, setCategory] = useState(ALL);
+  const [category, setCategory] = useState(
+    storageServices.getLocalStorage(INVENTORY_CATEGORY) || ALL,
+  );
   const [showAddDeck, setShowAddDeck] = useState(false);
   const [showAddPrecon, setShowAddPrecon] = useState(false);
   const [clan, setClan] = useState(ALL);
@@ -86,14 +89,19 @@ const Inventory = () => {
     setShowFloatingButtons(true);
   };
 
+  const handleSetCategory = (value) => {
+    setCategory(value);
+    storageServices.setLocalStorage(INVENTORY_CATEGORY, value);
+  };
+
   return (
     <div className="inventory-container mx-auto">
       {(!sharedKey && username) || isSharedInventory ? (
         <FlexGapped>
           <div
             className={twMerge(
-              showCryptOnMobile ? 'flex' : 'hidden',
-              'basis-full flex-col sm:flex sm:basis-5/9 sm:gap-2 lg:gap-3 xl:gap-4',
+              showCryptOnMobile ? "flex" : "hidden",
+              "basis-full flex-col sm:flex sm:basis-5/9 sm:gap-2 lg:gap-3 xl:gap-4",
             )}
           >
             <InventoryCryptWrapper
@@ -106,8 +114,8 @@ const Inventory = () => {
           </div>
           <div
             className={twMerge(
-              showCryptOnMobile ? 'hidden' : 'flex',
-              'basis-full flex-col sm:flex sm:basis-4/9 sm:gap-2 lg:gap-3 xl:gap-4',
+              showCryptOnMobile ? "hidden" : "flex",
+              "basis-full flex-col sm:flex sm:basis-4/9 sm:gap-2 lg:gap-3 xl:gap-4",
             )}
           >
             <InventoryLibraryWrapper
@@ -127,7 +135,7 @@ const Inventory = () => {
               discipline={discipline}
               isSharedInventory={isSharedInventory}
               onlyNotes={onlyNotes}
-              setCategory={setCategory}
+              setCategory={handleSetCategory}
               setOnlyNotes={setOnlyNotes}
               setSharedCrypt={setSharedCrypt}
               setSharedLibrary={setSharedLibrary}
@@ -139,9 +147,13 @@ const Inventory = () => {
               type={type}
             />
           </div>
-          {isMobile && showFloatingButtons && (
-            <ButtonFloat onClick={() => setShowCryptOnMobile(!showCryptOnMobile)} position="middle">
-              <div className="text-[28px]">{showCryptOnMobile ? 'LIB' : 'CR'}</div>
+          {showFloatingButtons && (
+            <ButtonFloat
+              className="sm:hidden"
+              onClick={() => setShowCryptOnMobile(!showCryptOnMobile)}
+              position="middle"
+            >
+              <div className="text-2xl">{showCryptOnMobile ? "LIB" : "CR"}</div>
             </ButtonFloat>
           )}
         </FlexGapped>
@@ -163,7 +175,7 @@ const Inventory = () => {
             discipline={discipline}
             isSharedInventory={isSharedInventory}
             onlyNotes={onlyNotes}
-            setCategory={setCategory}
+            setCategory={handleSetCategory}
             setOnlyNotes={setOnlyNotes}
             setSharedCrypt={setSharedCrypt}
             setSharedLibrary={setSharedLibrary}

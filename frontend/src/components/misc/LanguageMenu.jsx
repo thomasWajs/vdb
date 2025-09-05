@@ -1,8 +1,7 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { Flag } from '@/components';
-import { useApp } from '@/context';
-import { EN, ES, FR, PT } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { Flag } from "@/components";
+import { EN, ES, FR, PT } from "@/constants";
+import { useApp } from "@/context";
 
 const LanguageMenu = ({ handleClose }) => {
   const { lang, changeLang } = useApp();
@@ -22,9 +21,9 @@ const LanguageMenu = ({ handleClose }) => {
             <div
               key={l}
               className={twMerge(
-                'cursor-pointer',
-                lang == l &&
-                  'rounded-full border-4 border-double border-fgSecondary dark:border-fgSecondaryDark',
+                "cursor-pointer",
+                lang === l &&
+                  "rounded-full border-4 border-fgSecondary border-double dark:border-fgSecondaryDark",
               )}
               onClick={() => handleClick(l)}
             >

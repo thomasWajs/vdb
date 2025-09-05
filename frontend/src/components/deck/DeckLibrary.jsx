@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import { useCallback, useState } from "react";
+import { twMerge } from "tailwind-merge";
 import {
-  DeckLibraryTable,
-  ResultLibraryType,
-  ResultModal,
   DeckDrawProbability,
   DeckLibraryHeader,
+  DeckLibraryTable,
   FlexGapped,
-} from '@/components';
-import { useApp } from '@/context';
-import { useModalCardController, useDeckLibrary } from '@/hooks';
-import { LIBRARY, TYPE_MASTER } from '@/constants';
+  ResultLibraryType,
+  ResultModal,
+} from "@/components";
+import { LIBRARY, TYPE_MASTER } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckLibrary, useModalCardController } from "@/hooks";
 
-const DeckLibrary = ({ inSearch, inPreview, inMissing, deck }) => {
-  const { setShowFloatingButtons, isMobile, isNarrow } = useApp();
+const DeckLibrary = ({ inTwd, inSearch, inPreview, inMissing, deck }) => {
+  const { setShowFloatingButtons, isDesktop, isMobile, isNarrow } = useApp();
   const [showInfo, setShowInfo] = useState(false);
 
   const {
@@ -34,30 +35,39 @@ const DeckLibrary = ({ inSearch, inPreview, inMissing, deck }) => {
     handleModalCardClose,
   } = useModalCardController(library, librarySide);
 
-  const handleClick = (card) => {
-    handleModalCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClick = useCallback(
+    (card) => {
+      handleModalCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [library, librarySide],
+  );
 
-  const handleClickSide = (card) => {
-    handleModalSideCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClickSide = useCallback(
+    (card) => {
+      handleModalSideCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [library, librarySide],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
-  };
+    !isDesktop && setShowFloatingButtons(true);
+  }, [library, librarySide]);
 
   return (
     <FlexGapped className="flex-col">
       <div className="flex flex-col gap-2">
         <div
-          className={
-            !inPreview && !inMissing && !inSearch && !isMobile
-              ? 'sticky z-10 bg-bgPrimary dark:bg-bgPrimaryDark sm:top-10'
-              : ''
-          }
+          className={twMerge(
+            !inPreview &&
+              !inMissing &&
+              !inSearch &&
+              !isMobile &&
+              "sticky top-10 z-10 bg-bgPrimary max-md:top-0 dark:bg-bgPrimaryDark",
+            inTwd && "hidden",
+          )}
         >
           <DeckLibraryHeader
             inMissing={inMissing}
@@ -96,6 +106,7 @@ const DeckLibrary = ({ inSearch, inPreview, inMissing, deck }) => {
                   inMissing={inMissing}
                   inSearch={inSearch}
                   shouldShowModal={shouldShowModal}
+                  inTwd={inTwd}
                 />
               </div>
             );
@@ -122,7 +133,7 @@ const DeckLibrary = ({ inSearch, inPreview, inMissing, deck }) => {
                     cards={librarySideByType[cardtype]}
                     inMissing={inMissing}
                     inSearch={inSearch}
-                    placement={isNarrow ? 'bottom' : 'right'}
+                    placement={isNarrow ? "bottom" : "right"}
                     shouldShowModal={shouldShowModal}
                   />
                 </div>

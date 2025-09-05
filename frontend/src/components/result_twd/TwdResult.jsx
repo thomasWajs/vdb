@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { TwdDeck, TwdDeckWrapper, TwdResultTotal, Button } from '@/components';
-import { decksSort } from '@/utils';
-import { useApp } from '@/context';
-import { CARDS, DECKID, DATE_NEW_OLD, DATE_OLD_NEW, PLAYERS } from '@/constants';
+import { useMemo, useState } from "react";
+import { Button, TwdDeck, TwdDeckWrapper, TwdResultTotal } from "@/components";
+import { CARDS, DATE_NEW_OLD, DATE_OLD_NEW, DECKID, PLAYERS } from "@/constants";
+import { useApp } from "@/context";
+import { decksSort } from "@/utils";
 
 const TwdResult = ({ results }) => {
   const { twdSearchSort, changeTwdSearchSort } = useApp();
@@ -11,9 +11,9 @@ const TwdResult = ({ results }) => {
   const [showCounter, setShowCounter] = useState(SHOW_COUNTER_STEP);
 
   const sortMethods = {
-    [DATE_NEW_OLD]: 'D↓',
-    [DATE_OLD_NEW]: 'D↑',
-    [PLAYERS]: 'P',
+    [DATE_NEW_OLD]: "D↓",
+    [DATE_OLD_NEW]: "D↑",
+    [PLAYERS]: "P",
   };
 
   const sortedDecks = useMemo(() => {
@@ -25,34 +25,32 @@ const TwdResult = ({ results }) => {
   }, [sortedDecks, showCounter, twdSearchSort]);
 
   return (
-    <>
-      <div className="flex flex-col gap-4">
-        <div>
-          <TwdResultTotal
-            results={results}
-            sortMethods={sortMethods}
-            sortMethod={twdSearchSort}
-            setSortMethod={changeTwdSearchSort}
-          />
-          <div className="flex flex-col gap-4">
-            {showedDecks.map((d) => {
-              return d[CARDS] ? (
-                <TwdDeck key={d[DECKID]} deck={d} />
-              ) : (
-                <TwdDeckWrapper key={d[DECKID]} deckid={d[DECKID]} />
-              );
-            })}
-          </div>
+    <div className="flex flex-col gap-4">
+      <div>
+        <TwdResultTotal
+          results={results}
+          sortMethods={sortMethods}
+          sortMethod={twdSearchSort}
+          setSortMethod={changeTwdSearchSort}
+        />
+        <div className="flex flex-col gap-4">
+          {showedDecks.map((d) => {
+            return d[CARDS] ? (
+              <TwdDeck key={d[DECKID]} deck={d} />
+            ) : (
+              <TwdDeckWrapper key={d[DECKID]} deckid={d[DECKID]} />
+            );
+          })}
         </div>
-        {deckCounter > showCounter && (
-          <div className="flex justify-center">
-            <Button onClick={() => setShowCounter(showCounter + SHOW_COUNTER_STEP)}>
-              Show More ({deckCounter - showCounter} left)
-            </Button>
-          </div>
-        )}
       </div>
-    </>
+      {deckCounter > showCounter && (
+        <div className="flex justify-center">
+          <Button onClick={() => setShowCounter(showCounter + SHOW_COUNTER_STEP)}>
+            Show More ({deckCounter - showCounter} left)
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 

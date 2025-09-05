@@ -1,8 +1,7 @@
-import React from 'react';
-import X from '@icons/x.svg?react';
-import { Button, ResultLibraryTypeImage, SortButton, Header } from '@/components';
-import { setLibraryCompare } from '@/context';
-import { TYPE } from '@/constants';
+import X from "@icons/x.svg?react";
+import { Button, Header, ResultLibraryTypeImage, SortButton } from "@/components";
+import { TYPE } from "@/constants";
+import { setLibraryCompare } from "@/context";
 
 const ResultLibraryTotal = ({
   cards,
@@ -15,7 +14,7 @@ const ResultLibraryTotal = ({
   const byTypes = {};
   let total = 0;
 
-  cards.map((card) => {
+  cards.forEach((card) => {
     if (byTypes[card[TYPE]]) {
       byTypes[card[TYPE]] += 1;
     } else {
@@ -26,10 +25,10 @@ const ResultLibraryTotal = ({
 
   return (
     <Header>
-      <div className="whitespace-nowrap p-2 font-bold">
-        {inHoF ? 'LIBRARY' : inCompare ? 'COMPARE' : 'TOTAL'}: {total}
+      <div className="whitespace-nowrap p-1 font-bold sm:p-2">
+        {inHoF ? "LIBRARY" : inCompare ? "COMPARE" : "TOTAL"}: {total}
       </div>
-      <div className={Object.keys(byTypes).length > 3 ? '' : 'flex items-center'}>
+      <div className={Object.keys(byTypes).length > 3 ? "" : "flex items-center"}>
         {Object.keys(byTypes).map((k) => {
           return (
             <div key={k} className="inline-block whitespace-nowrap px-2">

@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { twMerge } from 'tailwind-merge';
-import Gem from '@icons/gem.svg?react';
+import Gem from "@icons/gem.svg?react";
+import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import {
-  FlexGapped,
-  DeckCrypt,
-  DeckLibrary,
-  DeckExportButton,
   ButtonIconed,
+  DeckCrypt,
+  DeckExportButton,
+  DeckLibrary,
+  FlexGapped,
   Modal,
-} from '@/components';
-import { useApp } from '@/context';
-import { NAME, CRYPT, LIBRARY } from '@/constants';
+} from "@/components";
+import { CRYPT, LIBRARY, NAME } from "@/constants";
+import { useApp } from "@/context";
 
 const DeckMissingModal = ({ setShow, deck, missAllVtes, inInventory }) => {
   const { isMobile, setShowFloatingButtons, setShowMenuButtons } = useApp();
@@ -29,7 +29,7 @@ const DeckMissingModal = ({ setShow, deck, missAllVtes, inInventory }) => {
           <div className="basis-full md:basis-5/9">
             <div
               className={twMerge(
-                !(isMobile || inInventory) && 'top-[22px] z-10 bg-bgPrimary dark:bg-bgPrimaryDark',
+                !(isMobile || inInventory) && "top-[22px] z-10 bg-bgPrimary dark:bg-bgPrimaryDark",
               )}
             >
               <DeckCrypt
@@ -55,8 +55,8 @@ const DeckMissingModal = ({ setShow, deck, missAllVtes, inInventory }) => {
               onClick={() => setShowMissAll(!showMissAll)}
               text={
                 showMissAll
-                  ? 'Show Missing In Inventory'
-                  : 'Show Missing for Complete Collection (SLOW!)'
+                  ? "Show Missing In Inventory"
+                  : "Show Missing for Complete Collection (SLOW!)"
               }
               icon={<Gem />}
             />

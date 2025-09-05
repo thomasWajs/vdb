@@ -1,10 +1,11 @@
-import React from 'react';
-import { useSnapshot } from 'valtio';
-import { deckStore } from '@/context';
-import { DeckSortButton } from '@/components';
-import { TAGS, DECKS } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
+import { DeckSortButton, Header } from "@/components";
+import { DECKS, TAGS } from "@/constants";
+import { deckStore, useApp } from "@/context";
 
 const DeckSelectAdvTotal = ({ sortMethod, setSortMethod, tagsFilter, setTagsFilter }) => {
+  const { isMobile } = useApp();
   const decks = useSnapshot(deckStore)[DECKS];
   const byTags = {};
 
@@ -16,9 +17,9 @@ const DeckSelectAdvTotal = ({ sortMethod, setSortMethod, tagsFilter, setTagsFilt
     }
   };
 
-  Object.values(decks).map((deck) => {
+  Object.values(decks).forEach((deck) => {
     if (deck[TAGS]) {
-      deck[TAGS].map((tag) => {
+      deck[TAGS].forEach((tag) => {
         if (byTags[tag]) {
           byTags[tag] += 1;
         } else {
@@ -29,8 +30,15 @@ const DeckSelectAdvTotal = ({ sortMethod, setSortMethod, tagsFilter, setTagsFilt
   });
 
   return (
-    <div className="flex items-center justify-between bg-bgSecondary dark:bg-bgSecondaryDark">
-      <div className="whitespace-nowrap p-2 font-bold">TOTAL: {Object.keys(decks).length}</div>
+    <Header
+      className={twMerge(
+        "sm:space-x-2",
+        isMobile && Object.keys(byTags).length > 10 ? "block" : "flex",
+      )}
+    >
+      <div className="whitespace-nowrap p-1 font-bold sm:p-2">
+        TOTAL: {Object.keys(decks).length}
+      </div>
       <div>
         {Object.keys(byTags)
           .toSorted()
@@ -49,8 +57,10 @@ const DeckSelectAdvTotal = ({ sortMethod, setSortMethod, tagsFilter, setTagsFilt
             );
           })}
       </div>
-      <DeckSortButton sortMethod={sortMethod} onChange={setSortMethod} />
-    </div>
+      <div className="flex justify-end">
+        <DeckSortButton sortMethod={sortMethod} onChange={setSortMethod} />
+      </div>
+    </Header>
   );
 };
 

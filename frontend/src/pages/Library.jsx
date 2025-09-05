@@ -1,7 +1,7 @@
-import React, { useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
+import { useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router";
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
 import {
   ButtonFloatAdd,
   ButtonFloatClose,
@@ -10,17 +10,17 @@ import {
   FlexGapped,
   LibrarySearchForm,
   ResultLibrary,
-} from '@/components';
+} from "@/components";
+import { DECK, DECKID, DECKS, LIBRARY, LIBRARY_COMPARE } from "@/constants";
 import {
-  useApp,
-  searchResults,
-  setLibraryResults,
-  setLibraryCompare,
-  setDeck,
   deckStore,
-} from '@/context';
-import { DECKID, LIBRARY, LIBRARY_COMPARE, DECK, DECKS } from '@/constants';
-import { getIsEditable } from '@/utils';
+  searchResults,
+  setDeck,
+  setLibraryCompare,
+  setLibraryResults,
+  useApp,
+} from "@/context";
+import { getIsEditable } from "@/utils";
 
 const Library = () => {
   const { addMode, toggleAddMode, isMobile, isDesktop, showFloatingButtons, lastDeckId } = useApp();
@@ -28,7 +28,7 @@ const Library = () => {
   const { [LIBRARY]: libraryResults, [LIBRARY_COMPARE]: libraryCompare } =
     useSnapshot(searchResults);
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = JSON.parse(searchParams.get('q'));
+  const query = JSON.parse(searchParams.get("q"));
   const isEditable = getIsEditable(deck);
 
   const showSearchForm = useMemo(() => {
@@ -60,18 +60,17 @@ const Library = () => {
   return (
     <div className="search-container mx-auto">
       <FlexGapped>
-        {!isMobile && (
-          <div
-            className={twMerge(
-              showSearchForm ? 'lg:basis-1/12' : 'sm:basis-5/12 lg:basis-6/12',
-              deck && addMode ? 'xl:basis-4/12' : 'xl:basis-2/12',
-            )}
-          >
-            {decks !== undefined && (isDesktop || (!isDesktop && !showSearchForm)) && (
-              <DeckSelectorAndDisplay />
-            )}
-          </div>
-        )}
+        <div
+          className={twMerge(
+            showSearchForm ? "lg:basis-1/12" : "sm:basis-5/12 lg:basis-6/12",
+            deck && addMode ? "xl:basis-4/12" : "xl:basis-2/12",
+            "max-sm:hidden",
+          )}
+        >
+          {decks !== undefined && (isDesktop || (!isDesktop && !showSearchForm)) && (
+            <DeckSelectorAndDisplay />
+          )}
+        </div>
         {showResultCol && (
           <div className="basis-full sm:basis-7/12 lg:basis-6/12 xl:basis-5/12">
             {((isMobile && libraryCompare && libraryResults) || (!isMobile && libraryCompare)) && (
@@ -89,17 +88,17 @@ const Library = () => {
             <div className="basis-full max-sm:p-2 sm:basis-5/12 lg:basis-4/12 xl:basis-3/12">
               <LibrarySearchForm />
             </div>
-            <div className={deck && addMode ? 'hidden' : 'hidden lg:flex lg:basis-1/12'} />
+            <div className={deck && addMode ? "hidden" : "hidden lg:flex lg:basis-1/12"} />
           </>
         )}
       </FlexGapped>
       {showToggleAddMode && (
         <ButtonFloatDeckOrSearch addMode={addMode} toggleAddMode={toggleAddMode} />
       )}
-      {isMobile && showFloatingButtons && showResultCol && (
+      {showFloatingButtons && showResultCol && (
         <>
-          <ButtonFloatClose handleClose={handleClear} />
-          {isEditable && <ButtonFloatAdd />}
+          <ButtonFloatClose className="sm:hidden" handleClose={handleClear} />
+          {isEditable && <ButtonFloatAdd className="sm:hidden" />}
         </>
       )}
     </div>

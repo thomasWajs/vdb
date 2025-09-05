@@ -1,15 +1,14 @@
-import React, { useMemo } from 'react';
-import { FixedSizeList } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import { twMerge } from 'tailwind-merge';
-import { WindowRows, ResultModal, InventoryLibraryTableRow } from '@/components';
-import { getIsPlaytest, librarySort } from '@/utils';
-import { useApp } from '@/context';
-import { useModalCardController } from '@/hooks';
-import { ID } from '@/constants';
+import { useCallback } from "react";
+import { List } from "react-window";
+import { twMerge } from "tailwind-merge";
+import { InventoryLibraryTableRow, ResultModal, WindowRows } from "@/components";
+import { ID, VALUE } from "@/constants";
+import { useApp } from "@/context";
+import { useModalCardController } from "@/hooks";
+import { getIsPlaytest, librarySort } from "@/utils";
 
 const InventoryLibraryTable = ({ cards, sortMethod, compact, withCompact, newFocus, inShared }) => {
-  const { playtestMode, setShowFloatingButtons } = useApp();
+  const { playtestMode, setShowFloatingButtons, isDesktop } = useApp();
   const sortedCards = librarySort(cards, sortMethod);
 
   const {
@@ -20,27 +19,31 @@ const InventoryLibraryTable = ({ cards, sortMethod, compact, withCompact, newFoc
     handleModalCardClose,
   } = useModalCardController(sortedCards);
 
-  const handleClick = (card) => {
-    handleModalCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClick = useCallback(
+    (card) => {
+      handleModalCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [sortedCards],
+  );
 
-  const cardRows = useMemo(() => {
-    return sortedCards
-      .filter((card) => playtestMode || !getIsPlaytest(card.c[ID]))
-      .map((card) => {
-        return (
-          <InventoryLibraryTableRow
-            key={card.c[ID]}
-            card={card}
-            compact={compact}
-            newFocus={newFocus}
-            inShared={inShared}
-            handleClick={handleClick}
-          />
-        );
-      });
+  const handleClose = useCallback(() => {
+    handleModalCardClose();
+    !isDesktop && setShowFloatingButtons(true);
   }, [sortedCards]);
+
+  const cardRows = sortedCards
+    .filter((card) => playtestMode || !getIsPlaytest(card.c[ID]))
+    .map((card) => (
+      <InventoryLibraryTableRow
+        key={card.c[ID]}
+        card={card}
+        compact={compact}
+        newFocus={newFocus}
+        inShared={inShared}
+        handleClick={handleClick}
+      />
+    ));
 
   return (
     <>
@@ -52,33 +55,26 @@ const InventoryLibraryTable = ({ cards, sortMethod, compact, withCompact, newFoc
         <div
           className={twMerge(
             !inShared && withCompact
-              ? 'h-[calc(100dvh-262px)] sm:h-[calc(100dvh-291px)] lg:h-[calc(100dvh-314px)] xl:h-[calc(100dvh-340px)]'
-              : 'h-[calc(100dvh-217px)] sm:h-[calc(100dvh-237px)] lg:h-[calc(100dvh-257px)] xl:h-[calc(100dvh-277px)]',
+              ? "h-[calc(100dvh-262px)] sm:h-[calc(100dvh-291px)] lg:h-[calc(100dvh-314px)] xl:h-[calc(100dvh-340px)]"
+              : "h-[calc(100dvh-217px)] sm:h-[calc(100dvh-237px)] lg:h-[calc(100dvh-257px)] xl:h-[calc(100dvh-277px)]",
             inShared &&
-              'h-[calc(100dvh-160px)] sm:h-[calc(100dvh-190px)] lg:h-[calc(100dvh-200px)] xl:h-[calc(100dvh-210px)]',
+              "h-[calc(100dvh-160px)] sm:h-[calc(100dvh-190px)] lg:h-[calc(100dvh-200px)] xl:h-[calc(100dvh-210px)]",
           )}
         >
-          <AutoSizer>
-            {({ width, height }) => (
-              <FixedSizeList
-                className="border-bgSecondary dark:border-bgSecondaryDark sm:border"
-                height={height}
-                width={width}
-                itemCount={cardRows.length}
-                itemSize={45}
-                itemData={cardRows}
-              >
-                {WindowRows}
-              </FixedSizeList>
-            )}
-          </AutoSizer>
+          <List
+            className="border-bgSecondary sm:border dark:border-bgSecondaryDark"
+            rowComponent={WindowRows}
+            rowCount={cardRows.length}
+            rowHeight={45}
+            rowProps={{ [VALUE]: cardRows }}
+          />
         </div>
       )}
       {shouldShowModal && (
         <ResultModal
           card={currentModalCard}
           handleModalCardChange={handleModalCardChange}
-          handleClose={handleModalCardClose}
+          handleClose={handleClose}
           forceInventoryMode
         />
       )}

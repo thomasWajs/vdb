@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
-import { useSnapshot } from 'valtio';
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
   ButtonClose,
   ButtonFloatClose,
@@ -16,9 +16,7 @@ import {
   TwdSearchFormLibrary,
   TwdSearchFormLibraryTotal,
   TwdSearchFormTags,
-} from '@/components';
-import { filterDecks, sanitizeFormState } from '@/utils';
-import { useApp, setTdaResults, searchTdaForm, clearTdaForm, tdaStore } from '@/context';
+} from "@/components";
 import {
   CAPACITY,
   CARDTYPES,
@@ -36,15 +34,17 @@ import {
   TAGS,
   TDA,
   TRAITS,
-} from '@/constants';
+} from "@/constants";
+import { clearTdaForm, searchTdaForm, setTdaResults, tdaStore, useApp } from "@/context";
+import { filterDecks, sanitizeFormState } from "@/utils";
 
-const TdaSearchForm = () => {
-  const { cryptCardBase, libraryCardBase, isMobile } = useApp();
+const TdaSearchForm = ({ setShowForm }) => {
+  const { cryptCardBase, libraryCardBase, showFloatingButtons, isMobile } = useApp();
   const tdaFormState = useSnapshot(searchTdaForm);
   const decks = useSnapshot(tdaStore)[DECKS];
   const [error, setError] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = JSON.parse(searchParams.get('q'));
+  const query = JSON.parse(searchParams.get("q"));
 
   useEffect(() => {
     if (query) {
@@ -69,52 +69,72 @@ const TdaSearchForm = () => {
     }
   }, [tdaFormState, cryptCardBase, libraryCardBase]);
 
-  const handleMultiSelectChange = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
-    searchTdaForm[name].value[i] = value;
-  };
+  const handleMultiSelectChange = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
+      searchTdaForm[name].value[i] = value;
+    },
+    [searchTdaForm],
+  );
 
-  const handleChangeWithOpt = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
+  const handleChangeWithOpt = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
 
-    searchTdaForm[i][name] = value;
-  };
+      searchTdaForm[i][name] = value;
+    },
+    [searchTdaForm],
+  );
 
-  const handleDisciplinesChange = (name) => {
-    searchTdaForm[DISCIPLINES][name] = !searchTdaForm[DISCIPLINES][name];
-  };
+  const handleDisciplinesChange = useCallback(
+    (name) => {
+      searchTdaForm[DISCIPLINES][name] = !searchTdaForm[DISCIPLINES][name];
+    },
+    [searchTdaForm],
+  );
 
-  const handleMultiChange = (event) => {
-    const { name, value } = event.currentTarget;
-    searchTdaForm[name][value] = !searchTdaForm[name][value];
-  };
+  const handleMultiChange = useCallback(
+    (event) => {
+      const { name, value } = event.currentTarget;
+      searchTdaForm[name][value] = !searchTdaForm[name][value];
+    },
+    [searchTdaForm],
+  );
 
-  const handleClear = () => {
+  const handleTagsChange = useCallback(
+    (name, target, value) => {
+      searchTdaForm[name][target] = value;
+    },
+    [searchTdaForm],
+  );
+
+  const handleClear = useCallback(() => {
     clearTdaForm();
     setTdaResults();
     setError(false);
-  };
+  }, []);
 
   const processSearch = () => {
     setError(false);
     const sanitizedForm = sanitizeFormState(TDA, searchTdaForm);
 
     if (Object.entries(sanitizedForm).length === 0) {
-      setError('EMPTY REQUEST');
+      setShowForm();
       return;
     }
 
     const filteredDecks = filterDecks(decks, sanitizedForm);
 
-    if (isMobile && filteredDecks.length == 0) {
-      setError('NO DECKS FOUND');
+    if (isMobile && filteredDecks.length === 0) {
+      setError("NO DECKS FOUND");
       return;
     }
 
     setSearchParams({ q: JSON.stringify(sanitizedForm) });
     setTdaResults(filteredDecks);
+    setShowForm();
   };
 
   return (
@@ -164,11 +184,11 @@ const TdaSearchForm = () => {
         onChange={handleDisciplinesChange}
       />
       <TwdSearchFormCardtypes value={tdaFormState[CARDTYPES]} onChange={handleChangeWithOpt} />
-      <TwdSearchFormTags value={tdaFormState[TAGS]} onChange={handleMultiChange} />
-      {isMobile && (
+      <TwdSearchFormTags value={tdaFormState[TAGS]} onChange={handleTagsChange} />
+      {showFloatingButtons && (
         <>
-          <ButtonFloatClose handleClose={handleClear} position="middle" />
-          <ButtonFloatSearch handleSearch={processSearch} error={error} />
+          <ButtonFloatClose className="sm:hidden" handleClose={handleClear} position="middle" />
+          <ButtonFloatSearch className="sm:hidden" handleSearch={processSearch} error={error} />
         </>
       )}
     </div>

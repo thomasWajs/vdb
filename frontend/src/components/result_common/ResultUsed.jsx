@@ -1,10 +1,9 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
-import { UsedPopover, Tooltip } from '@/components';
-import { getSoftMax, getHardTotal } from '@/utils';
-import { useApp, inventoryStore, usedStore } from '@/context';
-import { ID, CRYPT, LIBRARY } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
+import { Tooltip, UsedPopover } from "@/components";
+import { CRYPT, ID, LIBRARY } from "@/constants";
+import { inventoryStore, useApp, usedStore } from "@/context";
+import { getHardTotal, getSoftMax } from "@/utils";
 
 const ResultUsed = ({ card }) => {
   const { isDesktop } = useApp();
@@ -21,26 +20,26 @@ const ResultUsed = ({ card }) => {
   const isInventoryNote = inventory[card[ID]]?.t;
 
   return (
-    <Tooltip placement={isDesktop ? 'left' : 'bottom'} overlay={<UsedPopover cardid={card[ID]} />}>
+    <Tooltip placement={isDesktop ? "left" : "bottom"} overlay={<UsedPopover cardid={card[ID]} />}>
       {(inInventory > 0 || softUsedMax + hardUsedTotal > 0) && (
         <div
           className={twMerge(
-            'mx-1 flex items-center px-0.5',
+            "mx-1 flex items-center px-0.5",
             inInventory < softUsedMax + hardUsedTotal &&
-              'bg-bgError text-white dark:bg-bgErrorDark dark:text-whiteDark',
+              "bg-bgError text-white dark:bg-bgErrorDark dark:text-whiteDark",
           )}
         >
           <div className="flex basis-3/5 justify-center text-lg">
-            {isInventoryNote && <div className="min-w-[4px]"></div>}
+            {isInventoryNote && <div className="min-w-[4px]" />}
             {inInventory}
             {isInventoryNote && <div className="max-w-[4px] text-sm">*</div>}
           </div>
           <div
             className={twMerge(
-              'flex basis-2/5 justify-center text-sm',
+              "flex basis-2/5 justify-center text-sm",
               inInventory >= softUsedMax + hardUsedTotal
-                ? 'text-midGray dark:text-midGrayDark'
-                : 'text-white dark:text-white',
+                ? "text-midGray dark:text-midGrayDark"
+                : "text-white dark:text-white",
             )}
           >
             {inInventory >= softUsedMax + hardUsedTotal

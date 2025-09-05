@@ -1,8 +1,7 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { ResultDisciplineImage } from '@/components';
-import disciplinesList from '@/assets/data/disciplinesList.json';
-import disciplinesExtraList from '@/assets/data/disciplinesExtraList.json';
+import { twMerge } from "tailwind-merge";
+import disciplinesExtraList from "@/assets/data/disciplinesExtraList.json";
+import disciplinesList from "@/assets/data/disciplinesList.json";
+import { ResultDisciplineImage } from "@/components";
 
 const CryptSearchFormDisciplines = ({ value, onChange, withExtra }) => {
   const disciplines = withExtra
@@ -15,8 +14,8 @@ const CryptSearchFormDisciplines = ({ value, onChange, withExtra }) => {
         <div
           key={i}
           className={twMerge(
-            'flex h-[39px] w-[39px] cursor-pointer items-center justify-center',
-            !value[i] && 'opacity-40',
+            "flex h-[39px] w-[39px] cursor-pointer items-center justify-center",
+            !value[i] && "opacity-40",
           )}
           onClick={() => onChange(i, 2)}
         >

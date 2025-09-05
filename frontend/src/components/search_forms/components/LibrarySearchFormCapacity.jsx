@@ -1,21 +1,17 @@
-import React from 'react';
-import { Select } from '@/components';
-import { useApp } from '@/context';
-import { CAPACITY, ANY, LE, GE } from '@/constants';
+import { Select } from "@/components";
+import { ANY, CAPACITY, GE, LE } from "@/constants";
 
 const LibrarySearchFormCapacity = ({ value, onChange }) => {
-  const { isXWide } = useApp();
-  const maxMenuHeight = isXWide ? 500 : 350;
   const name = CAPACITY;
-  const options = ['ANY', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'].map((i) => ({
+  const options = ["ANY", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"].map((i) => ({
     value: i.toLowerCase(),
     name: name,
     label: <div className="flex justify-center">{i}</div>,
   }));
 
   const morelessOptions = [
-    [LE, '<='],
-    [GE, '>='],
+    [LE, "<="],
+    [GE, ">="],
   ].map((i) => ({
     value: i[0],
     name: name,
@@ -31,7 +27,6 @@ const LibrarySearchFormCapacity = ({ value, onChange }) => {
         <div className="w-1/2">
           <Select
             options={morelessOptions}
-            isSearchable={false}
             name={0}
             value={morelessOptions.find((obj) => obj.value === value.moreless)}
             onChange={onChange}
@@ -40,10 +35,8 @@ const LibrarySearchFormCapacity = ({ value, onChange }) => {
         <div className="w-1/2">
           <Select
             options={options}
-            isSearchable={false}
             isClearable={value[name] !== ANY}
             name={0}
-            maxMenuHeight={maxMenuHeight}
             value={options.find((obj) => obj.value === value[name])}
             onChange={(e, id) => (e ? onChange(e, id) : onChange({ name: name, value: ANY }, id))}
           />

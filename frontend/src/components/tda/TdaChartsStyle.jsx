@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis } from 'recharts';
-import { useApp } from '@/context';
-import { SUPERIOR, BASE, NAME, TAGS, VALUE } from '@/constants';
+import { useMemo } from "react";
+import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
+import { BASE, NAME, SUPERIOR, TAGS, VALUE } from "@/constants";
+import { useApp } from "@/context";
 
 const TdaChartsStyle = ({ decks }) => {
   const { isMobile, isDesktop, isWide } = useApp();
   const data = useMemo(() => {
     const qty = Object.keys(decks).length;
+
     const result = {};
 
     Object.values(decks).forEach((deck) => {
@@ -28,36 +29,44 @@ const TdaChartsStyle = ({ decks }) => {
 
     return [
       {
-        [NAME]: 'Bleed',
-        [VALUE]: result.bleed / qty || 0,
+        [NAME]: "Bleed",
+        [VALUE]: (result.bleed / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Stealth',
-        [VALUE]: result.stealth / qty || 0,
+        [NAME]: "Stealth",
+        [VALUE]: (result.stealth / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Block',
-        [VALUE]: result.block / qty || 0,
+        [NAME]: "Block",
+        [VALUE]: (result.block / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Rush',
-        [VALUE]: result.rush / qty || 0,
+        [NAME]: "Rush",
+        [VALUE]: (result.rush / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Combat',
-        [VALUE]: result.combat / qty || 0,
+        [NAME]: "Combat",
+        [VALUE]: (result.combat / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Ally',
-        [VALUE]: result.ally / qty || 0,
+        [NAME]: "Ally",
+        [VALUE]: (result.ally / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Swarm',
-        [VALUE]: result.swarm / qty || 0,
+        [NAME]: "Swarm",
+        [VALUE]: (result.swarm / qty) * 10 || 0,
+        fullMark: 10,
       },
       {
-        [NAME]: 'Vote',
-        [VALUE]: result.vote / qty || 0,
+        [NAME]: "Vote",
+        [VALUE]: (result.vote / qty) * 10 || 0,
+        fullMark: 10,
       },
     ];
   }, [decks]);

@@ -71,6 +71,8 @@ def generate_card(card):
         except ValueError:
             pass
 
+    card["Card Text"] = re.sub("[{}]", "", card["Card Text"])
+
     # Convert sets to dict
     if not card["Set"]:
         card["Set"] = {"playtest": {}}
@@ -112,6 +114,8 @@ def generate_card(card):
                 for precon in precons:
                     if "PL" in precon:
                         card["Set"]["V5L"] = {}
+                    elif "PH" in precon:
+                        card["Set"]["V5H"] = {}
                     else:
                         card["Set"]["V5"] = {}
 
@@ -142,10 +146,16 @@ def generate_card(card):
                         card["Set"]["Anthology I"][""] = precon
                         card["Set"]["Anthology"][""] = precon
 
-            # Split Lasombra from V5 (2020) set
+            # Split Hecata & Lasombra from V5 (2020) set
             elif set[0] == "V5":
                 for precon in precons:
-                    set_name = "V5" if "PL" not in precon else "V5L"
+                    set_name = None
+                    if "PL" in precon:
+                        set_name = "V5L"
+                    elif "PH" in precon:
+                        set_name = "V5H"
+                    else:
+                        set_name = "V5"
                     if m := re.match(r"^(\D+)([0-9]+)?", precon):
                         card["Set"][set_name][m.group(1)] = m.group(2)
 
@@ -238,7 +248,6 @@ def generate_card(card):
     if card["Clan"] == "Follower of Set":
         card["Clan"] = "Ministry"
 
-    card["Card Text"] = re.sub("[{}]", "", card["Card Text"])
     card["Card Text"] = (
         card["Card Text"]
         .replace("Assamites", "Banu Haqim")
@@ -308,7 +317,16 @@ with open(
 ) as cardbase_file_playtest, open(
     "playtest/cardbase_crypt_playtest.min.json", "w", encoding="utf8"
 ) as cardbase_file_min_playtest:
-    reader_playtest = csv.reader(cardbase_csv_playtest)
-    fieldnames_playtest = next(reader_playtest)
-    csv_cards_playtest = csv.DictReader(cardbase_csv_playtest, fieldnames_playtest)
-    generate_cards(csv_cards_playtest, cardbase_file_playtest, cardbase_file_min_playtest)
+    success = False
+    try:
+        reader_playtest = csv.reader(cardbase_csv_playtest)
+        fieldnames_playtest = next(reader_playtest)
+        csv_cards_playtest = csv.DictReader(cardbase_csv_playtest, fieldnames_playtest)
+        generate_cards(csv_cards_playtest, cardbase_file_playtest, cardbase_file_min_playtest)
+        success = True
+    except StopIteration:
+        print("PLAYTEST CRYPT DISABLED - NO PLAYTEST FILES FOUND")
+    finally:
+        if not success:
+            json.dump({}, cardbase_file_min_playtest, separators=(",", ":"))
+            json.dump({}, cardbase_file_playtest, indent=4, separators=(",", ":"))

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useImmer } from 'use-immer';
-import { FlexGapped, Modal, Button, DeckProxyCrypt, DeckProxyLibrary } from '@/components';
-import { useApp, usedStore, inventoryStore } from '@/context';
-import { getHardTotal, getSoftMax } from '@/utils';
-import { pdfServices } from '@/services';
-import { PRINT, SET, ID, INVENTORY_TYPE, SOFT, HARD, CRYPT, LIBRARY } from '@/constants';
+import { useState } from "react";
+import { useImmer } from "use-immer";
+import { Button, DeckProxyCrypt, DeckProxyLibrary, FlexGapped, Modal } from "@/components";
+import { CRYPT, HARD, ID, INVENTORY_TYPE, LIBRARY, PRINT, SET, SOFT } from "@/constants";
+import { inventoryStore, useApp, usedStore } from "@/context";
+import { pdfServices } from "@/services";
+import { getHardTotal, getSoftMax } from "@/utils";
 
 const DeckProxySelectModal = ({ deck, setShow }) => {
   const {
@@ -28,14 +28,14 @@ const DeckProxySelectModal = ({ deck, setShow }) => {
     Object.keys(deck[CRYPT]).forEach((cardid) => {
       cards[cardid] = {
         [PRINT]: false,
-        [SET]: '',
+        [SET]: "",
         q: deck[CRYPT][cardid].q,
       };
     });
     Object.keys(deck[LIBRARY]).forEach((cardid) => {
       cards[cardid] = {
         [PRINT]: false,
-        [SET]: '',
+        [SET]: "",
         q: deck[LIBRARY][cardid].q,
       };
     });

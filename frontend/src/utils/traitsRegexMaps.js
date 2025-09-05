@@ -9,15 +9,16 @@ import {
   EMBRACE,
   ENTER_COMBAT,
   FLIGHT,
+  HAND_SIZE,
   INFERNAL,
   INTERCEPT,
   INTERCEPT_1,
   NAME,
-  PREVENT,
   PRESS,
+  PREVENT,
   PUT_BLOOD,
-  REDUCE_BLEED,
   RED_LIST,
+  REDUCE_BLEED,
   SERAPH,
   STEALTH,
   STEALTH_1,
@@ -26,21 +27,21 @@ import {
   STRENGTH_2,
   UNLOCK,
   VOTES_TITLE,
-} from '@/constants';
+} from "@/constants";
 
 export const CryptTraitsRegexMap = {
   [ENTER_COMBAT]: (card) =>
-    `(he|she|it|they|${card[NAME].match(/^\S+/i)[0].replace(/,/, '')}) (can|may|attempt)(?! ?not)(.* to)? enter combat`,
+    `(he|she|it|they|${card[NAME].match(/^\S+/i)[0].replace(/,/, "")}) (can|may|attempt)(?! ?not)(.* to)? enter combat`,
   [PRESS]: () => /gets (.*)?optional press/i,
-  [BLEED_1]: () => /[:.] \+[1-9] bleed./i,
+  [BLEED_1]: () => /[:.] \+\d bleed./i,
   [BLEED_2]: () => /[:.] \+[2-9] bleed./i,
-  [STRENGTH_1]: () => /[:.] \+[1-9] strength./i,
+  [STRENGTH_1]: () => /[:.] \+\d strength./i,
   [STRENGTH_2]: () => /[:.] \+[2-9] strength./i,
-  [INTERCEPT_1]: () => /[:.] \+[1-9] intercept./i,
-  [STEALTH_1]: () =>
-    /([:.] \+[1-9] stealth.|gets \+[1-9] stealth on each of (his|her|they) actions)/i,
+  [INTERCEPT_1]: () => /[:.] \+\d intercept./i,
+  [STEALTH_1]: () => /([:.] \+\d stealth.|gets \+\d stealth on each of (his|her|they) actions)/i,
   [UNLOCK]: () => /(?!not )unlock(?! phase|ed)|wakes/i,
   [BLACK_HAND]: () => /black hand[ .:]/i,
+  [HAND_SIZE]: () => /(\+\d|X hand size)|(hand size is.*(increased|larger))/i,
   [SERAPH]: () => /seraph[.:]/i,
   [INFERNAL]: () => /infernal[.:]/i,
   [RED_LIST]: () => /red list[.:]/i,
@@ -52,10 +53,10 @@ export const CryptTraitsRegexMap = {
 
 export const LibraryTraitsRegexMap = {
   [INTERCEPT]: () =>
-    /-[0-9]+ stealth(?! \(d\))(?! \w)(?! action)|\+[0-9]+ intercept|gets -([0-9]|x)+ stealth|stealth to 0/i,
-  [STEALTH]: () => /\+[0-9]+ stealth(?! \(d\))(?! \w)(?! action)|-[0-9]+ intercept/i,
-  [BLEED]: () => /\+([0-9]+|X) bleed/i,
-  [STRENGTH]: () => /\+[0-9]+ strength/i,
+    /-\d+ stealth(?! \(d\))(?! \w)(?! action)|\+\d+ intercept|gets -(\d|x)+ stealth|stealth to 0/i,
+  [STEALTH]: () => /\+\d+ stealth(?! (action|equip|hunt|employ|political|\(d\)))|-\d+ intercept/i,
+  [BLEED]: () => /\+(\d+|X) bleed/i,
+  [STRENGTH]: () => /\+\d+ strength/i,
   [EMBRACE]: () => /becomes a.*(\d[ -]|same.*)capacity/i,
   [BOUNCE_BLEED]: () => /change the target of the bleed|is now bleeding/i,
   [UNLOCK]: () => /(?!not )unlock(?! phase|ed)|wakes/i,

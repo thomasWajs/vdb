@@ -1,51 +1,47 @@
-import React from 'react';
 import {
-  Select,
   SearchAdditionalForms,
-  SearchFormButtonLogicToggle,
   SearchFormButtonAdd,
   SearchFormButtonDel,
-} from '@/components';
-import { useApp } from '@/context';
+  SearchFormButtonLogicToggle,
+  Select,
+} from "@/components";
 import {
   ANY,
-  TITLED,
+  ARCHBISHOP,
+  BARON,
+  BISHOP,
+  CARDINAL,
+  INNER_CIRCLE,
+  JUSTICAR,
+  LOGIC,
+  MAGAJI,
   NON_TITLED,
   PRIMOGEN,
   PRINCE,
-  JUSTICAR,
-  INNER_CIRCLE,
-  BARON,
-  BISHOP,
-  ARCHBISHOP,
   PRISCUS,
-  CARDINAL,
   REGENT,
-  MAGAJI,
   TITLE,
-  LOGIC,
-} from '@/constants';
+  TITLED,
+} from "@/constants";
 
 const LibrarySearchFormTitle = ({ value, onChange, searchForm }) => {
-  const { isXWide } = useApp();
-  const maxMenuHeight = isXWide ? 500 : 350;
   const name = TITLE;
 
   const options = [
-    ['ANY', ANY],
-    ['Non-titled', NON_TITLED],
-    ['Titled', TITLED],
-    ['Primogen', PRIMOGEN],
-    ['Prince', PRINCE],
-    ['Justicar', JUSTICAR],
-    ['Inner Circle', INNER_CIRCLE],
-    ['Baron', BARON],
-    ['Bishop', BISHOP],
-    ['Archbishop', ARCHBISHOP],
-    ['Priscus', PRISCUS],
-    ['Cardinal', CARDINAL],
-    ['Regent', REGENT],
-    ['Magaji', MAGAJI],
+    ["ANY", ANY],
+    ["Non-titled", NON_TITLED],
+    ["Titled", TITLED],
+    ["Primogen", PRIMOGEN],
+    ["Prince", PRINCE],
+    ["Justicar", JUSTICAR],
+    ["Inner Circle", INNER_CIRCLE],
+    ["Baron", BARON],
+    ["Bishop", BISHOP],
+    ["Archbishop", ARCHBISHOP],
+    ["Priscus", PRISCUS],
+    ["Cardinal", CARDINAL],
+    ["Regent", REGENT],
+    ["Magaji", MAGAJI],
   ].map((i) => ({
     value: i[1],
     name: name,
@@ -69,7 +65,7 @@ const LibrarySearchFormTitle = ({ value, onChange, searchForm }) => {
                 value={value[LOGIC]}
                 searchForm={searchForm}
               />
-              {value.value.length == 1 ? (
+              {value.value.length === 1 ? (
                 <SearchFormButtonAdd searchForm={searchForm} name={name} />
               ) : (
                 <SearchFormButtonDel searchForm={searchForm} i={0} name={name} />
@@ -80,10 +76,8 @@ const LibrarySearchFormTitle = ({ value, onChange, searchForm }) => {
         <div className="w-3/4">
           <Select
             options={options}
-            isSearchable={false}
             isClearable={value.value[0] !== ANY}
             name={0}
-            maxMenuHeight={maxMenuHeight}
             value={options.find((obj) => obj.value === value.value[0])}
             onChange={(e, id) => (e ? onChange(e, id) : onChange({ name: name, value: ANY }, id))}
           />
@@ -97,7 +91,6 @@ const LibrarySearchFormTitle = ({ value, onChange, searchForm }) => {
           searchForm={searchForm}
           options={options}
           onChange={onChange}
-          maxMenuHeight={maxMenuHeight}
         />
       )}
     </>

@@ -1,44 +1,43 @@
-import React from 'react';
-import { ResultCryptTitle } from '@/components';
-import { capitalize } from '@/utils';
+import sectsOpts from "@/assets/data/sectsList.json";
+import { ResultCryptTitle } from "@/components";
 import {
+  ARCHBISHOP,
+  BARON,
+  BISHOP,
   CAPACITY,
+  CARDINAL,
+  INNER_CIRCLE,
+  JUSTICAR,
+  MAGAJI,
   PRIMOGEN,
   PRINCE,
-  JUSTICAR,
-  INNER_CIRCLE,
-  BARON,
+  PRISCUS,
+  REGENT,
+  TITLED,
   VOTE_1,
   VOTE_2,
-  BISHOP,
-  ARCHBISHOP,
-  PRISCUS,
-  CARDINAL,
-  REGENT,
-  MAGAJI,
-  TITLED,
-} from '@/constants';
-import sectsOpts from '@/assets/data/sectsList.json';
+} from "@/constants";
+import { capitalize } from "@/utils";
 
 const TitlesReq = ({ value }) => {
   if (value.length < 1) return;
-  const htmlTitle = value.map((v) => capitalize(v)).join(' or ');
+  const htmlTitle = value.map((v) => capitalize(v)).join(" or ");
 
   return (
     <div title={htmlTitle} className="text-fg-fgSecondary dark:text-fgSecondaryDark">
       <ResultCryptTitle value={value[0]} noTitle />
-      {value.length > 1 && '+'}
+      {value.length > 1 && "+"}
     </div>
   );
 };
 
 const SectReq = ({ value }) => {
   if (value.length < 1) return;
-  const htmlTitle = value.map((v) => capitalize(v)).join(' or ');
+  const htmlTitle = value.map((v) => capitalize(v)).join(" or ");
 
   return (
     <div title={htmlTitle} className="inline text-fgGreen dark:text-fgGreenDark">
-      {value.map((v) => v[0].charAt(0).toUpperCase()).join('-')}
+      {value.map((v) => v[0].charAt(0).toUpperCase()).join("-")}
     </div>
   );
 };
@@ -49,14 +48,14 @@ const CapacityReq = ({ value }) => {
 
   return (
     <div title={capitalize(value)}>
-      {matches[0][2] === 'less' ? '≤' : '≥'}
+      {matches[0][2] === "less" ? "≤" : "≥"}
       {matches[0][1]}
     </div>
   );
 };
 
 const ResultLibraryRequirements = ({ value }) => {
-  const requirements = value.split(',');
+  const requirements = value.split(",");
   const titlesOpts = [
     PRIMOGEN,
     PRINCE,
@@ -79,19 +78,19 @@ const ResultLibraryRequirements = ({ value }) => {
   const sectReq = requirements.filter((i) => sectsOpts.includes(capitalize(i)));
   const hasRequirements = capacityReq || titleReq.length > 0 || sectReq.length > 0;
 
-  if (hasRequirements) {
-    return (
-      <>
+  return (
+    <>
+      {hasRequirements ? (
         <div className="flex gap-1">
           <CapacityReq value={capacityReq} />
           <TitlesReq value={titleReq} />
-          {sectReq.length > 0 && (titleReq.length == 0 || titleReq[0] == 'titled') && (
+          {sectReq.length > 0 && (titleReq.length === 0 || titleReq[0] === TITLED) && (
             <SectReq value={sectReq} />
           )}
         </div>
-      </>
-    );
-  } else return;
+      ) : null}
+    </>
+  );
 };
 
 export default ResultLibraryRequirements;

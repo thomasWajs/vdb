@@ -1,12 +1,11 @@
-import React from 'react';
 import {
-  PdaResultDescriptionText,
-  TwdOpenDeckButton,
   DeckCloneButton,
   PdaFavoriteButton,
-} from '@/components';
-import { useApp } from '@/context';
-import { DECKID } from '@/constants';
+  PdaResultDescriptionText,
+  TwdOpenDeckButton,
+} from "@/components";
+import { DECKID } from "@/constants";
+import { useApp } from "@/context";
 
 const PdaResultDescription = ({ deck }) => {
   const { username } = useApp();

@@ -1,5 +1,4 @@
-import React from 'react';
-import { ResultDisciplineImage } from '@/components';
+import { ResultDisciplineImage } from "@/components";
 
 const ResultCryptDisciplines = ({ value }) => {
   return (

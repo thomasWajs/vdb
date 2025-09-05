@@ -3,22 +3,23 @@ import {
   ASCII,
   AUTHOR,
   BAD_CARDS,
+  BASE,
   CRYPT,
   DESCRIPTION,
   GROUP,
   ID,
   LIBRARY,
   NAME,
-} from '@/constants';
-import { getIsPlaytest } from '@/utils';
+} from "@/constants";
+import { getIsPlaytest } from "@/utils";
 
 const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester) => {
-  const { default: unidecode } = await import('unidecode');
+  const { default: unidecode } = await import("unidecode");
 
   const cardbase = {};
   Object.values(cryptCardBase).forEach((card) => {
     const adv = !!card?.[ADV][0];
-    const name = card[ASCII].toLowerCase().replace(/\W/g, '');
+    const name = card[ASCII].toLowerCase().replace(/\W/g, "");
 
     if (!Object.keys(cardbase).includes(name)) {
       cardbase[name] = { base: card[ID], [card[GROUP]]: card[ID] };
@@ -30,36 +31,36 @@ const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester
   });
 
   Object.values(libraryCardBase).forEach((card) => {
-    const name = card[ASCII].toLowerCase().replace(/\W/g, '');
+    const name = card[ASCII].toLowerCase().replace(/\W/g, "");
     cardbase[name] = { base: card[ID] };
   });
 
-  const minifyCardName = (name) => {
-    name = unidecode(name).toLowerCase();
-    if (name.startsWith('the ')) {
-      name = `${name.replace(/^the /, '')}, the`;
+  const minifyCardName = (n) => {
+    let name = unidecode(n).toLowerCase();
+    if (name.startsWith("the ")) {
+      name = `${name.replace(/^the /, "")}, the`;
     }
-    return name.replace(/--.*$/, '').replace(/\W/g, '');
+    return name.replace(/--.*$/, "").replace(/\W/g, "");
   };
 
   const parseCard = (i) => {
     let id;
     let q;
 
-    if (i.includes('ADV')) {
+    if (i.includes("ADV")) {
       const regexp = /^([0-9]+) ?x?\s+(.*?)\s\(?ADV\)?.*/;
       const match = i.match(regexp);
-      q = parseInt(match[1]);
+      q = Number.parseInt(match[1]);
       let cardname = match[2];
       cardname = minifyCardName(cardname);
 
       if (Object.keys(cardbase).includes(cardname)) {
-        id = cardbase[cardname]['adv'];
+        id = cardbase[cardname][ADV];
       }
-    } else if (i.includes(' (G')) {
+    } else if (i.includes(" (G")) {
       const regexp = /^\s*([0-9]+) ?x?\s+(.*)\s\(G(.*)\)/;
       const match = i.match(regexp);
-      q = parseInt(match[1]);
+      q = Number.parseInt(match[1]);
       const cardname = minifyCardName(match[2]);
       const group = match[3];
       if (Object.keys(cardbase).includes(cardname)) {
@@ -71,7 +72,7 @@ const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester
       let regexp = /^\s*([0-9]+) ?x?\s+(.*?)(\s+\d+.*):(.*)/;
       let match = i.match(regexp);
       if (match) {
-        q = parseInt(match[1]);
+        q = Number.parseInt(match[1]);
         const cardname = minifyCardName(match[2]);
         const group = match[4].toLowerCase();
         if (Object.keys(cardbase).includes(cardname)) {
@@ -82,10 +83,10 @@ const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester
       } else {
         regexp = /^\s*([0-9]+) ?x?\s*(.*)/;
         match = i.match(regexp);
-        q = parseInt(match[1]);
+        q = Number.parseInt(match[1]);
         const cardname = minifyCardName(match[2]);
         if (Object.keys(cardbase).includes(cardname)) {
-          id = cardbase[cardname]['base'];
+          id = cardbase[cardname][BASE];
         }
       }
     }
@@ -94,9 +95,9 @@ const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester
   };
 
   const deck = {
-    [NAME]: 'New deck',
-    [AUTHOR]: '',
-    [DESCRIPTION]: '',
+    [NAME]: "New deck",
+    [AUTHOR]: "",
+    [DESCRIPTION]: "",
     [CRYPT]: {},
     [LIBRARY]: {},
     [BAD_CARDS]: [],
@@ -104,24 +105,24 @@ const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester
 
   const deckArray = deckText.split(/\n/);
   deckArray.forEach((i) => {
-    i = i.trim();
-    if (i.startsWith('Deck Name: ')) {
-      deck[NAME] = i.replace('Deck Name: ', '');
+    const line = i.trim();
+    if (line.startsWith("Deck Name: ")) {
+      deck[NAME] = line.replace("Deck Name: ", "");
       return;
     }
-    if (i.startsWith('Author: ')) {
-      deck[AUTHOR] = i.replace('Author: ', '');
+    if (line.startsWith("Author: ")) {
+      deck[AUTHOR] = line.replace("Author: ", "");
       return;
     }
-    if (i.startsWith('Description: ')) {
-      deck[DESCRIPTION] = i.replace('Description: ', '');
+    if (line.startsWith("Description: ")) {
+      deck[DESCRIPTION] = line.replace("Description: ", "");
       return;
     }
-    if (!i || i.match(/^\D/)) {
+    if (!line || line.match(/^\D/)) {
       return;
     }
 
-    const [id, q] = parseCard(i);
+    const [id, q] = parseCard(line);
     const isPlaytest = getIsPlaytest(id);
 
     if (id && q && (!isPlaytest || isPlaytester)) {
@@ -137,7 +138,7 @@ const importDeck = async (deckText, cryptCardBase, libraryCardBase, isPlaytester
         };
       }
     } else {
-      deck[BAD_CARDS].push(i);
+      deck[BAD_CARDS].push(line);
     }
   });
 

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Modal, Tooltip } from '@/components';
-import { useApp } from '@/context';
+import { useCallback, useState } from "react";
+import { Modal, Tooltip } from "@/components";
+import { useApp } from "@/context";
 
 const ConditionalTooltipOrModal = ({
   children,
@@ -20,15 +20,19 @@ const ConditionalTooltipOrModal = ({
   const withModal = isModal !== undefined ? isModal : isMobile;
   const [showModal, setShowModal] = useState();
 
-  const handleClick = () => {
-    onClick && onClick();
+  const handleClick = useCallback(() => {
+    try {
+      onClick();
+    } catch {}
     setShowModal(true);
-  };
+  }, [onClick]);
 
-  const handleClose = () => {
-    onClose && onClose();
+  const handleClose = useCallback(() => {
+    try {
+      onClose();
+    } catch {}
     setShowModal(false);
-  };
+  }, [onClose]);
 
   return (
     <>

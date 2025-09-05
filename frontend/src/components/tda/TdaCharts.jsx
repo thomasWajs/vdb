@@ -1,11 +1,10 @@
-import React from 'react';
 import {
-  TdaChartsRankingStyle,
-  TdaChartsRankingClan,
-  TdaChartsStyle,
   TdaChartsClan,
+  TdaChartsRankingClan,
+  TdaChartsRankingStyle,
+  TdaChartsStyle,
   Title,
-} from '@/components';
+} from "@/components";
 
 const TdaCharts = ({ info, decks, searchResults }) => {
   return (

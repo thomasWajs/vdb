@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router';
-import { useSnapshot } from 'valtio';
+import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
-  ButtonFloatSearch,
   ButtonFloatClose,
+  ButtonFloatSearch,
   Checkbox,
+  CryptSearchFormClan,
+  CryptSearchFormSect,
   PdaSearchFormSrcSelector,
   TwdSearchFormButtons,
   TwdSearchFormCapacity,
   TwdSearchFormCardtypes,
-  CryptSearchFormClan,
-  CryptSearchFormSect,
   TwdSearchFormCrypt,
   TwdSearchFormDate,
   TwdSearchFormDisciplines,
@@ -19,10 +19,7 @@ import {
   TwdSearchFormMatchInventory,
   TwdSearchFormPlayer,
   TwdSearchFormTags,
-} from '@/components';
-import { sanitizeFormState } from '@/utils';
-import { useApp, setPdaResults, searchPdaForm, clearSearchForm } from '@/context';
-import { archiveServices } from '@/services';
+} from "@/components";
 import {
   AUTHOR,
   CAPACITY,
@@ -36,16 +33,19 @@ import {
   MATCH_INVENTORY,
   MONOCLAN,
   NAME,
+  NEW,
   PDA,
+  RANDOM,
   SCALING,
   SECT,
   SRC,
   STAR,
   TAGS,
   TRAITS,
-  RANDOM,
-  NEW,
-} from '@/constants';
+} from "@/constants";
+import { clearSearchForm, searchPdaForm, setPdaResults, useApp } from "@/context";
+import { archiveServices } from "@/services";
+import { sanitizeFormState } from "@/utils";
 
 const PdaSearchForm = ({ error, setError }) => {
   const { username, cryptCardBase, libraryCardBase, showFloatingButtons, inventoryMode, isMobile } =
@@ -53,7 +53,7 @@ const PdaSearchForm = ({ error, setError }) => {
   const pdaFormState = useSnapshot(searchPdaForm);
   const [isLoading, setIsLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = JSON.parse(searchParams.get('q'));
+  const query = JSON.parse(searchParams.get("q"));
 
   useEffect(() => {
     if (query) {
@@ -61,7 +61,7 @@ const PdaSearchForm = ({ error, setError }) => {
         searchPdaForm[i] = query[i];
       });
       if (query[RANDOM]) searchRandom(query[RANDOM]);
-      if (query[NEW]) searchRandom(query[NEW]);
+      if (query[NEW]) searchNew(query[NEW]);
     }
   }, []);
 
@@ -74,57 +74,85 @@ const PdaSearchForm = ({ error, setError }) => {
       } else {
         processSearch();
       }
-    } else if (isMobile && query && pdaFormState && cryptCardBase && libraryCardBase) {
+    } else if (
+      isMobile &&
+      query &&
+      !(query[RANDOM] || query[NEW]) &&
+      pdaFormState &&
+      cryptCardBase &&
+      libraryCardBase
+    ) {
       processSearch();
     }
   }, [pdaFormState, cryptCardBase, libraryCardBase]);
 
-  const handleMultiSelectChange = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
-    searchPdaForm[name].value[i] = value;
-  };
+  const handleMultiSelectChange = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
+      searchPdaForm[name].value[i] = value;
+    },
+    [searchPdaForm],
+  );
 
-  const handleChangeWithOpt = (event, id) => {
-    const i = id[NAME];
-    const { name, value } = event;
-    searchPdaForm[i][name] = value;
-  };
+  const handleChangeWithOpt = useCallback(
+    (event, id) => {
+      const i = id[NAME];
+      const { name, value } = event;
+      searchPdaForm[i][name] = value;
+    },
+    [searchPdaForm],
+  );
 
-  const handleSrcChange = (value) => {
-    searchPdaForm[SRC] = value;
-  };
+  const handleSrcChange = useCallback(
+    (value) => {
+      searchPdaForm[SRC] = value;
+    },
+    [searchPdaForm],
+  );
 
-  const handleDisciplinesChange = (name) => {
-    searchPdaForm[DISCIPLINES][name] = !searchPdaForm[DISCIPLINES][name];
-  };
+  const handleDisciplinesChange = useCallback(
+    (name) => {
+      searchPdaForm[DISCIPLINES][name] = !searchPdaForm[DISCIPLINES][name];
+    },
+    [searchPdaForm],
+  );
 
-  const handleMultiChange = (event) => {
-    const { name, value } = event.currentTarget;
-    searchPdaForm[name][value] = !searchPdaForm[name][value];
-  };
+  const handleMultiChange = useCallback(
+    (event) => {
+      const { name, value } = event.currentTarget;
+      searchPdaForm[name][value] = !searchPdaForm[name][value];
+    },
+    [searchPdaForm],
+  );
 
-  const handleMatchInventoryScalingChange = (e) => {
-    if (e.target.checked) {
-      searchPdaForm[MATCH_INVENTORY][SCALING] = e.target[NAME];
-    } else {
-      searchPdaForm[MATCH_INVENTORY][SCALING] = false;
-    }
-  };
+  const handleTagsChange = useCallback(
+    (name, target, value) => {
+      searchPdaForm[name][target] = value;
+    },
+    [searchPdaForm],
+  );
 
-  const handleClear = () => {
+  const handleMatchInventoryScalingChange = useCallback(
+    (e) => {
+      searchPdaForm[MATCH_INVENTORY][SCALING] = e.currentTarget.value ? 0 : e.currentTarget[NAME];
+    },
+    [searchPdaForm],
+  );
+
+  const handleClear = useCallback(() => {
     setSearchParams();
     clearSearchForm(PDA);
     setError(false);
-  };
+  }, [clearSearchForm]);
 
   const handleError = (e) => {
     switch (e.response.status) {
       case 400:
-        setError('NO DECKS FOUND');
+        setError("NO DECKS FOUND");
         break;
       default:
-        setError('CONNECTION PROBLEM');
+        setError("CONNECTION PROBLEM");
     }
 
     setPdaResults(null);
@@ -138,7 +166,7 @@ const PdaSearchForm = ({ error, setError }) => {
     setError(false);
     const sanitizedForm = sanitizeFormState(PDA, searchPdaForm);
     if (Object.entries(sanitizedForm).length === 0) {
-      setError('EMPTY REQUEST');
+      setError("EMPTY REQUEST");
       return;
     }
 
@@ -201,17 +229,17 @@ const PdaSearchForm = ({ error, setError }) => {
           />
           <div className="flex justify-end gap-6">
             <Checkbox
-              name="60"
+              name={60}
               label="Scale to 60 cards"
-              checked={pdaFormState[MATCH_INVENTORY][SCALING] == 60}
-              value={pdaFormState[MATCH_INVENTORY][SCALING]}
+              checked={pdaFormState[MATCH_INVENTORY][SCALING] === 60}
+              value={pdaFormState[MATCH_INVENTORY][SCALING] === 60}
               onChange={handleMatchInventoryScalingChange}
             />
             <Checkbox
-              name="75"
+              name={75}
               label="Scale to 75 cards"
-              checked={pdaFormState[MATCH_INVENTORY][SCALING] == 75}
-              value={pdaFormState[MATCH_INVENTORY][SCALING]}
+              checked={pdaFormState[MATCH_INVENTORY][SCALING] === 75}
+              value={pdaFormState[MATCH_INVENTORY][SCALING] === 75}
               onChange={handleMatchInventoryScalingChange}
             />
           </div>
@@ -259,12 +287,17 @@ const PdaSearchForm = ({ error, setError }) => {
         onChange={handleDisciplinesChange}
       />
       <TwdSearchFormCardtypes value={pdaFormState[CARDTYPES]} onChange={handleChangeWithOpt} />
-      <TwdSearchFormTags value={pdaFormState[TAGS]} onChange={handleMultiChange} />
+      <TwdSearchFormTags value={pdaFormState[TAGS]} onChange={handleTagsChange} />
       <TwdSearchFormPlayer value={pdaFormState[AUTHOR]} form={searchPdaForm} inPda />
-      {isMobile && showFloatingButtons && (
+      {showFloatingButtons && (
         <>
-          <ButtonFloatClose handleClose={handleClear} position="middle" />
-          <ButtonFloatSearch handleSearch={processSearch} error={error} isLoading={isLoading} />
+          <ButtonFloatClose className="sm:hidden" handleClose={handleClear} position="middle" />
+          <ButtonFloatSearch
+            className="sm:hidden"
+            handleSearch={processSearch}
+            error={error}
+            isLoading={isLoading}
+          />
         </>
       )}
     </div>

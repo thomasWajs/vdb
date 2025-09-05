@@ -1,17 +1,16 @@
-import React from 'react';
-import { InventoryCryptTable, InventoryFilterForm, SortButton, Header } from '@/components';
-import { useApp } from '@/context';
-import { useInventoryCrypt } from '@/hooks';
+import { Header, InventoryCryptTable, InventoryFilterForm, SortButton } from "@/components";
 import {
   ALL,
   CAPACITY_MAX_MIN,
   CAPACITY_MIN_MAX,
   CLANx,
-  GROUPx,
   CRYPT,
+  GROUPx,
   NAME,
   QUANTITY,
-} from '@/constants';
+} from "@/constants";
+import { useApp } from "@/context";
+import { useInventoryCrypt } from "@/hooks";
 
 const InventoryCrypt = ({
   compact,
@@ -26,12 +25,12 @@ const InventoryCrypt = ({
 }) => {
   const { cryptInventorySort, changeCryptInventorySort } = useApp();
   const sortMethods = {
-    [NAME]: 'N',
-    [QUANTITY]: 'Q',
-    [CLANx]: 'CL',
-    [GROUPx]: 'G',
-    [CAPACITY_MIN_MAX]: 'C↑',
-    [CAPACITY_MAX_MIN]: 'C↓',
+    [NAME]: "N",
+    [QUANTITY]: "Q",
+    [CLANx]: "CL",
+    [GROUPx]: "G",
+    [CAPACITY_MIN_MAX]: "C↑",
+    [CAPACITY_MAX_MIN]: "C↓",
   };
 
   const { cardsByClan, cardsByClanTotal, cardsByClanUnique, missingByClan, missingByClanTotal } =

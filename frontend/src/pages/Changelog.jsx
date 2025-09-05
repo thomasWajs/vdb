@@ -1,6 +1,5 @@
-import React from 'react';
-import { Await, useLoaderData } from 'react-router';
-import { Banner, TextWithLinks } from '@/components';
+import { Await, useLoaderData } from "react-router";
+import { Banner, TextWithLinks } from "@/components";
 
 const Changelog = () => {
   const loaderData = useLoaderData();
@@ -13,7 +12,7 @@ const Changelog = () => {
       <Await resolve={loaderData}>
         {(changes) => (
           <div className="flex flex-col gap-3 max-sm:p-3">
-            <div className="text-xl font-bold text-fgSecondary underline dark:text-fgSecondaryDark">
+            <div className="font-bold text-fgSecondary text-xl underline dark:text-fgSecondaryDark">
               CHANGELOG
             </div>
             <div className="flex flex-col gap-5">

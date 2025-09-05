@@ -1,22 +1,22 @@
-import React, { useMemo } from 'react';
-import { BubbleChart } from '@/components';
-import { byName, getClan } from '@/utils';
-import { useApp } from '@/context';
+import { useMemo } from "react";
+import { BubbleChart } from "@/components";
 import {
-  IN_SEARCH,
-  CLAN,
-  SCORE,
-  PLAYERS,
-  RANK,
+  ANTITRIBU,
   AUTHOR,
+  CLAN,
   CRYPT,
+  IN_SEARCH,
+  INDEX,
   LIBRARY,
   MULTI,
-  ANTITRIBU,
+  PLAYERS,
+  RANK,
+  SCORE,
   TAGS,
   VALUE,
-  INDEX,
-} from '@/constants';
+} from "@/constants";
+import { useApp } from "@/context";
+import { byName, deepClone, getClan } from "@/utils";
 
 const TdaChartsRankingClan = ({ info, decks, searchResults }) => {
   const { isMobile, isDesktop, isWide } = useApp();
@@ -47,7 +47,7 @@ const TdaChartsRankingClan = ({ info, decks, searchResults }) => {
       };
     });
 
-    return d;
+    return deepClone(d);
   }, [searchResults, decks, info]);
 
   return (
@@ -55,7 +55,7 @@ const TdaChartsRankingClan = ({ info, decks, searchResults }) => {
       {Object.keys(data)
         .toSorted(byName)
         .map((s) => {
-          const clan = isMobile && s.includes(ANTITRIBU) ? `!${s.replace(` ${ANTITRIBU}`, '')}` : s;
+          const clan = isMobile && s.includes(ANTITRIBU) ? `!${s.replace(` ${ANTITRIBU}`, "")}` : s;
 
           return (
             <BubbleChart

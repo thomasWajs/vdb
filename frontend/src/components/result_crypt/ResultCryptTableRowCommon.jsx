@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   CardPopover,
   ConditionalTooltip,
@@ -10,11 +9,11 @@ import {
   ResultCryptGroup,
   ResultCryptSect,
   ResultCryptTitle,
-  ResultPathImage,
   ResultName,
-} from '@/components';
-import { useApp } from '@/context';
-import { PATH, SECT, DISCIPLINES, TITLE, CLAN, GROUP } from '@/constants';
+  ResultPathImage,
+} from "@/components";
+import { CLAN, DISCIPLINES, GROUP, PATH, SECT, TITLE } from "@/constants";
+import { useApp } from "@/context";
 
 const ResultCryptTableRowCommon = ({
   card,
@@ -25,20 +24,24 @@ const ResultCryptTableRowCommon = ({
   inDeck,
   noDisciplines,
   shouldShowModal,
-  isBanned,
+  idx,
 }) => {
   const { isMobile, isNarrow, isDesktop, isWide } = useApp();
   const ALIGN_DISCIPLINES_THRESHOLD = isMobile ? 13 : 17;
 
+  const onClick = () => {
+    handleClick(idx ?? card);
+  };
+
   return (
     <>
-      <td className="min-w-[28px] md:min-w-[35px]" onClick={() => handleClick(card)}>
+      <td className="min-w-[28px] md:min-w-[35px]" onClick={onClick}>
         <div className="flex items-center justify-center">
           <ResultCryptCapacity card={card} />
         </div>
       </td>
       {!noDisciplines && (!inSearch || !isNarrow) && (
-        <td className="sm:min-w-[170px]" onClick={() => handleClick(card)}>
+        <td className="sm:min-w-[170px]" onClick={onClick}>
           {inDeck && keyDisciplines && disciplinesSet.length < ALIGN_DISCIPLINES_THRESHOLD ? (
             <DeckCryptDisciplines
               value={card[DISCIPLINES]}
@@ -50,7 +53,7 @@ const ResultCryptTableRowCommon = ({
           )}
         </td>
       )}
-      <td className="w-full" onClick={() => handleClick(card)}>
+      <td className="w-full" onClick={onClick}>
         <ConditionalTooltip
           overlay={<CardPopover card={card} />}
           disabled={isMobile || shouldShowModal}
@@ -58,18 +61,18 @@ const ResultCryptTableRowCommon = ({
           noClick
         >
           <div className="flex cursor-pointer px-1">
-            <ResultName card={card} isBanned={isBanned} />
+            <ResultName card={card} />
           </div>
         </ConditionalTooltip>
       </td>
       {((!isNarrow && !isDesktop) || isWide) && !inSearch ? (
         <>
-          <td className="min-w-[25px]" onClick={() => handleClick(card)}>
+          <td className="min-w-[25px]" onClick={onClick}>
             <div className="flex justify-center">
               <ResultCryptTitle value={card[TITLE]} />
             </div>
           </td>
-          <td className="min-w-[25px]" onClick={() => handleClick(card)}>
+          <td className="min-w-[25px]" onClick={onClick}>
             <div className="flex justify-center">
               {card[PATH] ? (
                 <ResultPathImage value={card[PATH]} />
@@ -78,19 +81,19 @@ const ResultCryptTableRowCommon = ({
               )}
             </div>
           </td>
-          <td className="min-w-[35px]" onClick={() => handleClick(card)}>
+          <td className="min-w-[35px]" onClick={onClick}>
             <div className="flex justify-center">
               <ResultClanImage value={card[CLAN]} />
             </div>
           </td>
-          <td className="min-w-[30px]" onClick={() => handleClick(card)}>
-            <div className="flex justify-center">
+          <td className="min-w-[30px]" onClick={onClick}>
+            <div className="flex justify-center print:dark:text-fgPrimary">
               <ResultCryptGroup value={card[GROUP]} />
             </div>
           </td>
         </>
       ) : (
-        <td className="min-w-[40px]" onClick={() => handleClick(card)}>
+        <td className="min-w-[40px]" onClick={onClick}>
           <ResultCryptClanGroupTitle card={card} />
         </td>
       )}

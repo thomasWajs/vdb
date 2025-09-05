@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import ky from 'ky';
-import { useNavigate, useParams } from 'react-router';
-import { useSnapshot } from 'valtio';
+import ky from "ky";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router";
+import { useSnapshot } from "valtio";
 import {
-  TdaLoadCustomButtons,
-  TdaLoadPreparedButtons,
-  TdaInfo,
-  TdaCharts,
-  TdaResult,
-  TdaSearchForm,
   ButtonClose,
+  ButtonFloatClose,
   ErrorMessage,
   FlexGapped,
   Header,
-} from '@/components';
-import { tdaStore, clearTdaForm, setTdaDecks, setTdaInfo, setTdaResults, useApp } from '@/context';
-import { sanitizeScoreSheet, getTags, importDeck } from '@/utils';
+  TdaCharts,
+  TdaInfo,
+  TdaLoadCustomButtons,
+  TdaLoadPreparedButtons,
+  TdaResult,
+  TdaSearchForm,
+} from "@/components";
 import {
   AUTHOR,
   CRYPT,
   DATE,
   DECKS,
+  DQ,
   EVENT,
   GW,
   INFO,
@@ -31,19 +31,23 @@ import {
   RANK,
   RESULTS,
   ROUNDS,
+  SCORE,
   TAGS,
   VP,
-  SCORE,
-} from '@/constants';
+} from "@/constants";
+import { clearTdaForm, setTdaDecks, setTdaInfo, setTdaResults, tdaStore, useApp } from "@/context";
+import { getTags, importDeck, sanitizeScoreSheet } from "@/utils";
 
-const TESTERS = ['1', 'crauseon'];
+const TESTERS = ["1", "crauseon"];
 
 const Tda = () => {
   const { username, cryptCardBase, libraryCardBase, isMobile } = useApp();
   const { [DECKS]: decks, [RESULTS]: results, [INFO]: info } = useSnapshot(tdaStore);
   const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = JSON.parse(searchParams.get("q"));
   const navigate = useNavigate();
-
+  const [showForm, setShowForm] = useState();
   const [tempDecks, setTempDecks] = useState();
   const [tempArchon, setTempArchon] = useState();
   const [error, setError] = useState(false);
@@ -55,7 +59,7 @@ const Tda = () => {
   };
 
   const loadPrepared = async (id) => {
-    const { default: JSZip } = await import('jszip');
+    const { default: JSZip } = await import("jszip");
     setError(false);
 
     const url = `${import.meta.env.VITE_BASE_URL}/tournaments/${id}.zip`;
@@ -64,23 +68,22 @@ const Tda = () => {
       .then((response) => {
         if (response.status === 200 || response.status === 0) {
           return Promise.resolve(response.blob());
-        } else {
-          return Promise.reject(new Error(response.statusText));
         }
+        return Promise.reject(new Error(response.statusText));
       })
       .then(JSZip.loadAsync)
       .then((zip) => {
         Object.values(zip.files).forEach(async (f) => {
-          if (f[NAME].includes('.xlsx')) {
-            const archon = await f.async('base64');
+          if (f[NAME].includes(".xlsx")) {
+            const archon = await f.async("base64");
             setTempArchon(archon);
           }
         });
 
         const fetchedDecks = Object.values(zip.files)
-          .filter((f) => !f[NAME].includes('.xlsx'))
+          .filter((f) => !f[NAME].includes(".xlsx"))
           .map(async (f) => {
-            const d = await f.async('string');
+            const d = await f.async("string");
             return getDeck(d);
           });
 
@@ -97,23 +100,23 @@ const Tda = () => {
   };
 
   const loadArchon = async (file) => {
-    const { read, utils } = await import('xlsx');
+    const { read, utils } = await import("xlsx");
     const wb = read(file);
 
     const getFinalPlace = (playerNumber) => {
-      const wsFinalTable = wb.Sheets['Final Round'];
-      const dataFinalTable = utils.sheet_to_csv(wsFinalTable).split('\n');
+      const wsFinalTable = wb.Sheets["Final Round"];
+      const dataFinalTable = utils.sheet_to_csv(wsFinalTable).split("\n");
       const finalPlace = dataFinalTable
         .filter((i) => {
-          const array = i.split(',');
-          return parseInt(array[0]) == playerNumber && array[21];
+          const array = i.split(",");
+          return Number.parseInt(array[0]) === playerNumber && array[21];
         })[0]
-        .split(',')[21];
-      return parseInt(finalPlace);
+        .split(",")[21];
+      return Number.parseInt(finalPlace);
     };
 
-    const wsInfo = wb.Sheets['Tournament Info'];
-    const dataInfo = utils.sheet_to_csv(wsInfo).split('\n');
+    const wsInfo = wb.Sheets["Tournament Info"];
+    const dataInfo = utils.sheet_to_csv(wsInfo).split("\n");
     let totalPlayers = 0;
     let totalRounds = 0;
     let totalMatches = 0;
@@ -121,43 +124,43 @@ const Tda = () => {
     let totalVp = 0;
     let medianVp = 0;
     let medianGw = 0;
-    let reportedRanks = [];
+    const reportedRanks = [];
     let event;
     let date;
     let location;
 
     dataInfo.forEach((n) => {
-      const array = n.split(',');
-      if (array[0] === 'Number of Players:') totalPlayers = parseInt(array[1]);
-      if (array[0] === 'Number of Rounds (including final):') totalRounds = array[1];
-      if (array[0] === 'Number of Event Matches:') totalMatches = array[1];
-      if (array[0] === 'Event Name:') event = array[1];
-      if (array[0] === 'Event Date (DD-MON-YY):') date = array[1];
-      if (array[0] === 'City:') location = array[1];
+      const array = n.split(",");
+      if (array[0] === "Number of Players:") totalPlayers = Number.parseInt(array[1]);
+      if (array[0] === "Number of Rounds (including final):") totalRounds = array[1];
+      if (array[0] === "Number of Event Matches:") totalMatches = array[1];
+      if (array[0] === "Event Name:") event = array[1];
+      if (array[0] === "Event Date (DD-MON-YY):") date = array[1];
+      if (array[0] === "City:") location = array[1];
     });
 
-    const wsScores = sanitizeScoreSheet(wb.Sheets['Methuselahs']);
-    const dataScores = utils.sheet_to_csv(wsScores).split('\n');
+    const wsScores = sanitizeScoreSheet(wb.Sheets.Methuselahs);
+    const dataScores = utils.sheet_to_csv(wsScores).split("\n");
 
     const archonIds = [];
     const tdaDecks = {};
 
     dataScores.forEach((n, idx) => {
       if (idx < 6) return;
-      const array = n.split(',');
+      const array = n.split(",");
       const playerId = array[4];
-      const playerNumber = parseInt(array[0]);
+      const playerNumber = Number.parseInt(array[0]);
       if (!playerId) return;
       archonIds.push(playerId);
 
       const rank =
-        array[20] == 'DQ'
-          ? 'DQ'
-          : parseInt(array[20]) > 5
-            ? parseInt(array[20])
-            : wb.Sheets['Final Round']
+        array[20] === DQ
+          ? DQ
+          : Number.parseInt(array[20]) > 5
+            ? Number.parseInt(array[20])
+            : wb.Sheets["Final Round"]
               ? getFinalPlace(playerNumber)
-              : parseInt(array[17]);
+              : Number.parseInt(array[17]);
 
       const name = `${array[1]} ${array[2]}`;
 
@@ -170,7 +173,7 @@ const Tda = () => {
       };
 
       if (tempDecks[playerId]) {
-        reportedRanks.push(score[RANK] == 'DQ' ? totalPlayers : score[RANK]);
+        reportedRanks.push(score[RANK] === DQ ? totalPlayers : score[RANK]);
         tdaDecks[playerId] = {
           ...tempDecks[playerId],
           [SCORE]: score,
@@ -199,7 +202,7 @@ const Tda = () => {
       medianReportedRank = (min + max) / 2;
     }
 
-    setTdaInfo({
+    const info = {
       [EVENT]: event,
       [DATE]: date,
       [LOCATION]: location,
@@ -214,20 +217,28 @@ const Tda = () => {
       medianPlayerVp: medianVp,
       medianRank: totalPlayers / 2,
       medianReportedRank: medianReportedRank,
-    });
+    };
+
+    setTdaInfo(info);
     setTdaDecks(tdaDecks);
   };
 
-  const handleClear = () => {
+  const handleCloseEvent = () => {
     clearTdaForm();
+    setShowForm();
     setError(false);
     setTempArchon();
     setTempDecks();
     setTdaInfo();
     setTdaDecks();
     setTdaResults();
-    navigate('/tda');
+    navigate("/tda");
   };
+
+  const handleClear = useCallback(() => {
+    setSearchParams();
+    setShowForm(true);
+  }, []);
 
   useEffect(() => {
     if (tempDecks && tempArchon) {
@@ -243,24 +254,26 @@ const Tda = () => {
 
   return (
     <div className="twd-container mx-auto flex flex-col gap-2">
-      <Header>
-        <div className="flex w-full flex-col p-2 text-lg max-sm:gap-2">
-          <div className="flex sm:justify-center">
-            Want more Tournaments here? Help your organizer to collect the data!
+      {!(info && decks) && (
+        <Header>
+          <div className="flex w-full flex-col p-2 text-lg max-sm:gap-2">
+            <div className="flex sm:justify-center">
+              Want more Tournaments here? Help your organizer to collect the data!
+            </div>
+            <div className="flex gap-1.5 sm:justify-center">
+              More details:
+              <a
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+                href="https://garourimgazette.wordpress.com/vtes-discussions/vtes-tournament-archive/"
+              >
+                TOURNAMENTS DECKS ARCHIVE
+              </a>
+            </div>
           </div>
-          <div className="flex gap-1.5 sm:justify-center">
-            More details:
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-              href="https://garourimgazette.wordpress.com/vtes-discussions/vtes-tournament-archive/"
-            >
-              TOURNAMENTS DECKS ARCHIVE
-            </a>
-          </div>
-        </div>
-      </Header>
+        </Header>
+      )}
       {error && <ErrorMessage>NO DATA AVAILABLE FOR EVENT #{error}</ErrorMessage>}
       <FlexGapped className="flex-col">
         {!(info && decks) && (
@@ -283,30 +296,40 @@ const Tda = () => {
             </div>
           </div>
         )}
-        <FlexGapped className="max-sm:flex-col">
-          <div className="flex basis-9/12 justify-center max-sm:order-last">
-            {decks && info && <TdaCharts info={info} decks={decks} searchResults={results ?? {}} />}
-          </div>
-          {info && decks && (
-            <FlexGapped className="basis-3/12 flex-col max-sm:px-2">
-              <ButtonClose handleClick={handleClear} text="Close Event" />
-              <TdaInfo info={info} decks={decks} />
-            </FlexGapped>
-          )}
-        </FlexGapped>
+        {(!showForm || !isMobile) && (
+          <FlexGapped className="max-sm:flex-col">
+            <div className="flex basis-9/12 justify-center max-sm:order-last">
+              {decks && info && (
+                <TdaCharts info={info} decks={decks} searchResults={results ?? {}} />
+              )}
+            </div>
+            {info && decks && (
+              <FlexGapped className="basis-3/12 flex-col max-sm:p-2">
+                <ButtonClose handleClick={handleCloseEvent} text="Close Event" />
+                <TdaInfo info={info} decks={decks} />
+              </FlexGapped>
+            )}
+          </FlexGapped>
+        )}
         {decks && info && (
           <FlexGapped>
-            <div className="flex flex-col gap-4 sm:basis-7/12 lg:basis-8/12 xl:basis-9/12">
-              <TdaResult decks={results ?? Object.values(decks)} />
-            </div>
-            {!(isMobile && decks && info) && (
-              <div className="basis-full max-sm:p-2 sm:basis-5/12 lg:basis-4/12 xl:basis-3/12">
-                <TdaSearchForm />
+            {(!showForm || !isMobile) && (
+              <div className="flex basis-full flex-col gap-4 sm:basis-7/12 lg:basis-8/12 xl:basis-9/12">
+                <TdaResult decks={results ?? Object.values(decks)} />
+              </div>
+            )}
+            {((showForm && !query) || !isMobile) && (
+              <div className="flex basis-full flex-col gap-2 max-sm:p-2 sm:basis-5/12 lg:basis-4/12 xl:basis-3/12">
+                {isMobile && <ButtonClose handleClick={handleCloseEvent} text="Close Event" />}
+                <TdaSearchForm setShowForm={setShowForm} />
               </div>
             )}
           </FlexGapped>
         )}
       </FlexGapped>
+      {!showForm && decks && info && (
+        <ButtonFloatClose className="sm:hidden" handleClose={handleClear} />
+      )}
     </div>
   );
 };

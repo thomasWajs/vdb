@@ -1,45 +1,45 @@
-import React, { useState, useMemo } from 'react';
-import { FixedSizeList } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import { useMemo, useState } from "react";
+import { List } from "react-window";
+import imbuedClansList from "@/assets/data/imbuedClansList.json";
+import vampireClansList from "@/assets/data/vampireClansList.json";
 import {
-  WindowRows,
-  TwdCardsHistoryCryptRow,
   InventoryFilterForm,
-  SortButton,
   ResultModal,
-} from '@/components';
+  SortButton,
+  TwdCardsHistoryCryptRow,
+  WindowRows,
+} from "@/components";
 import {
   ALL,
   CAPACITY_MAX_MIN,
   CAPACITY_MIN_MAX,
   CLAN,
+  CRYPT,
   DATE_PRINT,
   DATE_WIN,
   GROUP,
+  ID,
   NAME,
   PLAYER,
-  CRYPT,
-  ID,
-} from '@/constants';
-import { cryptSort } from '@/utils';
-import { useApp } from '@/context';
-import { useModalCardController } from '@/hooks';
-import imbuedClansList from '@/assets/data/imbuedClansList.json';
-import vampireClansList from '@/assets/data/vampireClansList.json';
+  VALUE,
+} from "@/constants";
+import { useApp } from "@/context";
+import { useModalCardController } from "@/hooks";
+import { cryptSort } from "@/utils";
 
 const TwdCardsHistoryCrypt = ({ cards, players }) => {
   const { isMobile } = useApp();
   const [clan, setClan] = useState(ALL);
-  const [sortMethod, setSortMethod] = useState([NAME]);
+  const [sortMethod, setSortMethod] = useState(NAME);
   const sortMethods = {
-    [NAME]: 'N',
-    [PLAYER]: 'P',
-    [DATE_PRINT]: 'DP',
-    [DATE_WIN]: 'DW',
-    [CLAN]: 'CL',
-    [GROUP]: 'G',
-    [CAPACITY_MIN_MAX]: 'C↑',
-    [CAPACITY_MAX_MIN]: 'C↓',
+    [NAME]: "N",
+    [PLAYER]: "P",
+    [DATE_PRINT]: "DP",
+    [DATE_WIN]: "DW",
+    [CLAN]: "CL",
+    [GROUP]: "G",
+    [CAPACITY_MIN_MAX]: "C↑",
+    [CAPACITY_MAX_MIN]: "C↓",
   };
 
   const cardsByClan = {};
@@ -72,21 +72,17 @@ const TwdCardsHistoryCrypt = ({ cards, players }) => {
     handleModalCardClose,
   } = useModalCardController(sortedCards);
 
-  const cardRows = useMemo(() => {
-    return sortedCards.map((card) => {
-      return (
-        <TwdCardsHistoryCryptRow
-          key={card[ID]}
-          card={card}
-          players={players}
-          handleClick={handleModalCardOpen}
-        />
-      );
-    });
-  }, [sortedCards]);
+  const cardRows = sortedCards.map((card) => (
+    <TwdCardsHistoryCryptRow
+      key={card[ID]}
+      card={card}
+      players={players}
+      handleClick={handleModalCardOpen}
+    />
+  ));
 
   return (
-    <div className="h-[calc(100dvh-132px)] sm:h-[calc(100dvh-195px)]">
+    <div className="h-[calc(100dvh-166px)] sm:h-[calc(100dvh-225px)]">
       <div className="flex items-center justify-between bg-bgSecondary dark:bg-bgSecondaryDark">
         <div className="w-3/4">
           <InventoryFilterForm
@@ -105,52 +101,46 @@ const TwdCardsHistoryCrypt = ({ cards, players }) => {
           setSortMethod={setSortMethod}
         />
       </div>
-      <div className="flex w-full bg-bgSecondary font-bold text-fgSecondary dark:bg-bgSecondaryDark dark:text-fgSecondaryDark">
-        {!isMobile && <div className="flex min-w-[32px] sm:min-w-[40px]" />}
-        {!isMobile && <div className="flex min-w-[170px] lg:min-w-[180px]" />}
+      <div className="flex min-h-[38px] w-full bg-bgSecondary font-bold text-fgSecondary dark:bg-bgSecondaryDark dark:text-fgSecondaryDark">
+        <div className="flex min-w-[40px] max-sm:hidden" />
+        <div className="flex min-w-[170px] max-sm:hidden lg:min-w-[180px]" />
         <div className="flex w-full" />
-        {!isMobile && <div className="flex min-w-[45px]" />}
+        <div className="flex min-w-[45px] max-sm:hidden" />
         <div
-          className="flex min-w-[45px] items-center justify-center sm:min-w-[60px]"
+          className="flex min-w-[60px] items-center justify-center max-sm:hidden"
           title="First Print Date"
         >
           Print
         </div>
-        {!isMobile && (
-          <div
-            className="flex min-w-[45px] items-center justify-center sm:min-w-[60px]"
-            title="First TWD Appearance Date"
-          >
-            Win
-          </div>
-        )}
+        <div
+          className="flex min-w-[45px] items-center justify-center sm:min-w-[60px]"
+          title="First TWD Appearance Date"
+        >
+          Win
+        </div>
         <div
           className="flex min-w-[25px] items-center justify-center sm:min-w-[65px]"
           title="Years to Win"
         >
           YtW
         </div>
-        <div className="flex min-w-[90px] items-center sm:min-w-[250px]" title="First Winner">
+        <div
+          className="flex min-w-[90px] items-center max-sm:justify-center sm:min-w-[250px]"
+          title="First Winner"
+        >
           Player
         </div>
         <div className="flex min-w-[45px] items-center justify-center sm:min-w-[110px]">
-          {isMobile ? 'D' : 'Deck'}
+          {isMobile ? "D" : "Deck"}
         </div>
       </div>
-      <AutoSizer>
-        {({ width, height }) => (
-          <FixedSizeList
-            className="border-bgSecondary dark:border-bgSecondaryDark sm:border"
-            height={height}
-            width={width}
-            itemCount={cardRows.length}
-            itemSize={45}
-            itemData={cardRows}
-          >
-            {WindowRows}
-          </FixedSizeList>
-        )}
-      </AutoSizer>
+      <List
+        className="border-bgSecondary sm:border dark:border-bgSecondaryDark"
+        rowComponent={WindowRows}
+        rowCount={cardRows.length}
+        rowHeight={45}
+        rowProps={{ [VALUE]: cardRows }}
+      />
       {shouldShowModal && (
         <ResultModal
           card={currentModalCard}

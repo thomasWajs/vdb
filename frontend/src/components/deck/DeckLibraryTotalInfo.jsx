@@ -1,6 +1,5 @@
-import React from 'react';
-import { ResultLibraryTypeImage, ResultLibraryDisciplines, ResultLibraryClan } from '@/components';
-import { TYPE_MASTER } from '@/constants';
+import { ResultLibraryClan, ResultLibraryDisciplines, ResultLibraryTypeImage } from "@/components";
+import { TYPE_MASTER } from "@/constants";
 
 const IconTextPercents = ({ icon, text, percents }) => {
   return (

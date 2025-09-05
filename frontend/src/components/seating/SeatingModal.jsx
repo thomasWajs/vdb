@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import PencilSquare from '@icons/pencil-square.svg?react';
-import Recycle from '@icons/recycle.svg?react';
-import PersonFill from '@icons/person-fill.svg?react';
+import PencilSquare from "@icons/pencil-square.svg?react";
+import PersonFill from "@icons/person-fill.svg?react";
+import Recycle from "@icons/recycle.svg?react";
+import { useState } from "react";
 import {
   ButtonIconed,
-  SeatingPlayerSelector,
-  SeatingTables,
-  SeatingSelectRandom,
   Modal,
-} from '@/components';
-import { STATE, RANDOM } from '@/constants';
+  SeatingPlayerSelector,
+  SeatingSelectRandom,
+  SeatingTables,
+} from "@/components";
+import { RANDOM, STATE } from "@/constants";
 
 const SeatingModal = ({
   addCustomDeck,

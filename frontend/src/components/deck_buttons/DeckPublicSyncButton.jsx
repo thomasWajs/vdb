@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useSnapshot } from 'valtio';
-import PeopleFill from '@icons/people-fill.svg?react';
-import { Spinner, ModalConfirmation, DeckPublicDiff, ButtonIconed } from '@/components';
-import { deckServices } from '@/services';
-import { useApp, deckStore } from '@/context';
-import { PUBLIC_PARENT, NAME, DECKS } from '@/constants';
+import PeopleFill from "@icons/people-fill.svg?react";
+import { useState } from "react";
+import { useSnapshot } from "valtio";
+import { ButtonIconed, DeckPublicDiff, ModalConfirmation, Spinner } from "@/components";
+import { DECKS, NAME, PUBLIC_PARENT } from "@/constants";
+import { deckStore, useApp } from "@/context";
+import { deckServices } from "@/services";
 
 const DeckPublicSyncButton = ({ deck }) => {
   const { isDesktop, setShowMenuButtons, setShowFloatingButtons } = useApp();
@@ -25,7 +25,7 @@ const DeckPublicSyncButton = ({ deck }) => {
   return (
     <>
       <ButtonIconed
-        variant={isDesktop ? 'secondary' : 'primary'}
+        variant={isDesktop ? "secondary" : "primary"}
         onClick={() => setShowConfirmation(true)}
         title="Sync Deck with Public Deck Archive"
         text="Sync Public Deck"

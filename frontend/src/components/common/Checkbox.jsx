@@ -1,7 +1,7 @@
-import React from 'react';
-import { Checkbox as CheckboxHUI, Field, Label } from '@headlessui/react';
-import { twMerge } from 'tailwind-merge';
-import { NAME, VALUE } from '@/constants';
+import { Checkbox as CheckboxHUI, Field, Label } from "@headlessui/react";
+import { useCallback } from "react";
+import { twMerge } from "tailwind-merge";
+import { NAME, VALUE } from "@/constants";
 
 const Checkbox = ({
   checked = false,
@@ -9,36 +9,36 @@ const Checkbox = ({
   name,
   value,
   onChange,
-  size = 'md',
+  size = "md",
   label,
   className,
 }) => {
   const textStyle = {
-    sm: 'text-sm gap-1',
-    md: 'text-md gap-1.5',
-    lg: 'text-lg gap-2',
+    sm: "text-sm gap-1",
+    md: "text-md gap-1.5",
+    lg: "text-lg gap-2",
   };
 
   const boxStyle = {
-    sm: 'size-3.5 mt-0.5',
-    md: 'size-4 mt-1',
-    lg: 'size-5 mt-1',
+    sm: "min-w-3.5 size-3.5 mt-0.5",
+    md: "min-w-4 size-4 mt-1",
+    lg: "min-w-5 size-5 mt-1",
   };
 
-  const handleChange = () => {
+  const handleChange = useCallback(() => {
     onChange({
       currentTarget: {
         [NAME]: name,
         [VALUE]: value,
       },
     });
-  };
+  }, [onChange, name, value]);
 
   return (
-    <Field disabled={disabled} className={twMerge('items-top flex', textStyle[size], className)}>
+    <Field disabled={disabled} className={twMerge("items-top flex", textStyle[size], className)}>
       <CheckboxHUI
         className={twMerge(
-          'outline-fgSecondaryDark dark:outline-fgSecondaryDark rounded-sm focus:outline-2',
+          "rounded-sm outline-fgSecondaryDark focus:outline-2 dark:outline-fgSecondaryDark",
           boxStyle[size],
         )}
         checked={checked}
@@ -49,22 +49,23 @@ const Checkbox = ({
         {({ checked, disabled }) => (
           <div
             className={twMerge(
-              'border-borderPrimary block rounded-sm border dark:border-none',
-              !checked && !disabled && 'dark:bg-whiteDark bg-white',
+              "block cursor-pointer rounded-sm border border-borderPrimary dark:border-none",
+              !checked && !disabled && "bg-white dark:bg-whiteDark",
               checked &&
                 !disabled &&
-                'bg-bgCheckboxSelected dark:bg-bgCheckboxSelectedDark border-none',
-              disabled && 'bg-midGray dark:bg-midGrayDark opacity-60',
+                "border-none bg-bgCheckboxSelected dark:bg-bgCheckboxSelectedDark",
+              disabled && "bg-midGray opacity-60 dark:bg-midGrayDark",
             )}
           >
             <svg
               className={twMerge(
-                'dark:stroke-whiteDark stroke-white',
-                checked ? 'opacity-100' : 'opacity-0',
+                "stroke-white dark:stroke-whiteDark",
+                checked ? "opacity-100" : "opacity-0",
               )}
               viewBox="0 0 14 14"
               fill="none"
             >
+              <title>Check Mark</title>
               <path
                 d="M3.5 7L5.5 9.5L10 4.5"
                 strokeWidth={2}
@@ -75,7 +76,7 @@ const Checkbox = ({
           </div>
         )}
       </CheckboxHUI>
-      {label ? <Label className="hover:cursor-pointer">{label}</Label> : null}
+      {label ? <Label className="cursor-pointer text-start">{label}</Label> : null}
     </Field>
   );
 };

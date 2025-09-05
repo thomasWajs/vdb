@@ -1,6 +1,5 @@
-import React from 'react';
-import { useApp } from '@/context';
-import { ResultDisciplineImage } from '@/components';
+import { ResultDisciplineImage } from "@/components";
+import { useApp } from "@/context";
 
 const DeckCryptDisciplines = ({ value, disciplinesSet, keyDisciplines }) => {
   const { isMobile } = useApp();
@@ -16,7 +15,7 @@ const DeckCryptDisciplines = ({ value, disciplinesSet, keyDisciplines }) => {
                   <div className="flex items-center justify-center">
                     <ResultDisciplineImage
                       value={d}
-                      size={isMobile ? 'sm' : 'md'}
+                      size={isMobile ? "sm" : "md"}
                       isSuperior={value[d] === 2}
                     />
                   </div>
@@ -35,7 +34,7 @@ const DeckCryptDisciplines = ({ value, disciplinesSet, keyDisciplines }) => {
                   {value[d] && (
                     <div className="flex items-center justify-center">
                       <ResultDisciplineImage
-                        size={isMobile ? 'sm' : 'md'}
+                        size={isMobile ? "sm" : "md"}
                         value={d}
                         isSuperior={value[d] === 2}
                       />

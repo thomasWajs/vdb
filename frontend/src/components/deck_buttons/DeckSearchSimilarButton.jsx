@@ -1,11 +1,11 @@
-import React from 'react';
-import { useNavigate } from 'react-router';
-import { Menu } from '@headlessui/react';
-import SymmetryVertical from '@icons/symmetry-vertical.svg?react';
-import { MenuItems, MenuItem, MenuButton } from '@/components';
-import { useApp, clearSearchForm, searchTwdForm, searchPdaForm } from '@/context';
-import { DECKID, TWD, PDA } from '@/constants';
-const SIMILAR = 'similar';
+import { Menu } from "@headlessui/react";
+import SymmetryVertical from "@icons/symmetry-vertical.svg?react";
+import { useNavigate } from "react-router";
+import { MenuButton, MenuItem, MenuItems } from "@/components";
+import { DECKID, PDA, TWD } from "@/constants";
+import { clearSearchForm, searchPdaForm, searchTwdForm, useApp } from "@/context";
+
+const SIMILAR = "similar";
 
 const DeckSearchSimilarButton = ({ deck }) => {
   const { isDesktop, setShowFloatingButtons, setShowMenuButtons } = useApp();
@@ -13,7 +13,7 @@ const DeckSearchSimilarButton = ({ deck }) => {
 
   const handleClick = (target) => {
     clearSearchForm(target);
-    const searchForm = target == PDA ? searchPdaForm : searchTwdForm;
+    const searchForm = target === PDA ? searchPdaForm : searchTwdForm;
     searchForm[SIMILAR] = deck[DECKID];
     navigate(`/${target}?q={"${SIMILAR}"%3A"${deck[DECKID]}"}`);
     setShowMenuButtons(false);
@@ -21,11 +21,11 @@ const DeckSearchSimilarButton = ({ deck }) => {
   };
 
   return (
-    <Menu as="div" className="relative">
+    <Menu>
       <MenuButton
         title="Search similar Decks in TWD/PDA"
         icon={<SymmetryVertical />}
-        variant={isDesktop ? 'secondary' : 'primary'}
+        variant={isDesktop ? "secondary" : "primary"}
         text="Similar Decks"
       />
       <MenuItems>

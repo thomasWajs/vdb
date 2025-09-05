@@ -1,5 +1,4 @@
-import React from 'react';
-import { DiffQuantityDiff } from '@/components';
+import { DiffQuantityDiff } from "@/components";
 
 const DiffQuantityDiffCard = ({ qFrom, qTo }) => {
   return (

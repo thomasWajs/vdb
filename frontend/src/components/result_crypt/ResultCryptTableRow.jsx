@@ -1,16 +1,10 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { useSnapshot } from 'valtio';
-import {
-  AccountLimitedDelCard,
-  ButtonAddCard,
-  ResultCryptTableRowCommon,
-  ResultUsed,
-} from '@/components';
-import { useApp, deckStore, deckCardChange } from '@/context';
-import { useSwipe } from '@/hooks';
-import { getIsEditable, getSwipedBg } from '@/utils';
-import { DECKID, CRYPT, ID, DECK } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { useSnapshot } from "valtio";
+import { ButtonAddCard, LimitedDelCard, ResultCryptTableRowCommon, ResultUsed } from "@/components";
+import { CRYPT, DECK, DECKID, ID } from "@/constants";
+import { deckCardChange, deckStore, useApp } from "@/context";
+import { useSwipe } from "@/hooks";
+import { getIsEditable, getSwipedBg } from "@/utils";
 
 const ResultCryptTableRow = ({
   card,
@@ -35,13 +29,13 @@ const ResultCryptTableRow = ({
     <tr
       {...swipeHandlers}
       className={twMerge(
-        'h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark',
+        "h-[38px] border-bgSecondary border-y dark:border-bgSecondaryDark",
         getSwipedBg(isSwiped),
       )}
     >
       {inLimited ? (
         <td className="min-w-[22px]">
-          <AccountLimitedDelCard cardid={card[ID]} target={inLimited} />
+          <LimitedDelCard cardid={card[ID]} target={inLimited} />
         </td>
       ) : (
         (inRecommendation || addMode) && (

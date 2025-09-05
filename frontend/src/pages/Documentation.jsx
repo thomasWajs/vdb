@@ -1,11 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router';
-import At from '@icons/at.svg?react';
-import Shuffle from '@icons/shuffle.svg?react';
-import SearchHeartFill from '@icons/search-heart-fill.svg?react';
-import PinAngleFill from '@icons/pin-angle-fill.svg?react';
-import ImageAlt from '@icons/image-alt.svg?react';
-import { Title, Banner } from '@/components';
+import At from "@icons/at.svg?react";
+import ImageAlt from "@icons/image-alt.svg?react";
+import PinAngleFill from "@icons/pin-angle-fill.svg?react";
+import SearchHeartFill from "@icons/search-heart-fill.svg?react";
+import Shuffle from "@icons/shuffle.svg?react";
+import { Link } from "react-router";
+import { Banner, Title } from "@/components";
 
 const SubTitle = ({ children }) => {
   return <div className="font-bold text-fgSecondary dark:text-fgSecondaryDark">{children}</div>;
@@ -55,6 +54,9 @@ const Documentation = () => {
               <li>
                 <a href="#tda">TDA search</a>
               </li>
+              <li>
+                <a href="#limited">Limited formats</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -79,7 +81,7 @@ const Documentation = () => {
                 Zurich & Zürich)
               </li>
               <li>
-                Accept{' '}
+                Accept{" "}
                 <a href="https://www.w3schools.com/python/python_regex.asp">
                   Python Regular Expressions
                 </a>
@@ -127,7 +129,7 @@ const Documentation = () => {
                 Zurich & Zürich)
               </li>
               <li>
-                Accept{' '}
+                Accept{" "}
                 <a href="https://www.w3schools.com/python/python_regex.asp">
                   Python Regular Expressions
                 </a>
@@ -335,7 +337,7 @@ const Documentation = () => {
                 library, excluding already played cards, shuffle it and draw back to your hand size)
               </li>
               <li>
-                Draw calculation code (requires a little programming literacy to read) is{' '}
+                Draw calculation code (requires a little programming literacy to read) is{" "}
                 <a href="https://github.com/smeea/vdb/blob/master/frontend/pages/components/drawProbability.js">
                   there
                 </a>
@@ -445,14 +447,14 @@ const Documentation = () => {
 
           <div>
             The only way to have Archon and Decks is to proactively COLLECT THEM. The initiative
-            behind it is{' '}
+            behind it is{" "}
             <a
               target="_blank"
               rel="noreferrer"
               href="https://static.krcg.org/data/tournament/index.html"
             >
               TOURNAMENTS DECKS ARCHIVE EXTENDED
-            </a>{' '}
+            </a>{" "}
             by Rune (Discord: rune3483). It requires efforts from organizers, so do not expect many
             tournaments to be available soon, but if you like the feature convince *and help* your
             organizer to gather that data.
@@ -462,6 +464,20 @@ const Documentation = () => {
             If you want to organize the tournament, collect the decks and have them at TWDA EXTENDED
             let me or Rune know (contacts at the bottom of <Link to="/about">About page</Link>) and
             we will direct you.
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <Title id="limited">Limited</Title>
+          <div>
+            This feature will let you use VDB for Limited formats (V5, 2-players or custom format)
+            and will highlight what cards in the deck are not compatible, and will restrict search
+            to only compatible cards.
+          </div>
+          <div>
+            To use it go to <Link to="/account">Account page</Link> and select format you want in
+            Limited dropdown menu. Limited toggle switch will show up in the top navigation bar (or
+            burger menu on mobile), using it you can enable or disable the feature.
           </div>
         </div>
       </div>

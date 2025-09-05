@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
-import People from '@icons/people.svg?react';
-import PeopleFill from '@icons/people-fill.svg?react';
-import { Spinner, DeckPublicToggleConfirmation, ButtonIconed } from '@/components';
-import { deckServices } from '@/services';
-import { useApp } from '@/context';
-import { PUBLIC_PARENT, PUBLIC_CHILD } from '@/constants';
+import People from "@icons/people.svg?react";
+import PeopleFill from "@icons/people-fill.svg?react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
+import { ButtonIconed, DeckPublicToggleConfirmation, Spinner } from "@/components";
+import { PUBLIC_CHILD, PUBLIC_PARENT } from "@/constants";
+import { useApp } from "@/context";
+import { deckServices } from "@/services";
 
-const DeckPublicToggleButton = ({ deck, inAdv }) => {
+const DeckPublicToggleButton = ({ deck, inAdv, className }) => {
   const { isDesktop, setShowMenuButtons, setShowFloatingButtons } = useApp();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,9 +32,10 @@ const DeckPublicToggleButton = ({ deck, inAdv }) => {
   return (
     <>
       <ButtonIconed
-        variant={inAdv || !isDesktop ? 'primary' : 'secondary'}
+        className={className}
+        variant={inAdv || !isDesktop ? "primary" : "secondary"}
         onClick={() => setShowConfirmation(true)}
-        title={`${isPublished ? 'In' : 'Not in'} Public Deck Archive`}
+        title={`${isPublished ? "In" : "Not in"} Public Deck Archive`}
         icon={
           !isLoading ? (
             (inAdv && !isPublished) || (!inAdv && isPublished) ? (
@@ -46,7 +47,7 @@ const DeckPublicToggleButton = ({ deck, inAdv }) => {
             <Spinner />
           )
         }
-        text={inAdv ? null : isPublished ? 'Remove from Public' : 'Make Public'}
+        text={inAdv ? null : isPublished ? "Remove from Public" : "Make Public"}
       />
       {showConfirmation && (
         <DeckPublicToggleConfirmation

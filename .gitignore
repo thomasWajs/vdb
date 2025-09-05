@@ -1,12 +1,11 @@
 **/.log/
 **/__pycache__/
-**/venv/
 **/migrations/
+**/.venv
+**/node_modules/
 backend/app.db
 backend/.env
-**/node_modules/
 frontend/dist/
-frontend/public/data/cardbase_crypt_playtest.json
-frontend/public/data/cardbase_lib_playtest.json
+frontend/public/data/*_playtest_*.json
 frontend/public/images/cards/playtest/
 misc/cards-update/playtest/

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { setLocalStorage, getLocalStorage } from '@/services/storageServices';
-import { AUTO, DARK, LIGHT } from '@/constants';
-const THEME = 'theme';
-const TOGGLE_THEME = 'toggleTheme';
+import React, { useEffect, useState } from "react";
+import { AUTO, DARK, LIGHT } from "@/constants";
+import { getLocalStorage, setLocalStorage } from "@/services/storageServices";
+
+const THEME = "theme";
+const TOGGLE_THEME = "toggleTheme";
 
 export const ThemeContext = React.createContext({
   [THEME]: AUTO,
@@ -13,8 +14,8 @@ export const ThemeProvider = (props) => {
   const [theme, setTheme] = useState(getLocalStorage(THEME) ?? AUTO);
 
   useEffect(() => {
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? DARK : LIGHT;
-    const root = document.getElementsByTagName('html')[0];
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+    const root = document.getElementsByTagName("html")[0];
     root.className = theme === AUTO ? systemTheme : theme;
   }, [theme]);
 

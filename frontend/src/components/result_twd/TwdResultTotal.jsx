@@ -1,8 +1,7 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
-import { SortButton, Header } from '@/components';
-import { useApp } from '@/context';
-import { CREATION_DATE } from '@/constants';
+import { twMerge } from "tailwind-merge";
+import { Header, SortButton } from "@/components";
+import { CREATION_DATE } from "@/constants";
+import { useApp } from "@/context";
 
 const TwdResultTotal = ({ results, sortMethods, sortMethod, setSortMethod }) => {
   const { isMobile } = useApp();
@@ -16,11 +15,11 @@ const TwdResultTotal = ({ results, sortMethods, sortMethod, setSortMethod }) => 
   return (
     <Header
       className={twMerge(
-        'sm:space-x-2',
-        isMobile && Object.keys(byYear).length > 10 ? 'block' : 'flex',
+        "sm:space-x-2",
+        isMobile && Object.keys(byYear).length > 10 ? "block" : "flex",
       )}
     >
-      <div className="whitespace-nowrap p-2 font-bold">TOTAL: {results.length}</div>
+      <div className="whitespace-nowrap p-1 font-bold sm:p-2">TOTAL: {results.length}</div>
       <div>
         {Object.keys(byYear)
           .toReversed()

@@ -1,11 +1,10 @@
-import React from 'react';
 import {
-  ReviewApplyButton,
-  ReviewCopyUrlButton,
-  ReviewCopyTextButton,
   DiffBackButton,
-} from '@/components';
-import { DECKID } from '@/constants';
+  ReviewApplyButton,
+  ReviewCopyTextButton,
+  ReviewCopyUrlButton,
+} from "@/components";
+import { DECKID } from "@/constants";
 
 const ReviewButtons = ({ parentId, deck, urlDiff }) => {
   return (

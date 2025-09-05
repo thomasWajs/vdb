@@ -1,9 +1,9 @@
-import React from 'react';
-import { DeckProxyCryptTable, ResultModal, Header, FlexGapped } from '@/components';
-import { countCards } from '@/utils';
-import { useApp } from '@/context';
-import { useModalCardController, useDeckCrypt } from '@/hooks';
-import { CRYPT, PRINT, INVENTORY_TYPE } from '@/constants';
+import { useCallback } from "react";
+import { DeckProxyCryptTable, FlexGapped, Header, ResultModal } from "@/components";
+import { CRYPT, INVENTORY_TYPE, PRINT } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckCrypt, useModalCardController } from "@/hooks";
+import { countCards } from "@/utils";
 
 const DeckProxyCrypt = ({
   deck,
@@ -12,7 +12,7 @@ const DeckProxyCrypt = ({
   handleSetSelector,
   handleProxyCounter,
 }) => {
-  const { cryptDeckSort, setShowFloatingButtons } = useApp();
+  const { cryptDeckSort, setShowFloatingButtons, isDesktop } = useApp();
   const { cryptSide, sortedCards, sortedCardsSide } = useDeckCrypt(deck[CRYPT], cryptDeckSort);
 
   const proxiesToPrint = Object.keys(proxySelected)
@@ -32,20 +32,26 @@ const DeckProxyCrypt = ({
     handleModalCardClose,
   } = useModalCardController(sortedCards, sortedCardsSide);
 
-  const handleClick = (card) => {
-    handleModalCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClick = useCallback(
+    (card) => {
+      handleModalCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [sortedCards, sortedCardsSide],
+  );
 
-  const handleClickSide = (card) => {
-    handleModalSideCardOpen(card);
-    setShowFloatingButtons(false);
-  };
+  const handleClickSide = useCallback(
+    (card) => {
+      handleModalSideCardOpen(card);
+      !isDesktop && setShowFloatingButtons(false);
+    },
+    [sortedCards, sortedCardsSide],
+  );
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     handleModalCardClose();
-    setShowFloatingButtons(true);
-  };
+    !isDesktop && setShowFloatingButtons(true);
+  }, [sortedCards, sortedCardsSide]);
 
   return (
     <FlexGapped className="flex-col">

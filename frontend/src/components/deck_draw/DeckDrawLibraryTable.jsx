@@ -1,7 +1,6 @@
-import React from 'react';
-import { ResultLibraryTableRowCommon, DeckDrawProbability } from '@/components';
-import { useApp } from '@/context';
-import { ID, NAME } from '@/constants';
+import { useCallback } from "react";
+import { DeckDrawProbability, ResultLibraryTableRowCommon, Tr } from "@/components";
+import { ID, NAME } from "@/constants";
 
 const DeckDrawLibraryTable = ({
   handleClick,
@@ -10,8 +9,6 @@ const DeckDrawLibraryTable = ({
   resultCards,
   ashHeap,
 }) => {
-  const { isMobile } = useApp();
-
   const N = restCards && resultCards ? restCards.length + resultCards.length : 0;
   const n = resultCards ? resultCards.length : 0;
   const nonPlayed = {};
@@ -26,22 +23,27 @@ const DeckDrawLibraryTable = ({
     });
   }
 
+  const onChange = useCallback(
+    (idx) => {
+      handleClick(idx);
+    },
+    [handleClick],
+  );
+
   return (
-    <table className="w-full border-bgSecondary dark:border-bgSecondaryDark sm:border">
+    <table className="w-full border-bgSecondary sm:border dark:border-bgSecondaryDark">
       <tbody>
         {resultCards.map((card, idx) => {
           return (
-            <tr
-              key={idx}
-              className="row-bg h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark"
-            >
+            <Tr key={idx}>
               <ResultLibraryTableRowCommon
                 card={card}
-                handleClick={() => handleClick(idx)}
+                handleClick={onChange}
+                idx={idx}
                 shouldShowModal={shouldShowModal}
               />
-              {(!ashHeap || !isMobile) && (
-                <td className="min-w-[45px] text-right text-fgSecondary dark:text-fgSecondaryDark sm:p-1">
+              {!ashHeap && (
+                <td className="min-w-[45px] p-1 text-right text-fgSecondary max-sm:hidden dark:text-fgSecondaryDark">
                   {!ashHeap && (
                     <DeckDrawProbability
                       cardName={card[NAME]}
@@ -52,7 +54,7 @@ const DeckDrawLibraryTable = ({
                   )}
                 </td>
               )}
-            </tr>
+            </Tr>
           );
         })}
       </tbody>

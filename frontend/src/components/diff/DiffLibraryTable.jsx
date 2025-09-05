@@ -1,6 +1,5 @@
-import React from 'react';
-import { DiffLibraryTableRow } from '@/components';
-import { ID } from '@/constants';
+import { DiffLibraryTableRow } from "@/components";
+import { ID } from "@/constants";
 
 const DiffLibraryTable = ({
   cardChange,
@@ -14,7 +13,7 @@ const DiffLibraryTable = ({
   handleClick,
 }) => {
   return (
-    <table className="w-full border-bgSecondary dark:border-bgSecondaryDark sm:border">
+    <table className="w-full border-bgSecondary sm:border dark:border-bgSecondaryDark">
       <tbody>
         {cards.map((card) => {
           return (

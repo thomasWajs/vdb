@@ -1,21 +1,18 @@
-import React from 'react';
-import { Menu } from '@headlessui/react';
-import SortDown from '@icons/sort-down.svg?react';
-import { MenuItems, MenuItem, MenuButton } from '@/components';
-import { capitalize } from '@/utils';
-
-const RelativeDiv = (props) => {
-  return <div className="relative" {...props} />;
-};
+import { Menu } from "@headlessui/react";
+import SortDown from "@icons/sort-down.svg?react";
+import { MenuButton, MenuItem, MenuItems } from "@/components";
+import { capitalize } from "@/utils";
 
 const SortButton = ({ sortMethod, setSortMethod, sortMethods, noText, className }) => {
   return (
-    <Menu as={RelativeDiv}>
+    <Menu>
       <MenuButton
         className={className}
         title="Sort"
         icon={<SortDown />}
-        text={noText ? null : capitalize(sortMethods[sortMethod])}
+        text={
+          !noText && <div className="whitespace-nowrap">{capitalize(sortMethods[sortMethod])}</div>
+        }
       />
       <MenuItems>
         {Object.keys(sortMethods).map((i) => {

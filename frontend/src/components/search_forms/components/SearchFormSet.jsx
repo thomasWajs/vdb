@@ -1,12 +1,11 @@
-import React from 'react';
+import setsAndPrecons from "@/assets/data/setsAndPrecons.json";
 import {
-  Select,
+  Checkbox,
   SearchAdditionalForms,
   SearchFormButtonAdd,
   SearchFormButtonDel,
-  Checkbox,
-} from '@/components';
-import { useApp } from '@/context';
+  Select,
+} from "@/components";
 import {
   AGE,
   ANY,
@@ -26,12 +25,12 @@ import {
   REPRINT,
   SET,
   TITLE,
-} from '@/constants';
-import setsAndPrecons from '@/assets/data/setsAndPrecons.json';
+  TWO_P,
+} from "@/constants";
+import { useApp } from "@/context";
 
 const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
-  const { playtestMode, isMobile, isXWide } = useApp();
-  const menuHeight = isXWide ? 500 : 350;
+  const { playtestMode, isMobile } = useApp();
   const name = SET;
 
   const options = [
@@ -58,8 +57,8 @@ const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
   ];
 
   Object.keys(setsAndPrecons)
-    .filter((set) => playtestMode || set !== PLAYTEST)
-    .map((set) => {
+    .filter((set) => (playtestMode || set !== PLAYTEST) && set !== TWO_P)
+    .forEach((set) => {
       const year = set === PLAYTEST ? null : setsAndPrecons[set][DATE].slice(2, 4);
       const fullName = setsAndPrecons[set][NAME];
 
@@ -96,7 +95,7 @@ const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
           <div className="font-bold text-fgSecondary dark:text-fgSecondaryDark">Set:</div>
           {value.value[0] !== ANY && (
             <div className="flex justify-end gap-1 px-1">
-              {value.value.length == 1 ? (
+              {value.value.length === 1 ? (
                 <SearchFormButtonAdd searchForm={searchForm} name={name} />
               ) : (
                 <SearchFormButtonDel searchForm={searchForm} i={0} name={name} />
@@ -109,9 +108,9 @@ const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
             options={options}
             isSearchable={!isMobile}
             isClearable={value.value[0] !== ANY}
+            menuPlacement="top"
             filterOption={filterOption}
             name={0}
-            menuHeight={menuHeight}
             value={options.find((obj) => obj.value === value.value[0])}
             onChange={(e, id) => (e ? onChange(e, id) : onChange({ name: name, value: ANY }, id))}
           />
@@ -125,7 +124,6 @@ const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
           searchForm={searchForm}
           options={options}
           onChange={onChange}
-          menuHeight={menuHeight}
         />
       )}
       <div className="flex flex-col gap-2">
@@ -133,23 +131,23 @@ const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
           {[
             {
               value: OR_NEWER,
-              label: 'Or Newer',
-              title: 'Printed in selected set or any newer (can be in older sets too)',
+              label: "Or Newer",
+              title: "Printed in selected set or any newer (can be in older sets too)",
             },
             {
               value: OR_OLDER,
-              label: 'Or Older',
-              title: 'Printed in selected set or any older (can be in newer sets too)',
+              label: "Or Older",
+              title: "Printed in selected set or any older (can be in newer sets too)",
             },
             {
               value: NOT_NEWER,
-              label: 'Not Newer',
-              title: 'Not printed in newer set',
+              label: "Not Newer",
+              title: "Not printed in newer set",
             },
             {
               value: NOT_OLDER,
-              label: 'Not Older',
-              title: 'Not printed in older set',
+              label: "Not Older",
+              title: "Not printed in older set",
             },
           ].map((i) => {
             return (
@@ -176,18 +174,18 @@ const SearchFormSet = ({ value, searchForm, onChange, onChangeOptions }) => {
           {[
             {
               value: ONLY,
-              label: 'Only In',
-              title: 'Printed only in selected Set',
+              label: "Only In",
+              title: "Printed only in selected Set",
             },
             {
               value: FIRST,
-              label: 'First Print',
-              title: 'Printed first in selected Set',
+              label: "First Print",
+              title: "Printed first in selected Set",
             },
             {
               value: REPRINT,
-              label: 'Reprint',
-              title: 'Reprinted in selected Set',
+              label: "Reprint",
+              title: "Reprinted in selected Set",
             },
           ].map((i) => {
             return (

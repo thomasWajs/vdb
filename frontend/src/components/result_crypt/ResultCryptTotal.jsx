@@ -1,10 +1,8 @@
-import React from 'react';
-import XIcon from '@icons/x.svg?react';
-import InfoCircle from '@icons/info-circle.svg?react';
-import { ANY } from '@/constants';
-import { Button, SortButton, Header } from '@/components';
-import { setCryptCompare } from '@/context';
-import { X, GROUP, CAPACITY } from '@/constants';
+import InfoCircle from "@icons/info-circle.svg?react";
+import XIcon from "@icons/x.svg?react";
+import { Button, Header, SortButton } from "@/components";
+import { ANY, CAPACITY, GROUP, X } from "@/constants";
+import { setCryptCompare } from "@/context";
 
 const ResultCryptTotal = ({
   cards,
@@ -19,7 +17,7 @@ const ResultCryptTotal = ({
   const byGroupsCapacityTotal = {};
   let total = 0;
 
-  cards.map((card) => {
+  cards.forEach((card) => {
     if (byGroups[card[GROUP]]) {
       byGroups[card[GROUP]] += 1;
     } else {
@@ -35,15 +33,15 @@ const ResultCryptTotal = ({
 
   return (
     <Header>
-      <div className="whitespace-nowrap p-2 font-bold">
-        {inHoF ? 'CRYPT' : inCompare ? 'COMPARE' : 'TOTAL'}: {total}
+      <div className="whitespace-nowrap p-1 font-bold sm:p-2">
+        {inHoF ? "CRYPT" : inCompare ? "COMPARE" : "TOTAL"}: {total}
       </div>
       <div>
         {Object.keys(byGroups).map((k) => {
           return (
             <div key={k} className="inline-block whitespace-nowrap px-2">
               <div className="inline pr-0.5 font-bold text-fgSecondary dark:text-fgSecondaryDark">
-                G{k == ANY ? X : k}:
+                G{k === ANY ? X : k}:
               </div>
               {byGroups[k]}
               {!inHoF && (
@@ -55,7 +53,7 @@ const ResultCryptTotal = ({
           );
         })}
       </div>
-      <div className={inCompare ? 'flex' : ''}>
+      <div className={inCompare ? "flex" : ""}>
         {inCompare ? (
           <div>
             <Button title="Clear Compare" onClick={() => setCryptCompare(undefined)}>

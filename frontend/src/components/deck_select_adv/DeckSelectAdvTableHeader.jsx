@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import Shuffle from '@icons/shuffle.svg?react';
-import PinAngleFill from '@icons/pin-angle-fill.svg?react';
-import At from '@icons/at.svg?react';
-import { DeckSelectAdvTagsFilter, Select, Checkbox, Input } from '@/components';
-import { useDebounce } from '@/hooks';
-import { useApp } from '@/context';
-import { TYPE_DEBOUNCE_DELAY, S, H, ANY } from '@/constants';
+import At from "@icons/at.svg?react";
+import PinAngleFill from "@icons/pin-angle-fill.svg?react";
+import Shuffle from "@icons/shuffle.svg?react";
+import { useState } from "react";
+import { Checkbox, DeckSelectAdvTagsFilter, Input, Select } from "@/components";
+import { ANY, H, NAME, S, TYPE_DEBOUNCE_DELAY } from "@/constants";
+import { useApp } from "@/context";
+import { useDebounce } from "@/hooks";
 
 const DeckSelectAdvTableHeader = ({
   allTagsOptions,
@@ -23,18 +23,18 @@ const DeckSelectAdvTableHeader = ({
   isSelectedAll,
   short,
 }) => {
-  const { inventoryMode, isMobile, isNarrow, isDesktop } = useApp();
+  const { inventoryMode, isMobile } = useApp();
 
-  const [debouncedNameFilter, setDebouncedNameFilter] = useState('');
+  const [debouncedNameFilter, setDebouncedNameFilter] = useState("");
   useDebounce(() => setNameFilter(debouncedNameFilter), TYPE_DEBOUNCE_DELAY, [debouncedNameFilter]);
 
   const invOptions = [
     {
       value: ANY,
-      label: 'ANY',
+      label: "ANY",
     },
     {
-      value: '',
+      value: "",
       label: (
         <div className="flex justify-center">
           <At />
@@ -78,8 +78,8 @@ const DeckSelectAdvTableHeader = ({
   return (
     <thead>
       <tr>
-        {!(short || isMobile) && (
-          <th className="min-w-[30px]">
+        {!short && (
+          <th className="min-w-[30px] max-sm:hidden">
             <Checkbox
               name="selectAll"
               checked={isSelectedAll}
@@ -88,42 +88,39 @@ const DeckSelectAdvTableHeader = ({
             />
           </th>
         )}
-        {inventoryMode && !isMobile && (
-          <th className="min-w-[52px]">
+        {inventoryMode && (
+          <th className="min-w-[52px] py-1 max-sm:hidden">
             <Select
               options={invOptions}
               onChange={(e) => setInvFilter(e.value)}
               value={invOptions.find((obj) => obj.value === invFilter)}
-              isSearchable={false}
               noDropdown
             />
           </th>
         )}
-        {(short || !isMobile) && (
-          <th className="min-w-[60px] sm:min-w-[70px]">
-            <Select
-              options={clanOptions}
-              onChange={(e) => setClanFilter(e.value)}
-              value={clanOptions.find((obj) => obj.value === clanFilter.toLowerCase())}
-              isSearchable
-              noDropdown
-            />
-          </th>
-        )}
-        <th className="min-w-[45vw] sm:min-w-[340px]">
+        <th className="min-w-[60px] p-1 max-sm:hidden sm:min-w-[70px]">
+          <Select
+            options={clanOptions}
+            onChange={(e) => setClanFilter(e.value)}
+            value={clanOptions.find((obj) => obj.value === clanFilter.toLowerCase())}
+            isSearchable={!isMobile}
+            noDropdown
+          />
+        </th>
+        <th className="min-w-[45vw] max-sm:p-1 sm:min-w-[340px] sm:py-1">
           <Input
             placeholder="Filter by Deck or Card Name"
-            name="text"
+            name={NAME}
             autoComplete="off"
             spellCheck="false"
             value={debouncedNameFilter}
             onChange={handleChangeNameFilter}
           />
         </th>
-        {!short && isDesktop && <th className="min-w-[30px] sm:min-w-[45px]" />}
-        {!short && !isNarrow && <th className="min-w-[100px] sm:min-w-[105px]" />}
+        {!short && <th className="min-w-[45px] max-xl:hidden" />}
+        {!short && <th className="min-w-[105px] max-md:hidden" />}
         {!short && (
-          <th className="w-full px-1 max-sm:px-0.5">
+          <th className="w-full p-1 text-start max-md:hidden">
             <DeckSelectAdvTagsFilter
               tagsFilter={tagsFilter}
               handleChangeTagsFilter={handleChangeTagsFilter}
@@ -131,19 +128,11 @@ const DeckSelectAdvTableHeader = ({
             />
           </th>
         )}
-        <th colSpan={short ? 2 : 1}>
-          <div className="flex items-center justify-end p-1">
+        <th colSpan={short ? 2 : 1} className="p-1">
+          <div className="flex items-center justify-end">
             <Checkbox
               name="revFilter"
-              label={
-                isDesktop ? (
-                  <div className="whitespace-nowrap">Show Revisions</div>
-                ) : isMobile ? (
-                  'R'
-                ) : (
-                  'Rev'
-                )
-              }
+              label={<div className="whitespace-nowrap">{isMobile ? "R" : "Show Revisions"}</div>}
               checked={revFilter}
               onChange={() => setRevFilter(!revFilter)}
             />

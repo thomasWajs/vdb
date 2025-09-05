@@ -1,8 +1,7 @@
-import React from 'react';
-import { ResultCryptTableRowCommon, DeckDrawProbability } from '@/components';
-import { getKeyDisciplines } from '@/utils';
-import { useApp } from '@/context';
-import { ID, NAME } from '@/constants';
+import { useCallback } from "react";
+import { DeckDrawProbability, ResultCryptTableRowCommon, Tr } from "@/components";
+import { ID, NAME } from "@/constants";
+import { getKeyDisciplines } from "@/utils";
 
 const DeckDrawCryptTable = ({
   handleClick,
@@ -12,9 +11,7 @@ const DeckDrawCryptTable = ({
   ashHeap,
   crypt,
 }) => {
-  const { isMobile } = useApp();
   const { disciplinesSet, keyDisciplines } = getKeyDisciplines(crypt);
-
   const N = restCards && resultCards ? restCards.length + resultCards.length : 0;
   const n = resultCards ? resultCards.length : 0;
   const nonPlayed = {};
@@ -29,25 +26,30 @@ const DeckDrawCryptTable = ({
     });
   }
 
+  const onChange = useCallback(
+    (idx) => {
+      handleClick(idx);
+    },
+    [handleClick],
+  );
+
   return (
-    <table className="w-full border-bgSecondary dark:border-bgSecondaryDark sm:border">
+    <table className="w-full border-bgSecondary sm:border dark:border-bgSecondaryDark">
       <tbody>
         {resultCards.map((card, idx) => {
           return (
-            <tr
-              key={idx}
-              className="row-bg h-[38px] border-y border-bgSecondary dark:border-bgSecondaryDark"
-            >
+            <Tr key={idx}>
               <ResultCryptTableRowCommon
                 card={card}
                 shouldShowModal={shouldShowModal}
-                handleClick={() => handleClick(idx)}
+                handleClick={onChange}
                 keyDisciplines={keyDisciplines}
                 disciplinesSet={disciplinesSet}
+                idx={idx}
                 inDeck
               />
-              {(!ashHeap || !isMobile) && (
-                <td className="min-w-[45px] text-right text-fgSecondary dark:text-fgSecondaryDark sm:p-1">
+              {!ashHeap && (
+                <td className="min-w-[45px] p-1 text-right text-fgSecondary max-sm:hidden dark:text-fgSecondaryDark">
                   {!ashHeap && (
                     <DeckDrawProbability
                       cardName={card[NAME]}
@@ -58,7 +60,7 @@ const DeckDrawCryptTable = ({
                   )}
                 </td>
               )}
-            </tr>
+            </Tr>
           );
         })}
       </tbody>

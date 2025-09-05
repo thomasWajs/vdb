@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import Link45Deg from '@icons/link-45deg.svg?react';
-import ClipboardFill from '@icons/clipboard-fill.svg?react';
-import { FlexGapped, Modal, Button, ButtonIconed } from '@/components';
-import { useApp } from '@/context';
-import { inventoryServices } from '@/services';
+import ClipboardFill from "@icons/clipboard-fill.svg?react";
+import Link45Deg from "@icons/link-45deg.svg?react";
+import { useState } from "react";
+import { Button, ButtonIconed, FlexGapped, Modal } from "@/components";
+import { useApp } from "@/context";
+import { inventoryServices } from "@/services";
 
 const InventoryShareModal = ({ setShow }) => {
   const { isMobile, setShowFloatingButtons, setShowMenuButtons, inventoryKey, setInventoryKey } =
@@ -65,7 +65,7 @@ const InventoryShareModal = ({ setShow }) => {
         </div>
         <div className="flex justify-end gap-2 max-sm:flex-col">
           <ButtonIconed
-            variant={success ? 'success' : 'primary'}
+            variant={success ? "success" : "primary"}
             onClick={handleClick}
             title="Create URL"
             icon={<Link45Deg width="19" height="19" viewBox="0 0 14 14" />}

@@ -1,14 +1,14 @@
-import React from 'react';
-import { useSnapshot } from 'valtio';
+import { useSnapshot } from "valtio";
 import {
-  DeckCardQuantityTd,
-  ResultLibraryTableRowCommon,
   Checkbox,
+  DeckCardQuantityTd,
   DeckProxyTableSetSelect,
-} from '@/components';
-import { useApp, usedStore, inventoryStore } from '@/context';
-import { getSoftMax, getHardTotal } from '@/utils';
-import { ID, PRINT, SET, SOFT, HARD, LIBRARY } from '@/constants';
+  ResultLibraryTableRowCommon,
+  Tr,
+} from "@/components";
+import { HARD, ID, LIBRARY, PRINT, SET, SOFT } from "@/constants";
+import { inventoryStore, usedStore } from "@/context";
+import { getHardTotal, getSoftMax } from "@/utils";
 
 const DeckProxyLibraryTableRow = ({
   handleClick,
@@ -19,7 +19,6 @@ const DeckProxyLibraryTableRow = ({
   inventoryType,
   card,
 }) => {
-  const { isMobile } = useApp();
   const inventoryLibrary = useSnapshot(inventoryStore)[LIBRARY];
   const usedLibrary = useSnapshot(usedStore)[LIBRARY];
   const inInventory = inventoryLibrary[card.c[ID]]?.q ?? 0;
@@ -27,12 +26,12 @@ const DeckProxyLibraryTableRow = ({
   const hardUsedTotal = getHardTotal(usedLibrary[HARD][card.c[ID]]) ?? 0;
 
   return (
-    <tr key={card.c[ID]} className="row-bg border-y border-bgSecondary dark:border-bgSecondaryDark">
-      <td className="min-w-[25px]">
+    <Tr key={card.c[ID]}>
+      <td className="min-w-[30px]">
         <div className="flex items-center justify-center">
           <Checkbox
             value={card.c[ID]}
-            name="print"
+            name={PRINT}
             checked={proxySelected[card.c[ID]]?.[PRINT]}
             onChange={handleProxySelector}
           />
@@ -52,14 +51,13 @@ const DeckProxyLibraryTableRow = ({
         softUsedMax={softUsedMax}
       />
       <ResultLibraryTableRowCommon card={card.c} handleClick={handleClick} inDeck />
-      {!isMobile && (
-        <DeckProxyTableSetSelect
-          card={card.c}
-          handleSetSelector={handleSetSelector}
-          value={proxySelected[card.c[ID]]?.[SET]}
-        />
-      )}
-    </tr>
+      <DeckProxyTableSetSelect
+        className="max-sm:hidden"
+        card={card.c}
+        handleSetSelector={handleSetSelector}
+        value={proxySelected[card.c[ID]]?.[SET]}
+      />
+    </Tr>
   );
 };
 

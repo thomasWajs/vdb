@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import InfoCircle from '@icons/info-circle.svg?react';
-import PlusLg from '@icons/plus-lg.svg?react';
+import InfoCircle from "@icons/info-circle.svg?react";
+import PlusLg from "@icons/plus-lg.svg?react";
+import { useState } from "react";
 import {
   Button,
-  DeckNewCard,
   DeckLibraryTotalInfo,
+  DeckNewCard,
+  Header,
   ResultLibraryCost,
   Warning,
-  Header,
-} from '@/components';
-import { useApp } from '@/context';
-import { getIsEditable } from '@/utils';
-import { useDeckLibrary } from '@/hooks';
-import { DECKID, POOL, BLOOD, X, LIBRARY, LIMITED, BANNED, PLAYTEST } from '@/constants';
+} from "@/components";
+import { BANNED, BLOOD, DECKID, LIBRARY, LIMITED, PLAYTEST, POOL, X } from "@/constants";
+import { useApp } from "@/context";
+import { useDeckLibrary } from "@/hooks";
+import { getIsEditable } from "@/utils";
 
 const DeckLibraryHeader = ({
   inMissing,
@@ -25,7 +25,7 @@ const DeckLibraryHeader = ({
   bloodTotalDiff,
   forceIsEditable,
 }) => {
-  const { limitedMode, isMobile } = useApp();
+  const { limitedMode } = useApp();
   const [showAdd, setShowAdd] = useState(false);
 
   const {
@@ -52,13 +52,23 @@ const DeckLibraryHeader = ({
           <div className="flex basis-full items-center justify-between gap-2 px-2 font-bold">
             <div className="flex">
               Library [{libraryTotalDiff ?? libraryTotal}
-              {!inMissing && (libraryTotal < 60 || libraryTotal > 90) && ' of 60-90'}]
+              {!inMissing && (libraryTotal < 60 || libraryTotal > 90) && " of 60-90"}]
             </div>
             <div className="flex gap-2">
               {!inMissing && (
                 <>
                   {hasBanned && <Warning type={BANNED} />}
-                  {limitedMode && hasLimited && <Warning type={LIMITED} />}
+                  {limitedMode && hasLimited && (
+                    <div className="flex gap-1">
+                      <Warning type={LIMITED} />
+                      <div
+                        className="flex font-normal text-fgRed dark:text-fgRedDark"
+                        title="Restricted Cards"
+                      >
+                        [{Math.round((hasLimited / libraryTotal) * 100)}%]
+                      </div>
+                    </div>
+                  )}
                   {hasPlaytest && <Warning type={PLAYTEST} />}
                 </>
               )}
@@ -74,7 +84,7 @@ const DeckLibraryHeader = ({
                       title="Rescaled for 90 cards library"
                     >
                       ({rescaledBloodTotal}
-                      <div className="text-[9px] font-normal">90</div>)
+                      <div className="font-normal text-2xs">90</div>)
                     </div>
                   )}
                 </div>
@@ -87,7 +97,7 @@ const DeckLibraryHeader = ({
                       title="Rescaled for 90 cards library"
                     >
                       ({rescaledPoolTotal}
-                      <div className="text-[9px] font-normal">90</div>)
+                      <div className="font-normal text-2xs">90</div>)
                     </div>
                   )}
                 </div>
@@ -102,8 +112,12 @@ const DeckLibraryHeader = ({
             >
               <InfoCircle />
             </Button>
-            {isEditable && !isMobile && (
-              <Button className="min-h-10" title="Add Card" onClick={() => setShowAdd(!showAdd)}>
+            {isEditable && (
+              <Button
+                className="min-h-10 max-sm:hidden"
+                title="Add Card"
+                onClick={() => setShowAdd(!showAdd)}
+              >
                 <PlusLg width="15" height="15" viewBox="0 0 16 16" />
               </Button>
             )}

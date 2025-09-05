@@ -1,5 +1,4 @@
-import React from 'react';
-import { twMerge } from 'tailwind-merge';
+import { twMerge } from "tailwind-merge";
 import {
   ButtonCloseModal,
   Hr,
@@ -8,30 +7,30 @@ import {
   ResultLibraryCost,
   ResultLibraryDisciplines,
   ResultLibraryRequirements,
+  ResultLibraryTypeImage,
   ResultMiscImage,
   ResultName,
-  ResultPathImage,
   ResultNameAka,
-  ResultLibraryTypeImage,
-} from '@/components';
-import { getLegality } from '@/utils';
-import { useApp } from '@/context';
+  ResultPathImage,
+} from "@/components";
 import {
   AKA,
   BANNED,
   BLOOD,
   BURN,
   CLAN,
+  CONVICTION,
   DISCIPLINE,
   ID,
+  PATH,
   PLAYTEST,
   POOL,
   REQUIREMENT,
   TRIFLE,
   TYPE,
-  CONVICTION,
-  PATH,
-} from '@/constants';
+} from "@/constants";
+import { useApp } from "@/context";
+import { getLegality } from "@/utils";
 
 const Requirements = ({ card }) => {
   return (
@@ -81,8 +80,8 @@ const ResultLibraryLayoutText = ({ card, handleClose, noClose, inPopover }) => {
       <div className="flex items-center justify-between">
         <div
           className={twMerge(
-            'flex justify-between gap-3 whitespace-nowrap',
-            (isMobile || inPopover) && 'flex-col gap-1.5',
+            "flex justify-between gap-3 whitespace-nowrap",
+            (isMobile || inPopover) && "flex-col gap-1.5",
           )}
         >
           <div className="flex items-center justify-between gap-2 whitespace-nowrap">
@@ -98,8 +97,8 @@ const ResultLibraryLayoutText = ({ card, handleClose, noClose, inPopover }) => {
         <div
           className={
             noClose || inPopover || isNarrow
-              ? 'hidden max-h-0 max-w-0 opacity-0'
-              : 'flex justify-center'
+              ? "hidden max-h-0 max-w-0 opacity-0"
+              : "flex justify-center"
           }
         >
           <ButtonCloseModal handleClick={handleClose} />
